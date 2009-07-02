@@ -70,9 +70,9 @@ private:
 	RequestParams(RequestParams const &);
 	RequestParams& operator = (RequestParams const &);
 
-	typedef typename Setup::template Allocator<StringType>::Type StringAllocatorType;
-	typedef std::map<StringType, StringType, std::less<StringType>, StringAllocatorType> VarMapType;
-	typedef std::multimap<StringType, StringType, std::less<StringType>, StringAllocatorType> ArgMapType;
+	typedef typename Setup::template Allocator<ParamType>::Type ParamAllocatorType;
+	typedef std::map<StringType, StringType, std::less<StringType>, ParamAllocatorType> VarMapType;
+	typedef std::multimap<StringType, StringType, std::less<StringType>, ParamAllocatorType> ArgMapType;
 	
 	void parseVar(char const *var);
 	void parseCookies(StringType const &cookies);
