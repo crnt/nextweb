@@ -1,0 +1,21 @@
+SCRIPT_NAME=/user
+SERVER_NAME=musicbay
+PATH_INFO=/pathed
+HTTP_ACCEPT=*/*
+REQUEST_METHOD=GET
+SCRIPT_FILENAME=/var/www/musicbay/htdocs/user
+SERVER_SOFTWARE=lighttpd/1.4.20
+HTTP_USER_AGENT=curl/7.18.0 (i486-pc-linux-gnu) libcurl/7.18.0 OpenSSL/0.9.8g zlib/1.2.3.3 libidn/1.1
+QUERY_STRING=id=10&data=my%20data
+REMOTE_PORT=52649
+SERVER_PORT=80
+REDIRECT_STATUS=200
+REMOTE_ADDR=127.0.0.1
+FCGI_ROLE=RESPONDER
+SERVER_PROTOCOL=HTTP/1.1
+REQUEST_URI=/user/pathed?id=10&data=my%20data
+GATEWAY_INTERFACE=CGI/1.1
+SERVER_ADDR=127.0.0.1
+DOCUMENT_ROOT=/var/www/musicbay/htdocs
+HTTP_HOST=musicbay
+PATH_TRANSLATED=/var/www/musicbay/htdocs/pathed

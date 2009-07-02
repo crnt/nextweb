@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: nextweb
+Description: nextweb is a modern web framework for python and C++.
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lnextweb-daemon
+Cflags: -I${includedir}

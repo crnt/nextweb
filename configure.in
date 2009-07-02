@@ -1,0 +1,33 @@
+AC_INIT([nextweb], [0.2.4], [highpower@mail.ru])
+AM_INIT_AUTOMAKE(1.9)
+
+AC_GNU_SOURCE
+AC_CONFIG_HEADERS(config/config.h)
+
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_CXXCPP
+AC_PROG_LIBTOOL
+
+AC_LANG([C++])
+
+AM_PATH_PYTHON
+AM_MAINTAINER_MODE
+
+AX_PREFIX_CONFIG_H(config/acsetup.hpp)
+for i in -W -Wall -Wextra -fexceptions -frtti -ftemplate-depth-128; do
+	AX_CHECK_COMPILER_FLAGS([$i], [CXXFLAGS="$CXXFLAGS $i"], [])
+done
+
+AC_PYTHON_DEVEL
+
+AX_CHECK_CPPUNIT([1.10.0], [], [
+	AC_MSG_WARN([cppunit not found. compilation of tests disabled])
+])
+
+AC_CONFIG_FILES([Makefile include/Makefile include/nextweb/Makefile 
+	include/details/Makefile library/Makefile regions/Makefile 
+	python/Makefile python/nextweb-compile python/nextweb-regc 
+	tests/Makefile extra/Makefile extra/nextweb.pc])
+
+AC_OUTPUT

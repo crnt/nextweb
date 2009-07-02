@@ -1,0 +1,20 @@
+Nextweb is a modern web framework for C++ and python. It is completely
+different from Django and others because it was designed and developed 
+essentially for high-loaded sites.
+
+Four main parts of this framework are:
+
+ * precompiled templates, which are efficient, modular and extensible
+   with token rewriting mechanism
+
+ * fastcgi server, implemening different request handling stratgies
+   including "thread pool", "thread per request" of "web-server spawned"
+
+ * user input checking functions
+
+ * common facilities, such as efficient authorization checker or IP to
+   region mapping, and respective services built on top of these 
+   facilities.
+
+Not all of the parts are completed yet :) 
+
