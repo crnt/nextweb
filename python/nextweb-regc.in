@@ -1,6 +1,0 @@
-#!@PYTHON@
-
-import nextweb.regions;
-
-if "__main__" == __name__:
-	pass;

@@ -1,6 +1,0 @@
-#!@PYTHON@
-
-import nextweb.templates;
-
-if "__main__" == __name__:
-	pass;

@@ -1,4 +1,3 @@
-/** @file Error.hpp */
 // nextweb - modern web framework for Python and C++
 // Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
 
@@ -21,7 +20,6 @@
 
 #include "nextweb/Config.hpp"
 
-#include <cstddef>
 #include <exception>
 
 namespace nextweb {
@@ -29,12 +27,10 @@ namespace nextweb {
 class NEXTWEB_API Error : public std::exception {
 
 public:
-	Error(char const *msg);
-	
+	Error(char const *format, ...);
 	virtual ~Error() throw ();
 	virtual char const* what() const throw ();
-
-	enum { MESSAGE_SIZE = 256 };
+	static int const MESSAGE_SIZE = 256;
 
 private:
 	char message_[MESSAGE_SIZE];

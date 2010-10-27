@@ -1,0 +1,24 @@
+check_PROGRAMS = fastcgi-tests
+
+fastcgi_tests_LDADD = ${top_srcdir}/fastcgi/libnextweb-fastcgi.la \
+	${top_srcdir}/utils/libnextweb.la
+	
+fastcgi_tests_SOURCES = main.cpp MockIO.cpp \
+	CookieTest.cpp \
+	FileTest.cpp \
+	HttpDateTest.cpp \
+	LineReaderTest.cpp \
+	RequestTest.cpp \
+	StreamBufferTest.cpp \
+	UrlEncodeTest.cpp \
+	UrlMatchTest.cpp \
+	VarNameTest.cpp
+
+AM_CXXFLAGS = -pthread
+AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/config \
+	-I${top_srcdir}/tests @CPPUNIT_CFLAGS@
+AM_LDFLAGS = @CPPUNIT_LIBS@
+
+noinst_HEADERS = MockIO.hpp
+
+TESTS = fastcgi-tests

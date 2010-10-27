@@ -1,11 +1,8 @@
 lib_LTLIBRARIES = libnextweb-regions.la
 
-libnextweb_regions_la_SOURCES = Regions.cpp
-libnextweb_regions_la_LDFLAGS = 
-libnextweb_regions_la_LIBADD = ../library/libnextweb.la
+libnextweb_regions_la_LIBADD = ${top_srcdir}/utils/libnextweb.la
+libnextweb_regions_la_SOURCES = 
 
 AM_CXXFLAGS = -pthread
-AM_CPPFLAGS = -I../config -I../include
-
-noinst_HEADERS = RegionsImpl.hpp
-pkginclude_HEADERS = Regions.hpp
+AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/config
+AM_LDFLAGS = 

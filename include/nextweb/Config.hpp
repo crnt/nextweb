@@ -1,4 +1,3 @@
-/** @file COnfig.hpp */
 // nextweb - modern web framework for Python and C++
 // Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
 
@@ -20,8 +19,15 @@
 #define NEXTWEB_CONFIG_HPP_INCLUDED
 
 #ifdef WIN32
-#else 
+#else
 #define NEXTWEB_API
-#endif // WIN32
+#endif 
+
+#ifndef NDEBUG
+#define NEXTWEB_DEBUG
+#define NEXTWEB_INLINE
+#else
+#define NEXTWEB_INLINE inline
+#endif 
 
 #endif // NEXTWEB_CONFIG_HPP_INCLUDED

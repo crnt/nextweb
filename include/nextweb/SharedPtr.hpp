@@ -1,4 +1,3 @@
-/** @file SharedPtr.hpp */
 // nextweb - modern web framework for Python and C++
 // Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
 
@@ -26,8 +25,6 @@
 
 namespace nextweb {
 
-class SharedPtrAccess;
-
 template <typename Type> 
 class NEXTWEB_API SharedPtr {
 
@@ -51,134 +48,144 @@ public:
 	Type const& operator * () const;
 	
 	void reset(Type *value = 0);
-	void swap(SharedPtr<Type> &ptr);
+	void swap(SharedPtr<Type> &ptr) throw ();
 	
 	class BoolConvertible;
 	operator BoolConvertible const* () const;
 	
-	friend class SharedPtrAccess;
+	template <typename Other> friend class SharedPtr;
 	template <typename Other> SharedPtr<Other> cast() const;
 
 private:
 	Type *value_;
 };
 
-class SharedPtrAccess {
-public:
-	template <typename Type> static Type* value(SharedPtr<Type> const &ptr);
-};
-
-template <typename Type> inline 
+template <typename Type> NEXTWEB_INLINE
 SharedPtr<Type>::SharedPtr(Type *value) :
 	value_(value)
 {
 	if (0 != value_) incRef(value_);
 }
 
-template <typename Type> inline
+template <typename Type> NEXTWEB_INLINE
 SharedPtr<Type>::~SharedPtr() {
 	if (0 != value_) decRef(value_);
 }
 
-template <typename Type> inline
+template <typename Type> NEXTWEB_INLINE
 SharedPtr<Type>::SharedPtr(SharedPtr<Type> const &rhs) :
 	value_(rhs.value_)
 {
 	if (0 != value_) incRef(value_);
 }
 
-template <typename Type> template <typename Other> inline 
+template <typename Type> template <typename Other> NEXTWEB_INLINE 
 SharedPtr<Type>::SharedPtr(SharedPtr<Other> const &rhs) :
-	value_(SharedPtrAccess::value(rhs))
+	value_(rhs.value_)
 {
 	if (0 != value_) incRef(value_);
 }
 
-template <typename Type> inline SharedPtr<Type>&
+template <typename Type> NEXTWEB_INLINE SharedPtr<Type>&
 SharedPtr<Type>::operator = (SharedPtr<Type> const &rhs) {
 	SharedPtr tmp(rhs);
 	swap(tmp);
 	return *this;
 }
 
-template <typename Type> template <typename Other> inline SharedPtr<Type>&
+template <typename Type> template <typename Other> NEXTWEB_INLINE SharedPtr<Type>&
 SharedPtr<Type>::operator = (SharedPtr<Other> const &rhs) {
 	SharedPtr tmp(rhs);
 	swap(tmp);
 	return *this;
 }
 
-template <typename Type> inline Type*
+template <typename Type> NEXTWEB_INLINE Type*
 SharedPtr<Type>::get() {
 	return value_;
 }
 
-template <typename Type> inline Type*
+template <typename Type> NEXTWEB_INLINE Type*
 SharedPtr<Type>::operator -> () {
 	assert(0 != value_);
 	return value_;
 }
 
-template <typename Type> inline Type const*
+template <typename Type> NEXTWEB_INLINE Type const*
 SharedPtr<Type>::get() const {
 	return value_;
 }
 
-template <typename Type> inline Type const*
+template <typename Type> NEXTWEB_INLINE Type const*
 SharedPtr<Type>::operator -> () const {
 	assert(0 != value_);
 	return value_;
 }
 	
-template <typename Type> inline Type&
+template <typename Type> NEXTWEB_INLINE Type&
 SharedPtr<Type>::operator * () {
 	assert(0 != value_);
 	return *value_;
 }
 
-template <typename Type> inline Type const&
+template <typename Type> NEXTWEB_INLINE Type const&
 SharedPtr<Type>::operator * () const {
 	assert(0 != value_);
 	return *value_;
 }
 	
-template <typename Type> inline void
+template <typename Type> NEXTWEB_INLINE void
 SharedPtr<Type>::reset(Type *value) {
 	SharedPtr<Type> tmp(value);
 	swap(tmp);
 }
 
-template <typename Type> inline void
-SharedPtr<Type>::swap(SharedPtr<Type> &ptr) {
+template <typename Type> NEXTWEB_INLINE void
+SharedPtr<Type>::swap(SharedPtr<Type> &ptr) throw () {
 	std::swap(value_, ptr.value_);
 }
 
-template <typename Type> inline 
+template <typename Type> NEXTWEB_INLINE 
 SharedPtr<Type>::operator typename SharedPtr<Type>::BoolConvertible const* () const {
 	return (0 == value_) ? 0 : reinterpret_cast<BoolConvertible const*>(value_);
 }
 
-template <typename Type> template <typename Other> inline SharedPtr<Other>
+template <typename Type> template <typename Other> NEXTWEB_INLINE SharedPtr<Other>
 SharedPtr<Type>::cast() const {
 	return SharedPtr<Other>(dynamic_cast<Other*>(value_));
 }
 
-template <typename Type> Type*
-SharedPtrAccess::value(SharedPtr<Type> const &ptr) {
-	return ptr.value_;
-}
-
-template <typename Type, typename Other> inline bool
+template <typename Type, typename Other> NEXTWEB_API NEXTWEB_INLINE bool
 operator == (SharedPtr<Type> const &ptr, SharedPtr<Other> const &other) {
 	return ptr.get() == other.get();
 }
 
-template <typename Type, typename Other> inline bool
+template <typename Type, typename Other> NEXTWEB_API NEXTWEB_INLINE bool
+operator == (Type const* const ptr, SharedPtr<Other> const &other) {
+	return ptr == other.get();
+}
+
+template <typename Type, typename Other> NEXTWEB_API NEXTWEB_INLINE bool
+operator == (SharedPtr<Type> const &ptr, Other const* const other) {
+	return ptr.get() == other;
+}
+
+template <typename Type, typename Other> NEXTWEB_API NEXTWEB_INLINE bool
 operator != (SharedPtr<Type> const &ptr, SharedPtr<Other> const &other) {
 	return ptr.get() != other.get();
 }
 
-template <typename Type> inline void
+template <typename Type, typename Other> NEXTWEB_API NEXTWEB_INLINE bool
+operator != (Type const* const ptr, SharedPtr<Other> const &other) {
+	return ptr != other.get();
+}
+
+template <typename Type, typename Other> NEXTWEB_API NEXTWEB_INLINE bool
+operator != (SharedPtr<Type> const &ptr, Other const* const other) {
+	return ptr.get() != other;
+}
+
+template <typename Type> NEXTWEB_API NEXTWEB_INLINE void
 swap(SharedPtr<Type> &ptr, SharedPtr<Type> &other) {
 	ptr.swap(other);
 }

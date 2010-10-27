@@ -1,4 +1,3 @@
-/** @file TestUtils.hpp */
 // nextweb - modern web framework for Python and C++
 // Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
 
@@ -21,23 +20,16 @@
 
 #include <string>
 
-#include "details/Range.hpp"
-
 namespace nextweb { namespace tests {
 
-template <typename Cont> inline Cont
-as(const char *str) {
-	return Cont(str, str + strlen(str));
+template <typename Sequence> inline Sequence
+as(char const *str) {
+	return Sequence(str, str + std::char_traits<char>::length(str));
 }
 
-template <typename Cont> inline std::string
-makeString(Cont const &cont) {
-	return std::string(cont.begin(), cont.end());
-}
-
-inline std::string
-makeString(details::Range<char const*> const &range) {
-	return std::string(range.begin(), range.size());
+template <typename Sequence> inline std::string
+makeString(Sequence const &seq) {
+	return std::string(seq.begin(), seq.end());
 }
 
 }} // namespaces

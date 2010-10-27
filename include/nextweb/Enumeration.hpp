@@ -1,4 +1,3 @@
-/** @file Enumeration.hpp */
 // nextweb - modern web framework for Python and C++
 // Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
 
@@ -20,13 +19,13 @@
 #define NEXTWEB_ENUMERATION_HPP_INCLUDED
 
 #include "nextweb/Config.hpp"
+#include "nextweb/Shared.hpp"
 #include "nextweb/SharedPtr.hpp"
-#include "nextweb/ReferenceCounted.hpp"
 
 namespace nextweb {
 
 template <typename Item>
-class NEXTWEB_API Enumeration : public ReferenceCounted {
+class NEXTWEB_API Enumeration : public Shared {
 
 public:
 	Enumeration();
@@ -34,7 +33,7 @@ public:
 	
 	typedef Item ValueType;
 	typedef Enumeration<Item> Type;
-	typedef SharedPtr<Type> PtrType;
+	typedef SharedPtr<Type> Pointer;
 
 	virtual Item nextElement() const = 0;
 	virtual bool hasMoreElements() const = 0;
@@ -44,12 +43,12 @@ private:
 	Enumeration& operator = (Enumeration const &);
 };
 
-template <typename Item> inline
+template <typename Item> NEXTWEB_INLINE
 Enumeration<Item>::Enumeration()
 {
 }
 
-template <typename Item> inline
+template <typename Item> NEXTWEB_INLINE
 Enumeration<Item>::~Enumeration() {
 }
 
