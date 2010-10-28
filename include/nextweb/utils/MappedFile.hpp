@@ -385,4 +385,9 @@ WriteableMappedFileReferenceProxy<Char, Impl>::operator Char const& () const {
 
 }} // namespaces
 
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/utils/MappedFile.hpp"
+#endif 
+
 #endif // NEXTWEB_UTILS_MAPPED_FILE_HPP_INCLUDED
+
