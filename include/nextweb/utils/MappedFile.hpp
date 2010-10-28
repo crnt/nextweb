@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
+// Copyright (C) 2009 Oleg Obolenskiy <highpower@yandex-team.ru>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
