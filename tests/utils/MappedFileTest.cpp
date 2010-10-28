@@ -125,6 +125,9 @@ MappedFileTest::testWriteFileWith() {
 
 	std::random_shuffle(file.begin(), file.end());
 	std::sort(file.begin(), file.end());
+	
+	std::size_t sortedSize = std::accumulate(file.rbegin(), file.rend(), static_cast<std::size_t>(0));
+	CPPUNIT_ASSERT_EQUAL(size, sortedSize);
 }
 
 template <typename Char> std::size_t
