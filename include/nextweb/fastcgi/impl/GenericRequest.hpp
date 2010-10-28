@@ -25,7 +25,6 @@
 #include "nextweb/Config.hpp"
 
 #include "nextweb/utils/Range.hpp"
-#include "nextweb/utils/Resource.hpp"
 #include "nextweb/utils/StringUtils.hpp"
 
 #include "nextweb/utils/TypeTraits.hpp"
@@ -34,16 +33,10 @@
 #include "nextweb/fastcgi/File.hpp"
 #include "nextweb/fastcgi/HttpError.hpp"
 
-#include "nextweb/fastcgi/impl/FileImpl.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
 #include "nextweb/fastcgi/impl/UrlEncode.hpp"
 
 namespace nextweb { namespace fastcgi {
-
-struct MemoryTraits {
-	void destroy(char *ptr);
-	static char* defaultValue();
-};
 
 template <typename IO>
 class GenericRequest {
@@ -95,7 +88,6 @@ private:
 	FileMap files_;
 	StringMultiMap args_;
 	StringMap vars_, cookies_;
-	utils::Resource<char*, MemoryTraits> memoryPost_;
 };
 
 template <typename Map> NEXTWEB_INLINE bool

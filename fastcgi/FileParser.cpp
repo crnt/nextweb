@@ -3,5 +3,11 @@
 
 namespace nextweb { namespace fastcgi {
 
+FileParser::FileParser()
+{
+}
+
+FileParser::~FileParser() {
+}
 
 }} // namespaces

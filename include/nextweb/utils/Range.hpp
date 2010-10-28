@@ -147,7 +147,7 @@ RangeBase<Iter, std::forward_iterator_tag>::empty() const {
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::forward_iterator_tag>::size_type
 RangeBase<Iter, std::forward_iterator_tag>::size() const {
-	return end_ == begin_ ? 0 : std::distance(begin_, end_);
+	return empty() ? 0 : std::distance(begin_, end_);
 }
 
 template <typename Iter> NEXTWEB_INLINE 

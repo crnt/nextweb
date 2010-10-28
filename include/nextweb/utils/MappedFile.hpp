@@ -466,7 +466,7 @@ WriteableMappedFileReferenceProxy<Char, Impl>::operator Char const& () const {
 
 template <typename Char, typename Impl> NEXTWEB_INLINE void
 WriteableMappedFileReferenceProxy<Char, Impl>::swap(WriteableMappedFileReferenceProxy<Char, Impl> &other) throw () {
-	swap(*iter_, *other.iter_);
+	std::iter_swap(iter_, other.iter_);
 }
 
 template <typename Char, typename Impl> NEXTWEB_INLINE void
