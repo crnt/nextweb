@@ -97,6 +97,8 @@ private:
 	void reservePage();
 	void releasePage() throw ();
 
+	static SizeType const INVALID_POSITION;
+
 private:
 	SizeType pos_;
 	SharedPtr<Impl> impl_;
@@ -171,9 +173,12 @@ private:
 	WriteableMappedFileIterator<Char, Impl> iter_;
 };
 
+template <typename Char, typename Impl> typename MappedFileIteratorBase<Char, Impl>::SizeType const
+MappedFileIteratorBase<Char, Impl>::INVALID_POSITION = std::numeric_limits<SizeType>::max();
+
 template <typename Char, typename Impl> NEXTWEB_INLINE
 MappedFileIteratorBase<Char, Impl>::MappedFileIteratorBase() :
-	pos_(std::numeric_limits<SizeType>::max()), impl_()
+	pos_(INVALID_POSITION), impl_()
 {
 }
 
@@ -255,12 +260,16 @@ MappedFileIteratorBase<Char, Impl>::implementation() const {
 
 template <typename Char, typename Impl> NEXTWEB_INLINE void
 MappedFileIteratorBase<Char, Impl>::reservePage() {
-	impl_->reservePage(pos_);
+	if (INVALID_POSITION != pos_) {
+		impl_->reservePage(pos_);
+	}
 }
 
 template <typename Char, typename Impl> NEXTWEB_INLINE void
 MappedFileIteratorBase<Char, Impl>::releasePage() throw () {
-	impl_->releasePage(pos_);
+	if (INVALID_POSITION != pos_) {
+		impl_->releasePage(pos_);
+	}
 }
 
 template <typename Char, typename Impl> NEXTWEB_INLINE 

@@ -60,7 +60,7 @@ MockMappedFileImpl<Impl>::reservePage(typename MockMappedFileImpl<Impl>::SizeTyp
 	
 	typename std::map<SizeType, int>::iterator i = pages_.find(realPos);
 	if (pages_.end() == i) {
-		pages_.insert(std::pair<SizeType, std::size_t>(realPos, 0));
+		pages_.insert(std::pair<SizeType, std::size_t>(realPos, 1));
 	}
 	else {
 		++(i->second);
