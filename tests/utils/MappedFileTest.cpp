@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdlib>
 #include <cstring>
+#include <numeric>
 
 #include <unistd.h>
 
@@ -82,6 +83,16 @@ MappedFileTest::testReadFileWith() {
 	
 	unlinkIfExists(stream.str());
 	std::size_t checksum = setupStream<Char>(stream.str(), 1000);
+	
+	typedef MockMappedFileImpl<MappedFileImpl> ImplType;
+	typedef ReadableMappedFile<char, ImplType> FileType;
+	
+	std::size_t size = 0;
+	FileType file(stream.str().c_str(), 0);
+	for (FileType::size_type i = 0; i < file.size(); ++i) {
+		size += static_cast<std::size_t>(static_cast<Char>(file.at(i)));
+	}
+	std::size_t otherSize = std::accumulate(file.begin(), file.end(), static_cast<std::size_t>(0));
 }
 
 template <typename Char> void
@@ -93,6 +104,16 @@ MappedFileTest::testWriteFileWith() {
 
 	setupStream<Char>(stream.str(), 10000);
 	unlinkIfExists(stream.str());	
+
+	typedef MockMappedFileImpl<MappedFileImpl> ImplType;
+	typedef WriteableMappedFile<char, ImplType> FileType;
+	
+	std::size_t size = 0;
+	FileType file(stream.str().c_str(), 0);
+	for (FileType::size_type i = 0; i < file.size(); ++i) {
+		size += static_cast<std::size_t>(static_cast<Char>(file.at(i)));
+	}
+	std::size_t otherSize = std::accumulate(file.begin(), file.end(), static_cast<std::size_t>(0));
 }
 
 template <typename Char> std::size_t
@@ -104,7 +125,7 @@ MappedFileTest::setupStream(std::string const &name, std::size_t count) {
 	for (std::size_t i = 0; i < count; ++i) {
 		Char value = static_cast<Char>(random());
 		stream.write(reinterpret_cast<char*>(&value), sizeof(Char));
-		result += value;
+		result += static_cast<std::size_t>(value);
 	}
 	return result;
 }
