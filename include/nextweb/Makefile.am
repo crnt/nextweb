@@ -10,10 +10,11 @@ nobase_pkginclude_HEADERS = Config.hpp Enumeration.hpp Error.hpp \
 	fastcgi/RequestHandler.hpp fastcgi/Request.hpp fastcgi/Response.hpp \
 	fastcgi/Server.hpp fastcgi/Settings.hpp inlines/fastcgi/HttpDate.hpp \
 	inlines/Shared.hpp inlines/utils/CharTraits.hpp \
-	inlines/utils/Functors.hpp inlines/utils/Range.hpp \
-	inlines/utils/ScopedLock.hpp inlines/utils/Threads.hpp Shared.hpp \
-	SharedPtr.hpp utils/CharTraits.hpp utils/EnumerationImpl.hpp \
-	utils/Functors.hpp utils/Integer.hpp utils/Iterator.hpp utils/Macros.hpp \
+	inlines/utils/Functors.hpp inlines/utils/MappedFile.hpp \
+	inlines/utils/Range.hpp inlines/utils/ScopedLock.hpp \
+	inlines/utils/Threads.hpp Shared.hpp SharedPtr.hpp \
+	utils/CharTraits.hpp utils/EnumerationImpl.hpp utils/Functors.hpp \
+	utils/Integer.hpp utils/Iterator.hpp utils/Macros.hpp \
 	utils/MappedFile.hpp utils/MultiThreaded.hpp utils/PosixThreads.hpp \
 	utils/Range.hpp utils/Resource.hpp utils/ScopedLock.hpp \
 	utils/SingleThreaded.hpp utils/StaticAssert.hpp \
