@@ -112,11 +112,14 @@ MappedFileImpl::mapFile(MappedFileImpl::SizeType size) {
 
 NEXTWEB_INLINE MappedFileImpl::Pointer
 MappedFileImpl::at(MappedFileImpl::SizeType position) {
+	assert(position < size());
+	return static_cast<char*>(pointer_) + position;
 }
 
 NEXTWEB_INLINE MappedFileImpl::Pointer
 MappedFileImpl::at(MappedFileImpl::SizeType position) const {
+	assert(position < size());
+	return static_cast<char*>(pointer_) + position;
 }
-
 
 }} // namespaces

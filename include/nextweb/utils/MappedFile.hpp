@@ -151,7 +151,6 @@ public:
 
 	ReadableMappedFileReferenceProxy(SizeType pos, SharedPtr<Impl> const &impl);
 	ReadableMappedFileReferenceProxy(ReadableMappedFileReferenceProxy<Char, Impl> const &other);
-	ReadableMappedFileReferenceProxy<Char, Impl>& operator = (ReadableMappedFileReferenceProxy<Char, Impl> const &other);
 	operator Char const& () const;
 
 private:
@@ -171,10 +170,14 @@ public:
 	
 	operator Char& ();
 	operator Char const& () const;
+	void swap(WriteableMappedFileReferenceProxy<Char, Impl> &other) throw ();
 
 private:
 	WriteableMappedFileIterator<Char, Impl> iter_;
 };
+
+template <typename Char, typename Impl> void
+swap(WriteableMappedFileReferenceProxy<Char, Impl> &target, WriteableMappedFileReferenceProxy<Char, Impl> &other);
 
 template <typename Char, typename Impl>
 class ReadableMappedFile {
@@ -277,7 +280,7 @@ MappedFileIteratorBase<Char, Impl>::MappedFileIteratorBase(MappedFileIteratorBas
 
 template <typename Char, typename Impl> NEXTWEB_INLINE void
 MappedFileIteratorBase<Char, Impl>::swap(MappedFileIteratorBase<Char, Impl> &other) throw () {
-	swap(impl_, other.impl_);
+	impl_.swap(other.impl_);
 	std::swap(pos_, other.pos_);
 }
 
@@ -367,7 +370,7 @@ ReadableMappedFileIterator<Char, Impl>::ReadableMappedFileIterator(ReadableMappe
 template <typename Char, typename Impl> NEXTWEB_INLINE ReadableMappedFileIterator<Char, Impl>&
 ReadableMappedFileIterator<Char, Impl>::operator = (ReadableMappedFileIterator<Char, Impl> const &other) {
 	ReadableMappedFileIterator<Char, Impl> copy(other);
-	swap(copy);
+	this->swap(copy);
 	return *this;
 }
 
@@ -400,7 +403,7 @@ WriteableMappedFileIterator<Char, Impl>::WriteableMappedFileIterator(WriteableMa
 template <typename Char, typename Impl> NEXTWEB_INLINE WriteableMappedFileIterator<Char, Impl>&
 WriteableMappedFileIterator<Char, Impl>::operator = (WriteableMappedFileIterator<Char, Impl> const &other) {
 	WriteableMappedFileIterator<Char, Impl> copy(other);
-	swap(copy);
+	this->swap(copy);
 	return *this;
 }
 
@@ -429,11 +432,6 @@ ReadableMappedFileReferenceProxy<Char, Impl>::ReadableMappedFileReferenceProxy(R
 {
 }
 
-template <typename Char, typename Impl> NEXTWEB_INLINE ReadableMappedFileReferenceProxy<Char, Impl>&
-ReadableMappedFileReferenceProxy<Char, Impl>::operator = (ReadableMappedFileReferenceProxy<Char, Impl> const &other) {
-	iter_ = other.iter_;
-}
-
 template <typename Char, typename Impl> NEXTWEB_INLINE
 ReadableMappedFileReferenceProxy<Char, Impl>::operator Char const& () const {
 	return iter_.dereference();
@@ -453,7 +451,7 @@ WriteableMappedFileReferenceProxy<Char, Impl>::WriteableMappedFileReferenceProxy
 
 template <typename Char, typename Impl> NEXTWEB_INLINE WriteableMappedFileReferenceProxy<Char, Impl>&
 WriteableMappedFileReferenceProxy<Char, Impl>::operator = (WriteableMappedFileReferenceProxy<Char, Impl> const &other) {
-	iter_ = other.iter_;
+	*iter_ = *other.iter_;
 }
 
 template <typename Char, typename Impl> NEXTWEB_INLINE
@@ -464,6 +462,16 @@ WriteableMappedFileReferenceProxy<Char, Impl>::operator Char& () {
 template <typename Char, typename Impl> NEXTWEB_INLINE
 WriteableMappedFileReferenceProxy<Char, Impl>::operator Char const& () const {
 	return static_cast<typename ReadableMappedFileIterator<Char, Impl>::Type>(iter_).dereference();
+}
+
+template <typename Char, typename Impl> NEXTWEB_INLINE void
+WriteableMappedFileReferenceProxy<Char, Impl>::swap(WriteableMappedFileReferenceProxy<Char, Impl> &other) throw () {
+	swap(*iter_, *other.iter_);
+}
+
+template <typename Char, typename Impl> NEXTWEB_INLINE void
+swap(WriteableMappedFileReferenceProxy<Char, Impl> &target, WriteableMappedFileReferenceProxy<Char, Impl> &other) {
+	target.swap(other);
 }
 
 template <typename Char, typename Impl> NEXTWEB_INLINE

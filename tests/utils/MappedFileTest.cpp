@@ -90,9 +90,13 @@ MappedFileTest::testReadFileWith() {
 	std::size_t size = 0;
 	FileType file(stream.str().c_str(), 0);
 	for (FileType::size_type i = 0; i < file.size(); ++i) {
-		size += static_cast<std::size_t>(static_cast<Char>(file.at(i)));
+		size += static_cast<Char>(file.at(i));
 	}
 	std::size_t otherSize = std::accumulate(file.begin(), file.end(), static_cast<std::size_t>(0));
+	std::size_t reversedSize = std::accumulate(file.rbegin(), file.rend(), static_cast<std::size_t>(0));
+	// CPPUNIT_ASSERT_EQUAL(size, checksum);
+	CPPUNIT_ASSERT_EQUAL(size, otherSize);
+	CPPUNIT_ASSERT_EQUAL(size, reversedSize);
 }
 
 template <typename Char> void
@@ -102,7 +106,7 @@ MappedFileTest::testWriteFileWith() {
 	std::stringstream stream;
 	stream << "write" << sizeof(Char) << ".dat";
 
-	setupStream<Char>(stream.str(), 10000);
+	std::size_t checksum = setupStream<Char>(stream.str(), 10000);
 	unlinkIfExists(stream.str());	
 
 	typedef MockMappedFileImpl<MappedFileImpl> ImplType;
@@ -111,9 +115,16 @@ MappedFileTest::testWriteFileWith() {
 	std::size_t size = 0;
 	FileType file(stream.str().c_str(), 0);
 	for (FileType::size_type i = 0; i < file.size(); ++i) {
-		size += static_cast<std::size_t>(static_cast<Char>(file.at(i)));
+		size += static_cast<Char>(file.at(i));
 	}
 	std::size_t otherSize = std::accumulate(file.begin(), file.end(), static_cast<std::size_t>(0));
+	std::size_t reversedSize = std::accumulate(file.rbegin(), file.rend(), static_cast<std::size_t>(0));
+	// CPPUNIT_ASSERT_EQUAL(size, checksum);
+	CPPUNIT_ASSERT_EQUAL(size, otherSize);
+	CPPUNIT_ASSERT_EQUAL(size, reversedSize);
+
+	std::random_shuffle(file.begin(), file.end());
+	std::sort(file.begin(), file.end());
 }
 
 template <typename Char> std::size_t
@@ -125,7 +136,7 @@ MappedFileTest::setupStream(std::string const &name, std::size_t count) {
 	for (std::size_t i = 0; i < count; ++i) {
 		Char value = static_cast<Char>(random());
 		stream.write(reinterpret_cast<char*>(&value), sizeof(Char));
-		result += static_cast<std::size_t>(value);
+		result += value;
 	}
 	return result;
 }
