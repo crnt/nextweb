@@ -110,4 +110,13 @@ MappedFileImpl::mapFile(MappedFileImpl::SizeType size) {
 	SystemError::throwUnless(INVALID_POINTER != pointer_);
 }
 
+NEXTWEB_INLINE MappedFileImpl::Pointer
+MappedFileImpl::at(MappedFileImpl::SizeType position) {
+}
+
+NEXTWEB_INLINE MappedFileImpl::Pointer
+MappedFileImpl::at(MappedFileImpl::SizeType position) const {
+}
+
+
 }} // namespaces

@@ -41,7 +41,14 @@ public:
 
 	typedef Iter iterator;
 	typedef Iter const_iterator;
+	
+	typedef typename std::iterator_traits<Iter>::pointer pointer;
 	typedef typename std::iterator_traits<Iter>::value_type value_type;
+
+	typedef typename std::iterator_traits<Iter>::reference reference;
+	typedef typename std::iterator_traits<Iter>::reference const const_reference;
+
+	typedef typename std::iterator_traits<Iter>::difference_type difference_type;
 	typedef typename MakeUnsigned<typename std::iterator_traits<Iter>::difference_type>::Type size_type;
 
 	iterator end();
@@ -82,10 +89,10 @@ public:
 	RangeBase();
 	RangeBase(Iter begin, Iter end);
 	
-	typedef typename std::iterator_traits<Iter>::value_type value_type;
+	typedef typename std::iterator_traits<Iter>::reference const const_reference;
 	typedef typename MakeUnsigned<typename std::iterator_traits<Iter>::difference_type>::Type size_type;
 
-	value_type const& operator [] (size_type index) const;
+	const_reference operator [] (size_type index) const;
 };
 
 template <typename Iter>
@@ -187,7 +194,7 @@ RangeBase<Iter, std::random_access_iterator_tag>::RangeBase(Iter begin, Iter end
 {
 }
 
-template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::random_access_iterator_tag>::value_type const&
+template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::random_access_iterator_tag>::const_reference
 RangeBase<Iter, std::random_access_iterator_tag>::operator [] (typename RangeBase<Iter, typename std::random_access_iterator_tag>::size_type index) const {
  	return *(this->begin() + index);
 }
