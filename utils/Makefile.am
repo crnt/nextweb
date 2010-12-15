@@ -5,7 +5,6 @@ libnextweb_la_SOURCES = \
 	CharTraits.cpp \
 	Error.cpp \
 	Functors.cpp \
-	MappedFile.cpp \
 	PosixThreads.cpp \
 	Range.cpp \
 	ScopedLock.cpp \

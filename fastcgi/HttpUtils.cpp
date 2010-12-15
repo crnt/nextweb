@@ -19,6 +19,9 @@ HttpConstants::METHOD("REQUEST_METHOD");
 std::string const
 HttpConstants::EMPTY_STRING;
 
+std::string const
+HttpConstants::CONTENT_LENGTH("CONTENT_LENGTH");
+
 utils::Range<char const*> const
 HttpConstants::COOKIE_VAR_NAME = utils::makeRange("HTTP_COOKIE");
 

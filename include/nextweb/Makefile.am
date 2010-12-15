@@ -2,6 +2,8 @@ nobase_pkginclude_HEADERS = \
 	Config.hpp \
 	Enumeration.hpp \
 	Error.hpp \
+	Shared.hpp \
+	SharedPtr.hpp \
 	fastcgi/Cookie.hpp \
 	fastcgi/File.hpp \
 	fastcgi/Forward.hpp \
@@ -30,13 +32,10 @@ nobase_pkginclude_HEADERS = \
 	inlines/Shared.hpp \
 	inlines/utils/CharTraits.hpp \
 	inlines/utils/Functors.hpp \
-	inlines/utils/MappedFile.hpp \
 	inlines/utils/Range.hpp \
 	inlines/utils/ScopedLock.hpp \
 	inlines/utils/StringConverters.hpp \
 	inlines/utils/Threads.hpp \
-	Shared.hpp \
-	SharedPtr.hpp \
 	utils/CharTraits.hpp \
 	utils/EnumerationImpl.hpp \
 	utils/Functors.hpp \
