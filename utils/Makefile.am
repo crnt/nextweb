@@ -10,6 +10,7 @@ libnextweb_la_SOURCES = \
 	Range.cpp \
 	ScopedLock.cpp \
 	Shared.cpp \
+	StringConverters.cpp \
 	SystemError.cpp \
 	Threads.cpp \
 	TypeTraits.cpp \

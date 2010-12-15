@@ -29,6 +29,7 @@
 
 #include "nextweb/utils/TypeTraits.hpp"
 #include "nextweb/utils/StaticAssert.hpp"
+#include "nextweb/utils/StringConverters.hpp"
 
 #include "nextweb/fastcgi/File.hpp"
 #include "nextweb/fastcgi/HttpError.hpp"
@@ -217,7 +218,7 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parsePost(std::size_t threshold) {
-	
+	std::string const &header = getVar(HttpConstants::CONTENT_LENGTH);
 }
 
 template <typename IO> NEXTWEB_INLINE void

@@ -33,6 +33,7 @@ nobase_pkginclude_HEADERS = \
 	inlines/utils/MappedFile.hpp \
 	inlines/utils/Range.hpp \
 	inlines/utils/ScopedLock.hpp \
+	inlines/utils/StringConverters.hpp \
 	inlines/utils/Threads.hpp \
 	Shared.hpp \
 	SharedPtr.hpp \

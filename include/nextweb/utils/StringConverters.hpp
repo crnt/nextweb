@@ -16,112 +16,150 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_DETAILS_STRING_CONVERTERS_HPP_INCLUDED
-#define NEXTWEB_DETAILS_STRING_CONVERTERS_HPP_INCLUDED
+#ifndef NEXTWEB_UTILS_STRING_CONVERTERS_HPP_INCLUDED
+#define NEXTWEB_UTILS_STRING_CONVERTERS_HPP_INCLUDED
 
 #include <cstdio>
 #include <limits>
+#include <string>
 
 #include "nextweb/Error.hpp"
-#include "details/SystemError.hpp"
+#include "nextweb/Config.hpp"
 
-namespace nextweb { namespace details {
+#include "nextweb/utils/TypeTraits.hpp"
+#include "nextweb/utils/SystemError.hpp"
+#include "nextweb/utils/StaticAssert.hpp"
 
-template <typename Setup, typename Basic>
+namespace nextweb { namespace utils {
+
+template <bool IsSigned>
+struct MaxTypeToConvert;
+
+template <>
+struct MaxTypeToConvert<true> {
+	typedef long long Type;
+};
+
+template <>
+struct MaxTypeToConvert<false> {
+	typedef unsigned long long Type;
+};
+
+template <typename X>
+struct CharArrayConverter;
+
+template <>
+struct CharArrayConverter<long long> {
+	typedef long long ValueType;
+	long long convert(char const *value);
+};
+
+template <>
+struct CharArrayConverter<unsigned long long> {
+	typedef unsigned long long ValueType;
+	unsigned long long convert(char const *value);
+};
+
+template <typename String, typename X>
 struct StringConverter {
-	static typename Setup::StringType toString(Basic value);
-	static Basic fromString(typename Setup::StringType const &value);
+	static String toString(X value);
+	static X fromString(String const &value);
+	NEXTWEB_STATIC_ASSERT((IsSame<typename String::value_type, char>::RESULT));
 };
 
-template <typename Setup>
-struct StringConverter<Setup, long long> {
-	typedef long long BasicType;
-	static typename Setup::StringType toString(long long value);
-	static long long fromString(typename Setup::StringType const &value);
+template <typename String>
+struct StringConverter<String, long long> {
+	typedef long long ValueType;
+	static String toString(long long value);
+	static long long fromString(String const &value);
+	NEXTWEB_STATIC_ASSERT((IsSame<typename String::value_type, char>::RESULT));
 };
 
-template <typename Setup>
-struct StringConverter<Setup, unsigned long long> {
-	typedef unsigned long long BasicType;
-	static typename Setup::StringType toString(unsigned long long value);
-	static unsigned long long fromString(typename Setup::StringType const &value);
+template <typename String>
+struct StringConverter<String, unsigned long long> {
+	typedef unsigned long long ValueType;
+	static String toString(unsigned long long value);
+	static unsigned long long fromString(String const &value);
+	NEXTWEB_STATIC_ASSERT((IsSame<typename String::value_type, char>::RESULT));
 };
 
-template <typename Setup, bool IsSigned>
+template <typename String, bool IsSigned>
 struct StringConverterSelector;
 
-template <typename Setup>
-struct StringConverterSelector<Setup, true> {
-	typedef StringConverter<Setup, long long> Type;
+template <typename String>
+struct StringConverterSelector<String, true> {
+	typedef StringConverter<String, long long> Type;
 };
 
-template <typename Setup>
-struct StringConverterSelector<Setup, false> {
-	typedef StringConverter<Setup, unsigned long long> Type;
+template <typename String>
+struct StringConverterSelector<String, false> {
+	typedef StringConverter<String, unsigned long long> Type;
 };
 
-template <typename Setup, typename Basic> inline typename Setup::StringType
-StringConverter<Setup, Basic>::toString(Basic value) {
-	typedef typename StringConverterSelector<Setup, std::numeric_limits<Basic>::is_signed>::Type ConverterType;
-	return ConverterType::toString(static_cast<typename ConverterType::BasicType>(value));
+template <typename String, typename X> NEXTWEB_INLINE String
+StringConverter<String, X>::toString(X value) {
+	typedef typename StringConverterSelector<String, std::numeric_limits<X>::is_signed>::Type ConverterType;
+	return ConverterType::toString(static_cast<typename ConverterType::ValueType>(value));
 }
 
-template <typename Setup, typename Basic> inline Basic
-StringConverter<Setup, Basic>::fromString(typename Setup::StringType const &value) {
-	typedef typename StringConverterSelector<Setup, std::numeric_limits<Basic>::is_signed>::Type ConverterType;
-	typename ConverterType::BasicType result = ConverterType::fromString(value);
-	if (static_cast<typename ConverterType::BasicType>(std::numeric_limits<Basic>::max()) < result) {
+template <typename String, typename X> NEXTWEB_INLINE X
+StringConverter<String, X>::fromString(String const &value) {
+	typedef typename StringConverterSelector<String, std::numeric_limits<X>::is_signed>::Type ConverterType;
+	typename ConverterType::ValueType result = ConverterType::fromString(value);
+	if (static_cast<typename ConverterType::ValueType>(std::numeric_limits<X>::max()) < result) {
 		throw Error("value too big");
 	}
-	return static_cast<Basic>(result);
+	return static_cast<X>(result);
 }
 
-template <typename Setup> inline typename Setup::StringType
-StringConverter<Setup, long long>::toString(long long value) {
+template <typename String> NEXTWEB_INLINE String
+StringConverter<String, long long>::toString(long long value) {
 	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%lld", value);
-	return typename Setup::StringType(buffer);
+	return String(buffer);
 }
 
-template <typename Setup> inline long long
-StringConverter<Setup, long long>::fromString(typename Setup::StringType const &value) {
-	long long retval;
-	int result = sscanf(value.c_str(), "%lld", &retval);
-	SystemError::throwUnless(result >= 0);
-	if (0 == result) {
-		throw Error("no value to convert");
-	}
-	return retval;
+template <typename String> NEXTWEB_INLINE long long
+StringConverter<String, long long>::fromString(String const &value) {
+	return CharArrayConverter<long long>::convert(value.c_str());
 }
 
-template <typename Setup> inline typename Setup::StringType
-StringConverter<Setup, unsigned long long>::toString(unsigned long long value) {
+template <typename String> NEXTWEB_INLINE String
+StringConverter<String, unsigned long long>::toString(unsigned long long value) {
 	char buffer[64];
 	snprintf(buffer, sizeof(buffer), "%llu", value);
-	return typename Setup::StringType(buffer);
+	return String(buffer);
 }
 
-template <typename Setup> inline unsigned long long
-StringConverter<Setup, unsigned long long>::fromString(typename Setup::StringType const &value) {
-	unsigned long long retval;
-	int result = sscanf(value.c_str(), "%llu", &retval);
-	SystemError::throwUnless(result >= 0);
-	if (0 == result) {
-		throw Error("no value to convert");
+template <typename String> NEXTWEB_INLINE unsigned long long
+StringConverter<String, unsigned long long>::fromString(String const &value) {
+	return CharArrayConverter<unsigned long long>::convert(value.c_str());
+}
+
+template <typename String, typename X> NEXTWEB_INLINE String
+toString(X value) {
+	return StringConverter<String, X>::toString(value);
+}
+
+template <typename X> NEXTWEB_INLINE X
+fromString(char const *value) {
+	typedef CharArrayConverter<typename MaxTypeToConvert<std::numeric_limits<X>::is_signed>::Type> ConverterType;
+	typename ConverterType::ValueType result = ConverterType::convert(value);
+	if (static_cast<typename ConverterType::ValueType>(std::numeric_limits<X>::max()) < result) {
+		throw Error("value too big");
 	}
-	return retval;
+	return static_cast<X>(result);
 }
 
-template <typename Setup, typename Basic> typename Setup::StringType
-toString(Basic value) {
-	return StringConverter<Setup, Basic>::toString(value);
-}
-
-template <typename Setup, typename Basic> Basic
-fromString(typename Setup::StringType const &value) {
-	return StringConverter<Setup, Basic>::fromString(value);
+template <typename X, typename String> NEXTWEB_INLINE X
+fromString(String const &value) {
+	return StringConverter<String, X>::fromString(value);
 }
 
 }} // namespaces
 
-#endif // NEXTWEB_DETAILS_STRING_CONVERTERS_HPP_INCLUDED
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/utils/StringConverters.hpp"
+#endif
+
+#endif // NEXTWEB_UTILS_STRING_CONVERTERS_HPP_INCLUDED

@@ -14,6 +14,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#ifndef NEXTWEB_INLINES_UTILS_MAPPED_FILE_HPP_INCLUDED
+#define NEXTWEB_INLINES_UTILS_MAPPED_FILE_HPP_INCLUDED
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -123,3 +126,5 @@ MappedFileImpl::at(MappedFileImpl::SizeType position) const {
 }
 
 }} // namespaces
+
+#endif // NEXTWEB_INLINES_UTILS_MAPPED_FILE_HPP_INCLUDED
