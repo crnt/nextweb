@@ -19,6 +19,7 @@
 #define NEXTWEB_UTILS_TYPE_LIST_HPP_INCLUDED
 
 #include <cstddef>
+#include "nextweb/utils/TypeTraits.hpp"
 
 namespace nextweb { namespace utils {
 
@@ -41,6 +42,38 @@ template <typename List>
 struct TypeListNthItem<List, static_cast<std::size_t>(0)> {
 	typedef typename List::Value Type;
 };
+
+template <std::size_t N>
+struct TypeListNthItem<NullType, N> {
+	typedef NullType Type;
+};
+
+template <typename X, typename List, int Index> 
+struct TypeListIndexOfImpl;
+
+template <typename List, typename X>
+struct TypeListIndexOf {
+	static int const RESULT = TypeListIndexOfImpl<List, X, 0>::RESULT;
+};
+
+template <typename List, typename X> int const
+TypeListIndexOf<List, X>::RESULT;
+
+template <typename List, typename X, int Index> 
+struct TypeListIndexOfImpl {
+	static int const RESULT = IsSame<X, typename List::Value>::RESULT ? Index : TypeListIndexOfImpl<typename List::Next, X, Index + 1>::RESULT;
+};
+
+template <typename List, typename X, int Index> int const
+TypeListIndexOfImpl<List, X, Index>::RESULT;
+
+template <typename X, int Index>
+struct TypeListIndexOfImpl<NullType, X, Index> {
+	static int const RESULT = -1;
+};
+
+template <typename X, int Index> int const
+TypeListIndexOfImpl<NullType, X, Index>::RESULT;
 
 }} // namespaces
 

@@ -23,8 +23,22 @@
 
 #include "nextweb/utils/TypeList.hpp"
 #include "nextweb/utils/TypeTraits.hpp"
+#include "nextweb/utils/StaticAssert.hpp"
 
 namespace nextweb { namespace utils {
+
+typedef NEXTWEB_MAKE_TYPE_LIST5(signed char, signed short, signed int, signed long, signed long long) SignedIntegerList;
+typedef NEXTWEB_MAKE_TYPE_LIST5(unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long) UnsignedIntegerList;
+
+template <typename X>
+struct IsInteger {
+	static bool const RESULT = (TypeListIndexOf<SignedIntegerList, X>::RESULT != -1) || (TypeListIndexOf<UnsignedIntegerList, X>::RESULT != -1);
+};
+
+template <>
+struct IsInteger<char> {
+	static bool const RESULT = true;
+};
 
 template <std::size_t Size, typename List, bool IsFound>
 struct IntegerSizeSearchImpl;
@@ -49,42 +63,6 @@ struct IntegerSizeSearchImpl<Size, NullType, IsFound> {
 	typedef NullType Type;
 };
 
-template <typename X, typename List, typename TargerList, bool IsFound>
-struct IntegerTypeSearchImpl;
-
-template <typename X, typename List, typename TargetList>
-struct IntegerTypeSearch {
-	typedef typename IntegerTypeSearchImpl<X, List, TargetList, IsSame<X, typename List::Value>::RESULT || IsSame<X, typename TargetList::Value>::RESULT>::Type Type;
-};
-
-template <typename List, typename TargetList>
-struct IntegerTypeSearch<char, List, TargetList> {
-	typedef typename IntegerTypeSearch<signed char, List, TargetList>::Type Type;
-};
-
-template <typename X, typename List, typename TargetList>
-struct IntegerTypeSearchImpl<X, List, TargetList, true> {
-	typedef typename TargetList::Value Type;
-};
-
-template <typename X, typename List, typename TargetList>
-struct IntegerTypeSearchImpl<X, List, TargetList, false> {
-	typedef typename IntegerTypeSearch<X, typename List::Next, typename TargetList::Next>::Type Type;
-};
-
-template <typename X, typename List, bool IsFound>
-struct IntegerTypeSearchImpl<X, List, NullType, IsFound> {
-	typedef NullType Type;
-};
-
-template <typename X, typename TargetList, bool IsFound>
-struct IntegerTypeSearchImpl<X, NullType, TargetList, IsFound> {
-	typedef NullType Type;
-};
-
-typedef NEXTWEB_MAKE_TYPE_LIST5(signed char, signed short, signed int, signed long, signed long long) SignedIntegerList;
-typedef NEXTWEB_MAKE_TYPE_LIST5(unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long) UnsignedIntegerList;
-
 typedef IntegerSizeSearch<1, SignedIntegerList>::Type Int8;
 typedef IntegerSizeSearch<2, SignedIntegerList>::Type Int16;
 typedef IntegerSizeSearch<4, SignedIntegerList>::Type Int32;
@@ -95,14 +73,43 @@ typedef IntegerSizeSearch<2, UnsignedIntegerList>::Type UInt16;
 typedef IntegerSizeSearch<4, UnsignedIntegerList>::Type UInt32;
 typedef IntegerSizeSearch<8, UnsignedIntegerList>::Type UInt64;
 
-template <typename Arg>
+template <typename X>
 struct MakeSigned {
-	typedef typename IntegerTypeSearch<Arg, UnsignedIntegerList, SignedIntegerList>::Type Type;
+	NEXTWEB_STATIC_ASSERT(IsInteger<X>::RESULT);
+	static int const SP = TypeListIndexOf<SignedIntegerList, X>::RESULT;
+	static int const UP = TypeListIndexOf<UnsignedIntegerList, X>::RESULT;
+	typedef typename TypeListNthItem<SignedIntegerList, (-1 != SP) ? SP : UP>::Type Type;
 };
 
-template <typename Arg>
+template <typename X> int const
+MakeSigned<X>::SP;
+
+template <typename X> int const
+MakeSigned<X>::UP;
+
+template <>
+struct MakeSigned<char> {
+	typedef signed char Type;
+};
+
+template <typename X>
 struct MakeUnsigned {
-	typedef typename IntegerTypeSearch<Arg, SignedIntegerList, UnsignedIntegerList>::Type Type;
+	NEXTWEB_STATIC_ASSERT(IsInteger<X>::RESULT);
+	static int const SP = TypeListIndexOf<SignedIntegerList, X>::RESULT;
+	static int const UP = TypeListIndexOf<UnsignedIntegerList, X>::RESULT;
+	typedef typename TypeListNthItem<UnsignedIntegerList, (-1 != SP) ? SP : UP>::Type Type;
+};
+
+
+template <typename X> int const
+MakeUnsigned<X>::SP;
+
+template <typename X> int const
+MakeUnsigned<X>::UP;
+
+template <>
+struct MakeUnsigned<char> {
+	typedef unsigned char Type;
 };
 
 }} // namespaces

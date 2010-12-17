@@ -1,0 +1,32 @@
+#include "acsetup.hpp"
+
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+
+#include "nextweb/templates/Params.hpp"
+
+namespace nextweb { namespace tests {
+
+class ParamsTest : public CppUnit::TestFixture {
+
+public:
+	void testOperations();
+
+private:
+	CPPUNIT_TEST_SUITE(ParamsTest);
+	CPPUNIT_TEST(testOperations);
+	CPPUNIT_TEST_SUITE_END();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION(ParamsTest);
+
+void
+ParamsTest::testOperations() {
+
+	using namespace templates;
+	ParamSet params;
+	params["data"][10] = 12345;
+}
+
+}} // namespaces
+	

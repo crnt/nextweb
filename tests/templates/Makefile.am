@@ -3,7 +3,7 @@ check_PROGRAMS = templates-tests
 templates_tests_LDADD = ${top_srcdir}/templates/libnextweb-templates.la \
 	${top_srcdir}/utils/libnextweb.la
 	
-templates_tests_SOURCES = main.cpp
+templates_tests_SOURCES = main.cpp Params.cpp
 
 AM_CXXFLAGS = -pthread
 AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/config \

@@ -36,6 +36,7 @@ nobase_pkginclude_HEADERS = \
 	inlines/utils/ScopedLock.hpp \
 	inlines/utils/StringConverters.hpp \
 	inlines/utils/Threads.hpp \
+	templates/Params.hpp \
 	utils/CharTraits.hpp \
 	utils/EnumerationImpl.hpp \
 	utils/Functors.hpp \

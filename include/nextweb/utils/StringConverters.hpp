@@ -26,6 +26,7 @@
 #include "nextweb/Error.hpp"
 #include "nextweb/Config.hpp"
 
+#include "nextweb/utils/Range.hpp"
 #include "nextweb/utils/TypeTraits.hpp"
 #include "nextweb/utils/SystemError.hpp"
 #include "nextweb/utils/StaticAssert.hpp"
@@ -115,8 +116,10 @@ StringConverter<String, X>::fromString(String const &value) {
 template <typename String> NEXTWEB_INLINE String
 StringConverter<String, long long>::toString(long long value) {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%lld", value);
-	return String(buffer);
+	int length = snprintf(buffer, sizeof(buffer), "%lld", value);
+	SystemError::throwUnless(length >= 0);
+	Range<char const*> range(buffer, buffer + length);
+	return String(range.begin(), range.end());
 }
 
 template <typename String> NEXTWEB_INLINE long long
@@ -127,8 +130,10 @@ StringConverter<String, long long>::fromString(String const &value) {
 template <typename String> NEXTWEB_INLINE String
 StringConverter<String, unsigned long long>::toString(unsigned long long value) {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%llu", value);
-	return String(buffer);
+	int length = snprintf(buffer, sizeof(buffer), "%llu", value);
+	SystemError::throwUnless(length >= 0);
+	Range<char const*> range(buffer, buffer + length);
+	return String(range.begin(), range.end());
 }
 
 template <typename String> NEXTWEB_INLINE unsigned long long
@@ -136,9 +141,9 @@ StringConverter<String, unsigned long long>::fromString(String const &value) {
 	return CharArrayConverter<unsigned long long>::convert(value.c_str());
 }
 
-template <typename String, typename X> NEXTWEB_INLINE String
-toString(X value) {
-	return StringConverter<String, X>::toString(value);
+template <typename String> NEXTWEB_INLINE String
+toString(char const *value) {
+	return String(value);
 }
 
 template <typename X> NEXTWEB_INLINE X
@@ -149,6 +154,16 @@ fromString(char const *value) {
 		throw Error("value too big");
 	}
 	return static_cast<X>(result);
+}
+
+template <typename X> NEXTWEB_INLINE std::string
+toString(X const &value) {
+	return StringConverter<std::string, X>::toString(value);
+}
+
+template <typename String, typename X> NEXTWEB_INLINE String
+toString(X const &value) {
+	return StringConverter<String, X>::toString(value);
 }
 
 template <typename X, typename String> NEXTWEB_INLINE X
