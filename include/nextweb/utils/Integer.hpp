@@ -31,12 +31,12 @@ typedef NEXTWEB_MAKE_TYPE_LIST5(signed char, signed short, signed int, signed lo
 typedef NEXTWEB_MAKE_TYPE_LIST5(unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long) UnsignedIntegerList;
 
 template <typename X>
-struct IsInteger {
+struct IsInt {
 	static bool const RESULT = (TypeListIndexOf<SignedIntegerList, X>::RESULT != -1) || (TypeListIndexOf<UnsignedIntegerList, X>::RESULT != -1);
 };
 
 template <>
-struct IsInteger<char> {
+struct IsInt<char> {
 	static bool const RESULT = true;
 };
 
@@ -67,15 +67,35 @@ typedef IntegerSizeSearch<1, SignedIntegerList>::Type Int8;
 typedef IntegerSizeSearch<2, SignedIntegerList>::Type Int16;
 typedef IntegerSizeSearch<4, SignedIntegerList>::Type Int32;
 typedef IntegerSizeSearch<8, SignedIntegerList>::Type Int64;
+typedef Int64 IntMax;
 
 typedef IntegerSizeSearch<1, UnsignedIntegerList>::Type UInt8;
 typedef IntegerSizeSearch<2, UnsignedIntegerList>::Type UInt16;
 typedef IntegerSizeSearch<4, UnsignedIntegerList>::Type UInt32;
 typedef IntegerSizeSearch<8, UnsignedIntegerList>::Type UInt64;
+typedef UInt64 UIntMax;
+
+template <bool IsSigned>
+struct MaxIntImpl;
+
+template <typename X>
+struct MaxInt {
+	typedef typename MaxIntImpl<std::numeric_limits<X>::is_signed>::Type Type;
+};
+
+template <>
+struct MaxIntImpl<true> {
+	typedef IntMax Type;
+};
+
+template <>
+struct MaxIntImpl<false> {
+	typedef UIntMax Type;
+};
 
 template <typename X>
 struct MakeSigned {
-	NEXTWEB_STATIC_ASSERT(IsInteger<X>::RESULT);
+	NEXTWEB_STATIC_ASSERT(IsInt<X>::RESULT);
 	static int const SP = TypeListIndexOf<SignedIntegerList, X>::RESULT;
 	static int const UP = TypeListIndexOf<UnsignedIntegerList, X>::RESULT;
 	typedef typename TypeListNthItem<SignedIntegerList, (-1 != SP) ? SP : UP>::Type Type;
@@ -94,7 +114,7 @@ struct MakeSigned<char> {
 
 template <typename X>
 struct MakeUnsigned {
-	NEXTWEB_STATIC_ASSERT(IsInteger<X>::RESULT);
+	NEXTWEB_STATIC_ASSERT(IsInt<X>::RESULT);
 	static int const SP = TypeListIndexOf<SignedIntegerList, X>::RESULT;
 	static int const UP = TypeListIndexOf<UnsignedIntegerList, X>::RESULT;
 	typedef typename TypeListNthItem<UnsignedIntegerList, (-1 != SP) ? SP : UP>::Type Type;

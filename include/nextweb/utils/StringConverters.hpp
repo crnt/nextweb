@@ -22,153 +22,93 @@
 #include <cstdio>
 #include <limits>
 #include <string>
+#include <sstream>
 
 #include "nextweb/Error.hpp"
 #include "nextweb/Config.hpp"
 
 #include "nextweb/utils/Range.hpp"
-#include "nextweb/utils/TypeTraits.hpp"
+#include "nextweb/utils/Integer.hpp"
 #include "nextweb/utils/SystemError.hpp"
-#include "nextweb/utils/StaticAssert.hpp"
 
 namespace nextweb { namespace utils {
 
-template <bool IsSigned>
-struct MaxTypeToConvert;
-
-template <>
-struct MaxTypeToConvert<true> {
-	typedef long long Type;
+class ConvertError : public Error {
+public:
+	ConvertError();
 };
 
-template <>
-struct MaxTypeToConvert<false> {
-	typedef unsigned long long Type;
+template <typename X, typename String, bool IsInteger>
+struct StringConverter;
+
+template <typename X, typename String>
+struct StringConverter<X, String, true>  {
+	static String toString(X val);
 };
 
-template <typename X>
-struct CharArrayConverter;
-
-template <>
-struct CharArrayConverter<long long> {
-	typedef long long ValueType;
-	long long convert(char const *value);
-};
-
-template <>
-struct CharArrayConverter<unsigned long long> {
-	typedef unsigned long long ValueType;
-	unsigned long long convert(char const *value);
-};
-
-template <typename String, typename X>
-struct StringConverter {
-	static String toString(X value);
-	static X fromString(String const &value);
-	NEXTWEB_STATIC_ASSERT((IsSame<typename String::value_type, char>::RESULT));
+template <typename X, typename String>
+struct StringConverter<X, String, false>  {
+	static String toString(X val);
+	typedef std::basic_stringstream<typename String::value_type> StreamType;
 };
 
 template <typename String>
-struct StringConverter<String, long long> {
-	typedef long long ValueType;
-	static String toString(long long value);
-	static long long fromString(String const &value);
-	NEXTWEB_STATIC_ASSERT((IsSame<typename String::value_type, char>::RESULT));
+struct StringConverter<IntMax, String, true> {
+	static String toString(IntMax val);
 };
 
 template <typename String>
-struct StringConverter<String, unsigned long long> {
-	typedef unsigned long long ValueType;
-	static String toString(unsigned long long value);
-	static unsigned long long fromString(String const &value);
-	NEXTWEB_STATIC_ASSERT((IsSame<typename String::value_type, char>::RESULT));
+struct StringConverter<UIntMax, String, true> {
+	static String toString(UIntMax val);
 };
 
-template <typename String, bool IsSigned>
-struct StringConverterSelector;
-
-template <typename String>
-struct StringConverterSelector<String, true> {
-	typedef StringConverter<String, long long> Type;
+template <typename X, typename String> NEXTWEB_INLINE String
+StringConverter<X, String, true>::toString(X val) {
+	typedef typename MaxInt<X>::Type ValueType;
+	return StringConverter<ValueType, String, true>::toString(static_cast<ValueType>(val));
 };
 
-template <typename String>
-struct StringConverterSelector<String, false> {
-	typedef StringConverter<String, unsigned long long> Type;
-};
-
-template <typename String, typename X> NEXTWEB_INLINE String
-StringConverter<String, X>::toString(X value) {
-	typedef typename StringConverterSelector<String, std::numeric_limits<X>::is_signed>::Type ConverterType;
-	return ConverterType::toString(static_cast<typename ConverterType::ValueType>(value));
-}
-
-template <typename String, typename X> NEXTWEB_INLINE X
-StringConverter<String, X>::fromString(String const &value) {
-	typedef typename StringConverterSelector<String, std::numeric_limits<X>::is_signed>::Type ConverterType;
-	typename ConverterType::ValueType result = ConverterType::fromString(value);
-	if (static_cast<typename ConverterType::ValueType>(std::numeric_limits<X>::max()) < result) {
-		throw Error("value too big");
+template <typename X, typename String> NEXTWEB_INLINE String
+StringConverter<X, String, false>::toString(X val) {
+	try {
+		String res;
+		StreamType stream;
+		stream.exceptions(std::ios::badbit);
+		stream << val;
+		stream >> res;
+		return res;
 	}
-	return static_cast<X>(result);
-}
-
-template <typename String> NEXTWEB_INLINE String
-StringConverter<String, long long>::toString(long long value) {
-	char buffer[64];
-	int length = snprintf(buffer, sizeof(buffer), "%lld", value);
-	SystemError::throwUnless(length >= 0);
-	Range<char const*> range(buffer, buffer + length);
-	return String(range.begin(), range.end());
-}
-
-template <typename String> NEXTWEB_INLINE long long
-StringConverter<String, long long>::fromString(String const &value) {
-	return CharArrayConverter<long long>::convert(value.c_str());
-}
-
-template <typename String> NEXTWEB_INLINE String
-StringConverter<String, unsigned long long>::toString(unsigned long long value) {
-	char buffer[64];
-	int length = snprintf(buffer, sizeof(buffer), "%llu", value);
-	SystemError::throwUnless(length >= 0);
-	Range<char const*> range(buffer, buffer + length);
-	return String(range.begin(), range.end());
-}
-
-template <typename String> NEXTWEB_INLINE unsigned long long
-StringConverter<String, unsigned long long>::fromString(String const &value) {
-	return CharArrayConverter<unsigned long long>::convert(value.c_str());
-}
-
-template <typename String> NEXTWEB_INLINE String
-toString(char const *value) {
-	return String(value);
-}
-
-template <typename X> NEXTWEB_INLINE X
-fromString(char const *value) {
-	typedef CharArrayConverter<typename MaxTypeToConvert<std::numeric_limits<X>::is_signed>::Type> ConverterType;
-	typename ConverterType::ValueType result = ConverterType::convert(value);
-	if (static_cast<typename ConverterType::ValueType>(std::numeric_limits<X>::max()) < result) {
-		throw Error("value too big");
+	catch (std::ios::failure const &) {
+		throw ConvertError();
 	}
-	return static_cast<X>(result);
-}
+};
+
+template <typename String> NEXTWEB_INLINE String
+StringConverter<IntMax, String, true>::toString(IntMax val) {
+	char buf[64];
+	int res = snprintf(buf, sizeof(buf), "%lld", val);
+	SystemError::throwUnless(res >= 0);
+	Range<char const*> range(buf, buf + res);
+	return String(range.begin(), range.end());
+};
+
+template <typename String> NEXTWEB_INLINE String
+StringConverter<UIntMax, String, true>::toString(UIntMax val) {
+	char buf[64];
+	int res = snprintf(buf, sizeof(buf), "%llu", val);
+	SystemError::throwUnless(res >= 0);
+	Range<char const*> range(buf, buf + res);
+	return String(range.begin(), range.end());
+};
 
 template <typename X> NEXTWEB_INLINE std::string
-toString(X const &value) {
-	return StringConverter<std::string, X>::toString(value);
+toString(X value) {
+	return StringConverter<X, std::string, IsInt<X>::RESULT>::toString(value);
 }
 
 template <typename String, typename X> NEXTWEB_INLINE String
-toString(X const &value) {
-	return StringConverter<String, X>::toString(value);
-}
-
-template <typename X, typename String> NEXTWEB_INLINE X
-fromString(String const &value) {
-	return StringConverter<String, X>::fromString(value);
+toString(X value) {
+	return StringConverter<X, String, IsInt<X>::RESULT>::toString(value);
 }
 
 }} // namespaces

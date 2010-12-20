@@ -18,33 +18,12 @@
 #ifndef NEXTWEB_INLINES_UTILS_STRING_CONVERTERS_HPP_INCLUDED
 #define NEXTWEB_INLINES_UTILS_STRING_CONVERTERS_HPP_INCLUDED
 
-#include <cstdio>
-
-#include "nextweb/Error.hpp"
-#include "nextweb/utils/SystemError.hpp"
-
 namespace nextweb { namespace utils {
 
-NEXTWEB_INLINE long long
-CharArrayConverter<long long>::convert(char const *value) {
-	long long retval;
-	int result = sscanf(value, "%lld", &retval);
-	SystemError::throwUnless(result >= 0);
-	if (0 == result) {
-		throw Error("no value to convert");
-	}
-	return retval;
-}
-
-NEXTWEB_INLINE unsigned long long
-CharArrayConverter<unsigned long long>::convert(char const *value) {
-	long long retval;
-	int result = sscanf(value, "%llu", &retval);
-	SystemError::throwUnless(result >= 0);
-	if (0 == result) {
-		throw Error("no value to convert");
-	}
-	return retval;
+NEXTWEB_INLINE
+ConvertError::ConvertError() :
+	Error("can not convert value")
+{
 }
 
 }} // namespaces

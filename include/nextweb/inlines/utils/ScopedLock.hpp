@@ -26,10 +26,6 @@ LockError::LockError(char const *message) :
 {
 }
 
-NEXTWEB_INLINE
-LockError::~LockError() throw () {
-}
-
 struct SingleThreadedMutex;
 
 template <> NEXTWEB_INLINE void

@@ -27,7 +27,6 @@ class LockError : public Error {
 
 public:
 	LockError(char const *message);
-	virtual ~LockError() throw ();
 };
 
 template <typename LockableObject>

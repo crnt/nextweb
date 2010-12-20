@@ -15,36 +15,44 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_ERROR_HPP_INCLUDED
-#define NEXTWEB_ERROR_HPP_INCLUDED
+#ifndef NEXTWEB_INLINES_ERROR_HPP_INCLUDED
+#define NEXTWEB_INLINES_ERROR_HPP_INCLUDED
 
-#include "nextweb/Config.hpp"
-
-#include <exception>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
 
 namespace nextweb {
 
-class NEXTWEB_API Error : public std::exception {
+NEXTWEB_INLINE
+Error::Error(char const *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vsnprintf(message_, MESSAGE_SIZE, format, args);
+	va_end(args);
+}
 
-public:
-	Error(char const *format, ...);
-	virtual ~Error() throw ();
-	
-	Error(Error const &other);
-	Error& operator = (Error const &other);
-	
-	static int const MESSAGE_SIZE = 256;
-	
-	virtual char const* what() const throw ();
+NEXTWEB_INLINE
+Error::~Error() throw () {
+}
 
-private:
-	char message_[MESSAGE_SIZE];
-};
+NEXTWEB_INLINE
+Error::Error(Error const &other)
+{
+	memcpy(message_, other.message_, MESSAGE_SIZE);
+}
+
+NEXTWEB_INLINE Error&
+Error::operator = (Error const &other) {
+	memcpy(message_, other.message_, MESSAGE_SIZE);
+}
+	
+NEXTWEB_INLINE char const*
+Error::what() const throw () {
+	return message_;
+}
 
 } // namespace
 
-#ifndef NEXTWEB_DEBUG
-#include "nextweb/inlines/Error.hpp"
-#endif
-
-#endif // NEXTWEB_ERROR_HPP_INCLUDED
+#endif // NEXTWEB_INLINES_ERROR_HPP_INCLUDED
