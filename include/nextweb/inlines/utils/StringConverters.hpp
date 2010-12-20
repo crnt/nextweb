@@ -26,6 +26,27 @@ ConvertError::ConvertError() :
 {
 }
 
+NEXTWEB_INLINE void
+ConvertError::throwUnless(bool condition) {
+	if (!condition) throw ConvertError();
+}
+
+NEXTWEB_INLINE IntMax
+IntConverter<true>::fromCharPtr(char const *value) {
+	IntMax res;
+	int success = sscanf(value, "%lld", &res);
+	ConvertError::throwUnless(success > 0);
+	return res;
+}
+
+NEXTWEB_INLINE UIntMax
+IntConverter<false>::fromCharPtr(char const *value) {
+	UIntMax res;
+	int success = sscanf(value, "%llu", &res);
+	ConvertError::throwUnless(success > 0);
+	return res;
+}
+
 }} // namespaces
 
 #endif // NEXTWEB_INLINES_UTILS_STRING_CONVERTERS_HPP_INCLUDED
