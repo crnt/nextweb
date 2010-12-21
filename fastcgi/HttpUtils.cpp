@@ -17,16 +17,25 @@ std::string const
 HttpConstants::METHOD("REQUEST_METHOD");
 
 std::string const
+HttpConstants::PATH_INFO("PATH_INFO");
+
+std::string const
 HttpConstants::EMPTY_STRING;
 
 std::string const
-HttpConstants::CONTENT_LENGTH("CONTENT_LENGTH");
+HttpConstants::CONTENT_TYPE("CONTENT_TYPE");
+
+std::string const
+HttpConstants::CONTENT_LENGTH("HTTP_CONTENT_LENGTH");
+
+utils::Range<char const*> const
+HttpConstants::BOUNDARY = utils::makeRange("boundary");
 
 utils::Range<char const*> const
 HttpConstants::COOKIE_VAR_NAME = utils::makeRange("HTTP_COOKIE");
 
 utils::Range<char const*> const
-HttpConstants::PATH_INFO_VAR_NAME = utils::makeRange("PATH_INFO");
+HttpConstants::MULTIPART_FORM_DATA = utils::makeRange("multipart/form-data");
 
 utils::Range<char const*> const
 HttpConstants::QUERY_STRING_VAR_NAME = utils::makeRange("QUERY_STRING");

@@ -30,18 +30,23 @@ public:
 	MockIO();
 	virtual ~MockIO();
 
-	char const* const* environ() const;
+	void checkIsValid() const;
 	void add(std::string const &value);
+	void attachFile(char const *fileName);
+
+	char const* const* environ() const; 
+	std::size_t read(char *buffer, std::size_t size); 
+	std::size_t write(char const *buffer, std::size_t size);
 	
 private:
 	MockIO(MockIO const &);
 	MockIO& operator = (MockIO const &);
-	void checkIsValid() const;
+	void validate() const;
 
 private:
 	std::ifstream post_;
-	std::vector<char const*> env_;
 	std::vector<std::string> strings_;
+	mutable std::vector<char const*> env_;
 };
 
 }} // namespaces

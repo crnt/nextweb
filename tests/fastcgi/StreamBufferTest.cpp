@@ -27,11 +27,11 @@ private:
 	
 private:
 	CPPUNIT_TEST_SUITE(StreamBufferTest);
-	// CPPUNIT_TEST(testBuffer);
+	CPPUNIT_TEST(testBuffer);
 	CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(StreamBufferTest);
+// CPPUNIT_TEST_SUITE_REGISTRATION(StreamBufferTest);
 
 void
 StreamBufferTest::testBuffer() {

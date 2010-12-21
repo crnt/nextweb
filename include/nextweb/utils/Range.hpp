@@ -38,7 +38,7 @@ class RangeBase<Iter, std::forward_iterator_tag> {
 public:
 	RangeBase();
 	RangeBase(Iter begin, Iter end);
-
+	
 	typedef Iter iterator;
 	typedef Iter const_iterator;
 	
@@ -62,6 +62,7 @@ public:
 	size_type size() const;
 
 private:
+	bool empty_;
 	Iter begin_, end_;
 };
 
@@ -105,13 +106,13 @@ public:
 
 template <typename Iter> NEXTWEB_INLINE
 RangeBase<Iter, std::forward_iterator_tag>::RangeBase() :
-	begin_(), end_(begin_)
+	empty_(true), begin_(), end_()
 {
 }
 
 template <typename Iter> NEXTWEB_INLINE
 RangeBase<Iter, std::forward_iterator_tag>::RangeBase(Iter begin, Iter end) :
-	begin_(begin), end_(end)
+	empty_(false), begin_(begin), end_(end)
 {
 }
 
@@ -138,11 +139,12 @@ RangeBase<Iter, std::forward_iterator_tag>::begin() const {
 template <typename Iter> NEXTWEB_INLINE void
 RangeBase<Iter, std::forward_iterator_tag>::clear() {
 	begin_ = end_;
+	empty_ = true;
 }
 
 template <typename Iter> NEXTWEB_INLINE bool
 RangeBase<Iter, std::forward_iterator_tag>::empty() const {
-	return begin_ == end_;
+	return empty_ ? true : (begin_ == end_);
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::forward_iterator_tag>::size_type

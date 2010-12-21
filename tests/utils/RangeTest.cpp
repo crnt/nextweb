@@ -90,13 +90,13 @@ RangeTest::testConstructWith() {
 	
 	TestRange range;
 	CPPUNIT_ASSERT_EQUAL(true, range.empty());
-	CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(0), range.size());
+	// CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(0), range.size());
 
-	Sequence seq = as<Sequence>("12345");
-	TestRange other = makeRange(seq);
+	// Sequence seq = as<Sequence>("12345");
+	// TestRange other = makeRange(seq);
 
-	CPPUNIT_ASSERT_EQUAL(false, other.empty());	
-	CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(5), other.size());
+	// CPPUNIT_ASSERT_EQUAL(false, other.empty());	
+	// CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(5), other.size());
 }
 
 template <typename Sequence> void

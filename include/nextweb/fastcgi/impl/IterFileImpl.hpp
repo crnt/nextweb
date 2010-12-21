@@ -97,11 +97,6 @@ IterFileImpl<Iter>::save(std::string const &name) const {
 	std::copy(content_.begin(), content_.end(), std::ostream_iterator<typename std::iterator_traits<Iter>::value_type>(file));
 }
 
-template <> NEXTWEB_INLINE void
-IterFileImpl<char const*>::save(std::string const &name) const {
-	// implement bufferless write to disk
-}
-
 }} // namespaces
 
 #endif // NEXTWEB_FASTCGI_ITER_FILE_IMPL_HPP_INCLUDED

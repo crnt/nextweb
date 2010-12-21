@@ -26,12 +26,13 @@ namespace nextweb { namespace fastcgi {
 class FCGI {
 
 public:
-	FCGI(int sock);
+	FCGI(int socket);
 	virtual ~FCGI();
 
 	void accept();
 	void finish();
 
+	char const* const* environ() const; 
 	std::size_t read(char *buffer, std::size_t size); 
 	std::size_t write(char const *buffer, std::size_t size);
 
@@ -39,16 +40,7 @@ private:
 	FCGI(FCGI const &);
 	FCGI& operator = (FCGI const &);
 
-	void setFlag(int flag);
-	void checkFlag(int flag) const;
-	bool isFlagSet(int flag) const;
-
-	static int const REQUEST_INITIALIZED = 1;
-	static int const REQUEST_ACCEPTED = 2;
-	static int const REQUEST_FINISHED = 4;
-
 private:
-	int flags_;
 	FCGX_Request request_;
 };
 

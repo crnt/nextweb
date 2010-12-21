@@ -19,11 +19,18 @@
 #define NEXTWEB_FASTCGI_POST_PARSER_HPP_INCLUDED
 
 #include <string>
+#include <iostream>
 
 #include "nextweb/Config.hpp"
 #include "nextweb/Shared.hpp"
+#include "nextweb/utils/Range.hpp"
 #include "nextweb/utils/Resource.hpp"
+#include "nextweb/utils/StringUtils.hpp"
+
 #include "nextweb/fastcgi/File.hpp"
+#include "nextweb/fastcgi/HttpError.hpp"
+#include "nextweb/fastcgi/impl/HttpUtils.hpp"
+#include "nextweb/fastcgi/impl/IterFileImpl.hpp"
 
 namespace nextweb { namespace fastcgi {
 
@@ -35,6 +42,7 @@ public:
 
 	virtual void addFile(File const &file) = 0;
 	virtual void addArg(std::string const &name, std::string const &value) = 0;
+	virtual std::string const& contentType() const = 0;
 	
 private:
 	PostParserListener(PostParserListener const &);
@@ -53,8 +61,10 @@ public:
 	virtual void parsePost(IO &io, std::size_t size) = 0;
 
 protected:
+	
 	void fireAddFile(File const &file);
 	void fireAddArg(std::string const &name, std::string const &value);
+	std::string const& contentType() const;
 
 private:
 	PostParser(PostParser const &);
@@ -78,6 +88,15 @@ public:
 private:
 	ContainerPostParser(ContainerPostParser const &);
 	ContainerPostParser& operator = (ContainerPostParser const &);
+	
+	typedef utils::Range<std::string::const_iterator> StringRangeType;
+	typedef utils::Range<typename Container::const_iterator> RangeType;
+
+	void parsePlainPost();
+	void parseArg(RangeType const &part);
+	void parsePart(RangeType const &part);
+	void parseMultipart(std::string const &bound);
+	std::string getBoundary(StringRangeType const &value) const;
 
 private:
 	Container container_;	
@@ -103,6 +122,11 @@ PostParser<IO>::fireAddArg(std::string const &name, std::string const &value) {
 	listener_->addArg(name, value);
 }
 
+template <typename IO> NEXTWEB_INLINE std::string const&
+PostParser<IO>::contentType() const {
+	return listener_->contentType();
+}
+
 template <typename IO, typename Container> NEXTWEB_INLINE
 ContainerPostParser<IO, Container>::ContainerPostParser(PostParserListener *listener) :
 	PostParser<IO>(listener), container_()
@@ -125,6 +149,72 @@ ContainerPostParser<IO, Container>::available() const {
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parsePost(IO &io, std::size_t size) {
+	
+	using namespace utils;
+	container_.resize(size);
+	io.read(&container_[0], size);
+	std::string const &type = this->contentType();
+
+	StringRangeType range(type.begin(), type.end());
+	range = trim(range);
+	if (startsWith(range, HttpConstants::MULTIPART_FORM_DATA)) {
+		StringRangeType head, tail;
+		splitOnce(range, ';', head, tail);
+		parseMultipart(getBoundary(trim(tail)));
+	}
+	else {
+		parsePlainPost();
+	}
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::parsePlainPost() {
+	using namespace utils;
+	RangeType range(container_.begin(), container_.end()), part;
+	while (!range.empty()) {
+		splitFirstOfOnce(range, "&;", part, range);
+		parseArg(part);
+	}
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::parseArg(typename ContainerPostParser<IO, Container>::RangeType const &part) {
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, Container>::RangeType const &part) {
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
+	using namespace utils;
+	typedef Range<typename Container::const_iterator> RangeType;
+	RangeType range(container_.begin(), container_.end()), part;
+	while (!range.empty()) {
+		splitOnce(range, bound, part, range);
+		parsePart(part);
+	}
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE std::string
+ContainerPostParser<IO, Container>::getBoundary(typename ContainerPostParser<IO, Container>::StringRangeType const &value) const {
+
+	using namespace utils;
+	if (!startsWith(value, HttpConstants::BOUNDARY)) {
+		throw HttpError(HttpError::BAD_REQUEST);
+	}
+
+	std::string result("--");
+	StringRangeType head, tail;
+	splitOnce(value, '=', head, tail);
+	tail = trim(tail);
+	if ((tail.size() < static_cast<StringRangeType::size_type>(2)) || '"' != *(tail.begin()) || '"' != *(tail.rbegin())) {
+		throw HttpError(HttpError::BAD_REQUEST);
+	}
+
+	tail = truncate(tail, 1, 1);
+	result.append(tail.begin(), tail.end());
+	return result;
 }
 
 }} // namespaces

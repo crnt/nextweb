@@ -53,6 +53,7 @@ public:
 
 	bool isSecure() const;
 	std::string const& pathInfo() const;
+	virtual std::string const& contentType() const;
 
 	StringMap const& vars() const;
 	bool hasVar(std::string const &name) const;
@@ -74,7 +75,7 @@ public:
 	bool hasFile(std::string const &name) const;
 	File getFile(std::string const &name) const;
 	virtual void addFile(File const &file);
-	
+
 private:
 	GenericRequest(GenericRequest const &);
 	GenericRequest& operator = (GenericRequest const &);
@@ -129,7 +130,12 @@ GenericRequest<IO>::isSecure() const {
 
 template <typename IO> NEXTWEB_INLINE std::string const&
 GenericRequest<IO>::pathInfo() const {
-	return getVar(HttpConstants::PATH_INFO_VAR_NAME);
+	return getVar(HttpConstants::PATH_INFO);
+}
+
+template <typename IO> NEXTWEB_INLINE std::string const&
+GenericRequest<IO>::contentType() const {
+	return getVar(HttpConstants::CONTENT_TYPE);
 }
 
 template <typename IO> NEXTWEB_INLINE typename GenericRequest<IO>::StringMap const&
@@ -233,6 +239,11 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parsePost(std::size_t threshold) {
 	std::size_t postSize = utils::fromString<std::size_t>(getVar(HttpConstants::CONTENT_LENGTH));
+	typedef std::vector<char> CharVector;
+	if (!postParser_) {
+		postParser_.reset(new ContainerPostParser<IO, CharVector>(this));
+	}
+	postParser_->parsePost(io_, postSize);
 }
 
 template <typename IO> NEXTWEB_INLINE void

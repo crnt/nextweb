@@ -33,11 +33,14 @@ struct HttpConstants {
 	static std::string const HEAD;
 	static std::string const POST;
 	static std::string const METHOD;
+	static std::string const PATH_INFO;
 	static std::string const EMPTY_STRING;
+	static std::string const CONTENT_TYPE;
 	static std::string const CONTENT_LENGTH;
 	
+	static utils::Range<char const*> const BOUNDARY;
 	static utils::Range<char const*> const COOKIE_VAR_NAME;
-	static utils::Range<char const*> const PATH_INFO_VAR_NAME;
+	static utils::Range<char const*> const MULTIPART_FORM_DATA;
 	static utils::Range<char const*> const QUERY_STRING_VAR_NAME;
 };
 

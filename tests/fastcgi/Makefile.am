@@ -19,5 +19,7 @@ AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/config \
 	-I${top_srcdir}/tests @CPPUNIT_CFLAGS@
 AM_LDFLAGS = @CPPUNIT_LIBS@
 
-noinst_HEADERS = MockIO.hpp
 TESTS = fastcgi-tests
+
+noinst_HEADERS = MockIO.hpp
+noinst_DATA = MultipartN.dat MultipartRN.dat
