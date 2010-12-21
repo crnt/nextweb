@@ -9,6 +9,7 @@ libnextweb_fastcgi_la_SOURCES = \
 	HttpError.cpp \
 	HttpUtils.cpp \
 	Logger.cpp \
+	PostParser.cpp \
 	Request.cpp \
 	RequestHandler.cpp \
 	Response.cpp \

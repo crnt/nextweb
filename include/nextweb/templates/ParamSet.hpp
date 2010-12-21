@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_TEMPLATES_PARAMS_HPP_INCLUDED
-#define NEXTWEB_TEMPLATES_PARAMS_HPP_INCLUDED
+#ifndef NEXTWEB_TEMPLATES_PARAM_SET_HPP_INCLUDED
+#define NEXTWEB_TEMPLATES_PARAM_SET_HPP_INCLUDED
 
 #include <map>
 #include <string>
@@ -31,7 +31,6 @@ class NEXTWEB_API Param {
 public:
 	Param();
 	virtual ~Param();
-
 	virtual std::string const& get(std::string const &name) const = 0;
 	virtual void set(std::string const &name, std::string const &value) = 0;
 	
@@ -40,53 +39,41 @@ protected:
 	Param& operator = (Param const &);
 };
 
-template <typename Derived, typename Result>
-struct NEXTWEB_API SubscribeImpl {
-	Result operator [] (std::string const &prefix);
-	template <typename T> Result operator [] (T const &prefix);
-};
+class NEXTWEB_API SubParam : public Param {
 
-class NEXTWEB_API SubParam : 
-	public Param, 
-	public SubscribeImpl<SubParam, SubParam>
-{
 public:
 	SubParam(Param *parent, std::string const &prefix);
 	virtual ~SubParam();
+	virtual std::string const& get(std::string const &name) const;
+	virtual void set(std::string const &name, std::string const &value);
 	
 	SubParam(SubParam const &other);
 	SubParam& operator = (SubParam const &other);
 	void swap(SubParam &other) throw ();
 
-	operator std::string const& () const;
-	template <typename T> operator T () const;
-
-	void operator = (std::string const &value);
+	template <typename T> T as() const;
 	template <typename T> void operator = (T const &value);
-	
-	virtual std::string const& get(std::string const &name) const;
-	virtual void set(std::string const &name, std::string const &value);
+	template <typename T> SubParam operator [] (T const &prefix);
 	
 private:
 	std::string const& getValue() const;
 	void setValue(std::string const &value);
-	SubParam create(std::string const &name);
 
 private:
 	Param *parent_;
 	std::string prefix_;
 };
 
-class NEXTWEB_API ParamSet : 
-	public Param, 
-	public SubscribeImpl<ParamSet, SubParam>
-{
+class NEXTWEB_API ParamSet : public Param {
+
 public:
 	ParamSet();
 	virtual ~ParamSet();
 	virtual std::string const& get(std::string const &name) const;
 	virtual void set(std::string const &name, std::string const &value);
-
+	
+	template <typename T> SubParam operator [] (T const &prefix);
+	
 private:
 	ParamSet(ParamSet const &);
 	ParamSet& operator = (ParamSet const &);
@@ -95,18 +82,8 @@ private:
 	std::map<std::string, std::string> values_;
 };
 
-template <typename Derived, typename Result> NEXTWEB_INLINE Result
-SubscribeImpl<Derived, Result>::operator [] (std::string const &prefix) {
-	return Result(static_cast<Derived*>(this), prefix);
-}
-
-template <typename Derived, typename Result> template <typename T> NEXTWEB_INLINE Result
-SubscribeImpl<Derived, Result>::operator [] (T const &prefix) {
-	return Result(static_cast<Derived*>(this), utils::toString(prefix));
-}
-
-template <typename T> NEXTWEB_INLINE
-SubParam::operator T () const {
+template <typename T> NEXTWEB_INLINE T
+SubParam::as() const {
 	return utils::fromString<T>(getValue());
 }
 
@@ -115,7 +92,16 @@ SubParam::operator = (T const &value) {
 	setValue(utils::toString(value));
 }
 
+template <typename T> NEXTWEB_INLINE SubParam
+SubParam::operator [] (T const &prefix) {
+	return SubParam(this, utils::toString(prefix));
+}
+
+template <typename T> NEXTWEB_INLINE SubParam
+ParamSet::operator [] (T const &prefix) {
+	return SubParam(this, utils::toString(prefix));
+}
+
 }} // namespaces
 
-#endif // NEXTWEB_TEMPLATES_PARAMS_HPP_INCLUDED
-
+#endif // NEXTWEB_TEMPLATES_PARAM_SET_HPP_INCLUDED

@@ -2,8 +2,6 @@ nobase_pkginclude_HEADERS = \
 	Config.hpp \
 	Enumeration.hpp \
 	Error.hpp \
-	Shared.hpp \
-	SharedPtr.hpp \
 	fastcgi/Cookie.hpp \
 	fastcgi/File.hpp \
 	fastcgi/Forward.hpp \
@@ -16,27 +14,35 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/impl/HttpUtils.hpp \
 	fastcgi/impl/IterFileImpl.hpp \
 	fastcgi/impl/LineReader.hpp \
+	fastcgi/impl/PostParser.hpp \
 	fastcgi/impl/RequestImpl.hpp \
 	fastcgi/impl/ResponseImpl.hpp \
 	fastcgi/impl/ServerImpl.hpp \
 	fastcgi/impl/StreamBuffer.hpp \
 	fastcgi/impl/UrlEncode.hpp \
-	fastcgi/impl/UrlMatch.hpp
+	fastcgi/impl/UrlMatch.hpp \
 	fastcgi/Logger.hpp \
 	fastcgi/RequestHandler.hpp \
 	fastcgi/Request.hpp \
 	fastcgi/Response.hpp \
 	fastcgi/Server.hpp \
 	fastcgi/Settings.hpp \
+	inlines/Error.hpp \
 	inlines/fastcgi/HttpDate.hpp \
 	inlines/Shared.hpp \
 	inlines/utils/CharTraits.hpp \
 	inlines/utils/Functors.hpp \
+	inlines/utils/MappedFile.hpp \
 	inlines/utils/Range.hpp \
 	inlines/utils/ScopedLock.hpp \
 	inlines/utils/StringConverters.hpp \
 	inlines/utils/Threads.hpp \
-	templates/Params.hpp \
+	Shared.hpp \
+	SharedPtr.hpp \
+	templates/impl/TemplateImpl.hpp \
+	templates/ParamSet.hpp \
+	templates/Template.hpp \
+	utils/CharBuffer.hpp \
 	utils/CharTraits.hpp \
 	utils/EnumerationImpl.hpp \
 	utils/Functors.hpp \

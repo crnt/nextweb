@@ -20,5 +20,4 @@ AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/config \
 AM_LDFLAGS = @CPPUNIT_LIBS@
 
 noinst_HEADERS = MockIO.hpp
-
 TESTS = fastcgi-tests

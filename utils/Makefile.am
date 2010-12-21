@@ -2,9 +2,11 @@ lib_LTLIBRARIES = libnextweb.la
 
 libnextweb_la_LDFLAGS = 
 libnextweb_la_SOURCES = \
+	CharBuffer.cpp \
 	CharTraits.cpp \
 	Error.cpp \
 	Functors.cpp \
+	MappedFile.cpp \
 	PosixThreads.cpp \
 	Range.cpp \
 	ScopedLock.cpp \

@@ -1,5 +1,5 @@
 #include "acsetup.hpp"
-#include "nextweb/templates/Params.hpp"
+#include "nextweb/templates/ParamSet.hpp"
 
 #include <sstream>
 #include <algorithm>
@@ -49,15 +49,6 @@ void
 SubParam::swap(SubParam &other) throw () {
 	std::swap(parent_, other.parent_);
 	std::swap(prefix_, other.prefix_);
-}
-
-SubParam::operator std::string const& () const {
-	return getValue();
-}
-
-void
-SubParam::operator = (std::string const &value) {
-	setValue(value);
 }
 
 std::string const&

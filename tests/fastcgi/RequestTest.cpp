@@ -45,6 +45,7 @@ RequestTest::testPost() {
 	
 	MockIO io;
 	io.add("REQUEST_METHOD=POST");
+	io.add("CONTENT_LENGTH=1024");
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
 
@@ -52,7 +53,8 @@ void
 RequestTest::testLargePost() {
 	
 	MockIO io;
-	io.add("REQUEST_METHOD=POST");	
+	io.add("REQUEST_METHOD=POST");
+	io.add("CONTENT_LENGTH=1024");
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
 
