@@ -18,18 +18,21 @@
 #ifndef NEXTWEB_FASTCGI_POST_PARSER_HPP_INCLUDED
 #define NEXTWEB_FASTCGI_POST_PARSER_HPP_INCLUDED
 
+#include <map>
 #include <string>
-#include <iostream>
 
 #include "nextweb/Config.hpp"
 #include "nextweb/Shared.hpp"
 #include "nextweb/utils/Range.hpp"
+#include "nextweb/utils/Functors.hpp"
 #include "nextweb/utils/Resource.hpp"
 #include "nextweb/utils/StringUtils.hpp"
+#include "nextweb/utils/StringConverters.hpp"
 
 #include "nextweb/fastcgi/File.hpp"
 #include "nextweb/fastcgi/HttpError.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
+#include "nextweb/fastcgi/impl/UrlEncode.hpp"
 #include "nextweb/fastcgi/impl/IterFileImpl.hpp"
 
 namespace nextweb { namespace fastcgi {
@@ -91,11 +94,15 @@ private:
 	
 	typedef utils::Range<std::string::const_iterator> StringRangeType;
 	typedef utils::Range<typename Container::const_iterator> RangeType;
+	
+	typedef utils::CILess<RangeType> LessType;
+	typedef std::map<RangeType, RangeType, LessType> HeaderMapType;
 
 	void parsePlainPost();
 	void parseArg(RangeType const &part);
 	void parsePart(RangeType const &part);
 	void parseMultipart(std::string const &bound);
+	void parseHeaderLines(RangeType const &lines, HeaderMapType &map);
 	std::string getBoundary(StringRangeType const &value) const;
 
 private:
@@ -179,10 +186,30 @@ ContainerPostParser<IO, Container>::parsePlainPost() {
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parseArg(typename ContainerPostParser<IO, Container>::RangeType const &part) {
+	RangeType head, tail;
+	utils::splitOnce(part, '=', head, tail);
+	fireAddArg(urlencode<std::string>(head), urlencode<std::string>(tail));
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, Container>::RangeType const &part) {
+	
+	using namespace utils;
+	typedef typename Container::value_type CharType;
+	
+	IsLineEnd<CharType> checker;
+	typename RangeType::const_iterator begin = part.begin(), end = part.end();
+	typename RangeType::const_iterator lineEnd = nextMatched(begin, end, checker);
+	typename RangeType::const_iterator newLine = nextNotMatched(lineEnd, end, checker);
+
+	RangeType token(lineEnd, newLine);
+	if (HttpConstants::RNRN != token && HttpConstants::NN != token) {
+		throw HttpError(HttpError::BAD_REQUEST);
+	}
+	
+	HeaderMapType map;
+	RangeType header(begin, lineEnd), content(newLine, end);
+	parseHeaderLines(header, map);
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
@@ -194,6 +221,11 @@ ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
 		splitOnce(range, bound, part, range);
 		parsePart(part);
 	}
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::parseHeaderLines(typename ContainerPostParser<IO, Container>::RangeType const &lines, typename ContainerPostParser<IO, Container>::HeaderMapType &map) {
+
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE std::string

@@ -29,6 +29,12 @@ std::string const
 HttpConstants::CONTENT_LENGTH("HTTP_CONTENT_LENGTH");
 
 utils::Range<char const*> const
+HttpConstants::NN = utils::makeRange("\n\n");
+
+utils::Range<char const*> const
+HttpConstants::RNRN = utils::makeRange("\r\n\r\n");
+
+utils::Range<char const*> const
 HttpConstants::BOUNDARY = utils::makeRange("boundary");
 
 utils::Range<char const*> const

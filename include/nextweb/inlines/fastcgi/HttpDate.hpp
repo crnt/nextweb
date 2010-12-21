@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_HTTP_DATE_IPP_INCLUDED
-#define NEXTWEB_FASTCGI_HTTP_DATE_IPP_INCLUDED
+#ifndef NEXTWEB_INLINES_FASTCGI_HTTP_DATE_HPP_INCLUDED
+#define NEXTWEB_INLINES_FASTCGI_HTTP_DATE_HPP_INCLUDED
 
 namespace nextweb { namespace fastcgi {
 
@@ -27,4 +27,4 @@ swap(HttpDate &date, HttpDate &other) {
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_HTTP_DATE_IPP_INCLUDED
+#endif // NEXTWEB_INLINES_FASTCGI_HTTP_DATE_HPP_INCLUDED

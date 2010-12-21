@@ -38,6 +38,8 @@ struct HttpConstants {
 	static std::string const CONTENT_TYPE;
 	static std::string const CONTENT_LENGTH;
 	
+	static utils::Range<char const*> const NN;
+	static utils::Range<char const*> const RNRN;
 	static utils::Range<char const*> const BOUNDARY;
 	static utils::Range<char const*> const COOKIE_VAR_NAME;
 	static utils::Range<char const*> const MULTIPART_FORM_DATA;

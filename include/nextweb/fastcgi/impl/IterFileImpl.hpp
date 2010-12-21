@@ -99,4 +99,8 @@ IterFileImpl<Iter>::save(std::string const &name) const {
 
 }} // namespaces
 
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/fastcgi/IterFileImpl.hpp"
+#endif
+
 #endif // NEXTWEB_FASTCGI_ITER_FILE_IMPL_HPP_INCLUDED
