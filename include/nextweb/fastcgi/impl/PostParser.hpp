@@ -31,6 +31,7 @@
 #include "nextweb/fastcgi/HttpError.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
 #include "nextweb/fastcgi/impl/UrlEncode.hpp"
+#include "nextweb/fastcgi/impl/LineReader.hpp"
 #include "nextweb/fastcgi/impl/IterFileImpl.hpp"
 
 namespace nextweb { namespace fastcgi {
@@ -229,6 +230,11 @@ ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::processPart(typename ContainerPostParser<IO, Container>::RangeType const &header, typename ContainerPostParser<IO, Container>::RangeType const &content) {
+	
+	RangeType line, range = header;
+	while (!range.empty()) {
+		std::pair<RangeType, bool> p = nextLine(range);
+	}
 	
 	RangeType name, filename, type;
 	typedef typename Container::iterator IteratorType;

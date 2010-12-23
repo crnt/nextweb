@@ -15,8 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_LINE_UTILS_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_LINE_UTILS_HPP_INCLUDED
+
+#include <utility>
 
 #include "nextweb/Config.hpp"
 #include "nextweb/utils/Functors.hpp"
@@ -24,12 +26,10 @@
 
 namespace nextweb { namespace fastcgi {
 
-template <typename Sequence> NEXTWEB_INLINE void
-readLine(Sequence const &source, Sequence &head, Sequence tail) {
-
-
+template <typename Sequence> NEXTWEB_INLINE std::pair<Sequence, bool>
+nextLine(Sequence &source) {
 }
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_LINE_UTILS_HPP_INCLUDED
