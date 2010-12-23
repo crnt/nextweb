@@ -1,6 +1,6 @@
 /** @file StringConverters.hpp */
 // nextweb - modern web framework for Python and C++
-// Copyright (C) 2009 Oleg Obolenskiy <highpower@nextweb.org>
+// Copyright (C) 2011 Oleg Obolenskiy <highpower@nextweb.org>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License

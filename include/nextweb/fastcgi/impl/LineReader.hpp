@@ -15,43 +15,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_ENUMERATION_HPP_INCLUDED
-#define NEXTWEB_ENUMERATION_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
 
 #include "nextweb/Config.hpp"
-#include "nextweb/Shared.hpp"
-#include "nextweb/SharedPtr.hpp"
+#include "nextweb/utils/Functors.hpp"
+#include "nextweb/utils/StringUtils.hpp"
 
-namespace nextweb {
+namespace nextweb { namespace fastcgi {
 
-template <typename Item>
-class NEXTWEB_API Enumeration : public Shared {
+template <typename Sequence> NEXTWEB_INLINE void
+readLine(Sequence const &source, Sequence &head, Sequence tail) {
 
-public:
-	Enumeration();
-	virtual ~Enumeration();
-	
-	typedef Item ValueType;
-	typedef Enumeration<Item> Type;
-	typedef SharedPtr<Type> Pointer;
 
-	virtual Item nextElement() const = 0;
-	virtual bool hasMoreElements() const = 0;
-
-private:
-	Enumeration(Enumeration const &);
-	Enumeration& operator = (Enumeration const &);
-};
-
-template <typename Item> NEXTWEB_INLINE
-Enumeration<Item>::Enumeration()
-{
 }
 
-template <typename Item> NEXTWEB_INLINE
-Enumeration<Item>::~Enumeration() {
-}
+}} // namespaces
 
-} // namespace 
-
-#endif // NEXTWEB_ENUMERATION_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED

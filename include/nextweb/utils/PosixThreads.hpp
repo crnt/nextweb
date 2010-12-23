@@ -1,5 +1,5 @@
 // nextweb - modern web framework for Python and C++
-// Copyright (C) 2009 Oleg Obolenskiy <highpower@yandex-team.ru>
+// Copyright (C) 2011 Oleg Obolenskiy <highpower@yandex-team.ru>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,8 +25,6 @@
 
 namespace nextweb { namespace utils {
 
-class TimeSpec;
-
 class Thread {
 
 public:
@@ -45,6 +43,8 @@ private:
 private:
 	pthread_t impl_;
 };
+
+struct TimeSpec;
 
 class Condition {
 

@@ -18,7 +18,9 @@ FCGI::~FCGI() {
 
 void
 FCGI::accept() {
-	FCGX_Accept_r(&request_) < 0;
+	if (FCGX_Accept_r(&request_) < 0) {
+		throw Error("can not accept fastcgi request");
+	}
 }
 
 void

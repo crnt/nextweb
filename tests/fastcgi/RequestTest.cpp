@@ -19,9 +19,9 @@ public:
 private:
 	CPPUNIT_TEST_SUITE(RequestTest);
 	CPPUNIT_TEST(testGet);
-	// CPPUNIT_TEST(testPostN);
-	// CPPUNIT_TEST(testPostRN);
-	// CPPUNIT_TEST(testLargePost);
+	CPPUNIT_TEST(testPostN);
+	CPPUNIT_TEST(testPostRN);
+	CPPUNIT_TEST(testLargePost);
 	CPPUNIT_TEST_SUITE_END();
 };
 

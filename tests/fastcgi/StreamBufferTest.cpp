@@ -179,13 +179,9 @@ StreamBufferTest::testPositionImplWith(Sequence &seq) {
 	CPPUNIT_ASSERT(stream.good());
 	CPPUNIT_ASSERT_EQUAL(static_cast<std::streampos>(sizeof(value) - 3), stream.tellg());
 
-#ifndef _STLPORT_VERSION	
-
 	stream.seekg(static_cast<std::streamoff>(-2), std::ios::beg);
 	CPPUNIT_ASSERT(stream.fail());
 	stream.clear();
-
-#endif
 
 }
 

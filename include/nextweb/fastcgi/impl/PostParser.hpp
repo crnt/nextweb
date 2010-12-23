@@ -1,5 +1,5 @@
 // nextweb - modern web framework for Python and C++
-// Copyright (C) 2009 Oleg Obolenskiy <highpower@yandex-team.ru>
+// Copyright (C) 2011 Oleg Obolenskiy <highpower@yandex-team.ru>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -94,12 +94,13 @@ private:
 	using PostParser<IO>::fireAddArg;
 
 	typedef utils::Range<std::string::const_iterator> StringRangeType;
-	typedef utils::Range<typename Container::const_iterator> RangeType;
+	typedef utils::Range<typename Container::iterator> RangeType;
 	
 	void parsePlainPost();
-	void parseArg(RangeType const &part);
+	void parseArg(RangeType const &arg);
 	void parsePart(RangeType const &part);
 	void parseMultipart(std::string const &bound);
+	void processPart(RangeType const &header, RangeType const &content);
 	std::string getBoundary(StringRangeType const &value) const;
 
 private:
@@ -155,6 +156,7 @@ template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parsePost(IO &io, std::size_t size) {
 	
 	using namespace utils;
+
 	container_.resize(size);
 	io.read(&container_[0], size);
 	std::string const &type = contentType();
@@ -192,39 +194,50 @@ template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, Container>::RangeType const &part) {
 	
 	using namespace utils;
+	IsLineEnd<typename Container::value_type> checker;
 	
-	typedef typename Container::value_type CharType;
-	typedef typename Container::const_iterator IteratorType;
-	
-	IsLineEnd<CharType> checker;
-	typename RangeType::const_iterator begin = part.begin(), end = part.end();
-	typename RangeType::const_iterator lineEnd = nextMatched(begin, end, checker);
-	typename RangeType::const_iterator newLine = nextNotMatched(lineEnd, end, checker);
+	typename RangeType::iterator const begin = part.begin(), end = part.end();
+	typename RangeType::iterator newLine = begin, lineEnd;
 
-	RangeType token(lineEnd, newLine);
-	if (HttpConstants::RNRN != token && HttpConstants::NN != token) {
-		throw HttpError(HttpError::BAD_REQUEST);
+	for (std::size_t count = 0; true; ++count) {
+		lineEnd = nextMatched(newLine, end, checker);
+ 		newLine = nextNotMatched(lineEnd, end, checker);
+		RangeType token(lineEnd, newLine);
+
+		if (token.empty()) {
+			throw HttpError(HttpError::BAD_REQUEST);
+		}
+		else if (HttpConstants::RNRN == token || HttpConstants::NN == token) {
+			break;
+		}
 	}
-	RangeType name, filename, type;
 	RangeType header(begin, lineEnd), content(newLine, end);
+	processPart(header, content);
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
+	using namespace utils;
+	RangeType range(container_.begin(), container_.end()), part;
+	while (!range.empty()) {
+		splitOnce(range, bound, part, range);
+		if (!part.empty()) {
+			parsePart(part);
+		}
+	}
+}
+
+template <typename IO, typename Container> NEXTWEB_INLINE void
+ContainerPostParser<IO, Container>::processPart(typename ContainerPostParser<IO, Container>::RangeType const &header, typename ContainerPostParser<IO, Container>::RangeType const &content) {
 	
+	RangeType name, filename, type;
+	typedef typename Container::iterator IteratorType;
 	if (filename.empty()) {
 		fireAddArg(utils::toString(name), utils::toString(content));
 	}
 	else {
 		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(filename, type, content));
 		fireAddFile(utils::toString(name), File(impl));
-	}
-}
-
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
-	using namespace utils;
-	typedef Range<typename Container::const_iterator> RangeType;
-	RangeType range(container_.begin(), container_.end()), part;
-	while (!range.empty()) {
-		splitOnce(range, bound, part, range);
-		parsePart(part);
 	}
 }
 
