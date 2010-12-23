@@ -89,6 +89,10 @@ private:
 	ContainerPostParser(ContainerPostParser const &);
 	ContainerPostParser& operator = (ContainerPostParser const &);
 	
+	using PostParser<IO>::contentType;
+	using PostParser<IO>::fireAddFile;
+	using PostParser<IO>::fireAddArg;
+
 	typedef utils::Range<std::string::const_iterator> StringRangeType;
 	typedef utils::Range<typename Container::const_iterator> RangeType;
 	
@@ -153,7 +157,7 @@ ContainerPostParser<IO, Container>::parsePost(IO &io, std::size_t size) {
 	using namespace utils;
 	container_.resize(size);
 	io.read(&container_[0], size);
-	std::string const &type = this->contentType();
+	std::string const &type = contentType();
 
 	StringRangeType range(type.begin(), type.end());
 	range = trim(range);
@@ -181,7 +185,7 @@ template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parseArg(typename ContainerPostParser<IO, Container>::RangeType const &part) {
 	RangeType head, tail;
 	utils::splitOnce(part, '=', head, tail);
-	this->fireAddArg(urlencode<std::string>(head), urlencode<std::string>(tail));
+	fireAddArg(urlencode<std::string>(head), urlencode<std::string>(tail));
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
@@ -209,7 +213,7 @@ ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, C
 	}
 	else {
 		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(filename, type, content));
-		this->fireAddFile(utils::toString(name), File(impl));
+		fireAddFile(utils::toString(name), File(impl));
 	}
 }
 
