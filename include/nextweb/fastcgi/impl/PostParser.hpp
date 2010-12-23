@@ -18,14 +18,12 @@
 #ifndef NEXTWEB_FASTCGI_POST_PARSER_HPP_INCLUDED
 #define NEXTWEB_FASTCGI_POST_PARSER_HPP_INCLUDED
 
-#include <map>
 #include <string>
 
 #include "nextweb/Config.hpp"
 #include "nextweb/Shared.hpp"
 #include "nextweb/utils/Range.hpp"
 #include "nextweb/utils/Functors.hpp"
-#include "nextweb/utils/Resource.hpp"
 #include "nextweb/utils/StringUtils.hpp"
 #include "nextweb/utils/StringConverters.hpp"
 
@@ -43,9 +41,9 @@ public:
 	PostParserListener();
 	virtual ~PostParserListener();
 
-	virtual void addFile(File const &file) = 0;
-	virtual void addArg(std::string const &name, std::string const &value) = 0;
 	virtual std::string const& contentType() const = 0;
+	virtual void addFile(std::string const &name, File const &file) = 0;
+	virtual void addArg(std::string const &name, std::string const &value) = 0;
 	
 private:
 	PostParserListener(PostParserListener const &);
@@ -64,10 +62,9 @@ public:
 	virtual void parsePost(IO &io, std::size_t size) = 0;
 
 protected:
-	
-	void fireAddFile(File const &file);
-	void fireAddArg(std::string const &name, std::string const &value);
 	std::string const& contentType() const;
+	void fireAddFile(std::string const &name, File const &file);
+	void fireAddArg(std::string const &name, std::string const &value);
 
 private:
 	PostParser(PostParser const &);
@@ -95,14 +92,10 @@ private:
 	typedef utils::Range<std::string::const_iterator> StringRangeType;
 	typedef utils::Range<typename Container::const_iterator> RangeType;
 	
-	typedef utils::CILess<RangeType> LessType;
-	typedef std::map<RangeType, RangeType, LessType> HeaderMapType;
-
 	void parsePlainPost();
 	void parseArg(RangeType const &part);
 	void parsePart(RangeType const &part);
 	void parseMultipart(std::string const &bound);
-	void parseHeaderLines(RangeType const &lines, HeaderMapType &map);
 	std::string getBoundary(StringRangeType const &value) const;
 
 private:
@@ -119,19 +112,19 @@ template <typename IO> NEXTWEB_INLINE
 PostParser<IO>::~PostParser() {
 }
 
+template <typename IO> NEXTWEB_INLINE std::string const&
+PostParser<IO>::contentType() const {
+	return listener_->contentType();
+}
+
 template <typename IO> NEXTWEB_INLINE void
-PostParser<IO>::fireAddFile(File const &file) {
-	listener_->addFile(file);
+PostParser<IO>::fireAddFile(std::string const &name, File const &file) {
+	listener_->addFile(name, file);
 }
 
 template <typename IO> NEXTWEB_INLINE void
 PostParser<IO>::fireAddArg(std::string const &name, std::string const &value) {
 	listener_->addArg(name, value);
-}
-
-template <typename IO> NEXTWEB_INLINE std::string const&
-PostParser<IO>::contentType() const {
-	return listener_->contentType();
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE
@@ -188,14 +181,16 @@ template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parseArg(typename ContainerPostParser<IO, Container>::RangeType const &part) {
 	RangeType head, tail;
 	utils::splitOnce(part, '=', head, tail);
-	fireAddArg(urlencode<std::string>(head), urlencode<std::string>(tail));
+	this->fireAddArg(urlencode<std::string>(head), urlencode<std::string>(tail));
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, Container>::RangeType const &part) {
 	
 	using namespace utils;
+	
 	typedef typename Container::value_type CharType;
+	typedef typename Container::const_iterator IteratorType;
 	
 	IsLineEnd<CharType> checker;
 	typename RangeType::const_iterator begin = part.begin(), end = part.end();
@@ -206,10 +201,16 @@ ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, C
 	if (HttpConstants::RNRN != token && HttpConstants::NN != token) {
 		throw HttpError(HttpError::BAD_REQUEST);
 	}
-	
-	HeaderMapType map;
+	RangeType name, filename, type;
 	RangeType header(begin, lineEnd), content(newLine, end);
-	parseHeaderLines(header, map);
+	
+	if (filename.empty()) {
+		fireAddArg(utils::toString(name), utils::toString(content));
+	}
+	else {
+		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(filename, type, content));
+		this->fireAddFile(utils::toString(name), File(impl));
+	}
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE void
@@ -221,11 +222,6 @@ ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
 		splitOnce(range, bound, part, range);
 		parsePart(part);
 	}
-}
-
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parseHeaderLines(typename ContainerPostParser<IO, Container>::RangeType const &lines, typename ContainerPostParser<IO, Container>::HeaderMapType &map) {
-
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE std::string

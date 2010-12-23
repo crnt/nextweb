@@ -46,6 +46,7 @@ Error::Error(Error const &other)
 NEXTWEB_INLINE Error&
 Error::operator = (Error const &other) {
 	memcpy(message_, other.message_, MESSAGE_SIZE);
+	return *this;
 }
 	
 NEXTWEB_INLINE char const*

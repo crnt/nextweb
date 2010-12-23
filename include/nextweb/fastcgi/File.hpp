@@ -42,6 +42,7 @@ public:
 	std::string const& contentType() const;
 
 	std::istream& stream();
+	void save(char const *name) const;
 	void save(std::string const &name) const;
 
 private:

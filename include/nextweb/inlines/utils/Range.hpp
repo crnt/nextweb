@@ -18,7 +18,14 @@
 #ifndef NEXTWEB_INLINES_UTILS_RANGE_HPP_INCLUDED
 #define NEXTWEB_INLINES_UTILS_RANGE_HPP_INCLUDED
 
+#include <cstring>
+
 namespace nextweb { namespace utils {
+
+NEXTWEB_INLINE Range<char*>
+makeRange(char *str) {
+	return Range<char*>(str, str + strlen(str));
+}
 
 NEXTWEB_INLINE Range<char const*>
 makeRange(char const *str) {

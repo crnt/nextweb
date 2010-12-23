@@ -10,7 +10,7 @@
 namespace nextweb { namespace tests {
 
 MockIO::MockIO() :
-	post_(), env_(), strings_()
+	post_(), strings_(), env_()
 {
 	post_.exceptions(std::ios::badbit | std::ios::failbit);
 	validate();

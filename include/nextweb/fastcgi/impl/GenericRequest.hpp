@@ -74,7 +74,7 @@ public:
 	FileMap const& files() const;
 	bool hasFile(std::string const &name) const;
 	File getFile(std::string const &name) const;
-	virtual void addFile(File const &file);
+	virtual void addFile(std::string const &name, File const &file);
 
 private:
 	GenericRequest(GenericRequest const &);
@@ -185,6 +185,7 @@ GenericRequest<IO>::getArg(std::string const &name) const {
 
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::addArg(std::string const &name, std::string const &value) {
+	args_.insert(std::make_pair(name, value));
 }
 
 template <typename IO> NEXTWEB_INLINE bool
@@ -217,8 +218,12 @@ GenericRequest<IO>::getFile(std::string const &name) const {
 }
 
 template <typename IO> NEXTWEB_INLINE void
-GenericRequest<IO>::addFile(File const &file) {
-	FileMap::iterator i = files_.find(file.name());
+GenericRequest<IO>::addFile(std::string const &name, File const &file) {
+	// FIXME: what should we do with multiple file instances with the same name?
+	FileMap::iterator i = files_.find(name);
+	if (files_.end() == i) {
+		files_.insert(std::make_pair(name, file));
+	}
 }
 
 template <typename IO> NEXTWEB_INLINE void
@@ -238,6 +243,7 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parsePost(std::size_t threshold) {
+	(void) threshold;
 	std::size_t postSize = utils::fromString<std::size_t>(getVar(HttpConstants::CONTENT_LENGTH));
 	typedef std::vector<char> CharVector;
 	if (!postParser_) {

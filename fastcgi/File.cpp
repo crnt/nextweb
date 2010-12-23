@@ -53,8 +53,13 @@ File::stream() {
 }
 
 void
-File::save(std::string const &name) const {
+File::save(char const *name) const {
 	impl_->save(name);
+}
+
+void
+File::save(std::string const &name) const {
+	impl_->save(name.c_str());
 }
 
 }} // namespaces

@@ -36,7 +36,7 @@ public:
 	virtual std::string const& contentType() const = 0;
 
 	virtual std::istream& stream() = 0;
-	virtual void save(std::string const &name) const = 0;
+	virtual void save(char const *name) const = 0;
 
 private:
 	FileImpl(FileImpl const &);

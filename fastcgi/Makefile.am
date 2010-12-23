@@ -5,6 +5,7 @@ libnextweb_fastcgi_la_SOURCES = \
 	Cookie.cpp \
 	FCGI.cpp \
 	File.cpp \
+	FileImpl.cpp \
 	HttpDate.cpp \
 	HttpError.cpp \
 	HttpUtils.cpp \

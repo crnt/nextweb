@@ -75,7 +75,11 @@ public:
 	
 	typedef std::reverse_iterator<Iter> reverse_iterator;
 	typedef std::reverse_iterator<Iter> const_reverse_iterator;
+	typedef RangeBase<Iter, std::forward_iterator_tag> BaseType;
 
+	using BaseType::end;
+	using BaseType::begin;
+	
 	reverse_iterator rend();
 	const_reverse_iterator rend() const;
 
@@ -154,34 +158,34 @@ RangeBase<Iter, std::forward_iterator_tag>::size() const {
 
 template <typename Iter> NEXTWEB_INLINE 
 RangeBase<Iter, std::bidirectional_iterator_tag>::RangeBase() :
-	RangeBase<Iter, std::forward_iterator_tag>()
+	BaseType()
 {
 }
 
 template <typename Iter> NEXTWEB_INLINE 
 RangeBase<Iter, std::bidirectional_iterator_tag>::RangeBase(Iter begin, Iter end) :
-	RangeBase<Iter, std::forward_iterator_tag>(begin, end)
+	BaseType(begin, end)
 {
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::bidirectional_iterator_tag>::reverse_iterator
 RangeBase<Iter, std::bidirectional_iterator_tag>::rend() {
-	return reverse_iterator(this->begin());
+	return reverse_iterator(begin());
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::bidirectional_iterator_tag>::const_reverse_iterator
 RangeBase<Iter, std::bidirectional_iterator_tag>::rend() const {
-	return const_reverse_iterator(this->begin());
+	return const_reverse_iterator(begin());
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::bidirectional_iterator_tag>::reverse_iterator
 RangeBase<Iter, std::bidirectional_iterator_tag>::rbegin() {
-	return reverse_iterator(this->end());
+	return reverse_iterator(end());
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::bidirectional_iterator_tag>::const_reverse_iterator
 RangeBase<Iter, std::bidirectional_iterator_tag>::rbegin() const {
-	return const_reverse_iterator(this->end());
+	return const_reverse_iterator(end());
 }
 
 template <typename Iter> NEXTWEB_INLINE 
@@ -262,6 +266,9 @@ template <typename Iter> NEXTWEB_INLINE Range<Iter>
 makeRange(Iter begin, Iter end) {
 	return Range<Iter>(begin, end);
 }
+
+Range<char*>
+makeRange(char *str);
 
 Range<char const*>
 makeRange(char const *str);

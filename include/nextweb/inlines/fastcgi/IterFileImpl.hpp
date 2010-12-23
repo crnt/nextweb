@@ -21,7 +21,7 @@
 namespace nextweb { namespace fastcgi {
 
 template <> NEXTWEB_INLINE void
-IterFileImpl<char const*>::save(std::string const &name) const {
+IterFileImpl<char const*>::save(char const *name) const {
 }
 
 }} // namespaces
