@@ -102,6 +102,8 @@ private:
 	void parsePart(RangeType const &part);
 	void parseMultipart(std::string const &bound);
 	void processPart(RangeType const &header, RangeType const &content);
+	template <typename Sequence> bool parseHeader(Sequence const &s, RangeType &name, RangeType &value);
+	
 	std::string getBoundary(StringRangeType const &value) const;
 
 private:
@@ -231,9 +233,16 @@ ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
 template <typename IO, typename Container> NEXTWEB_INLINE void
 ContainerPostParser<IO, Container>::processPart(typename ContainerPostParser<IO, Container>::RangeType const &header, typename ContainerPostParser<IO, Container>::RangeType const &content) {
 	
-	RangeType line, range = header;
-	while (!range.empty()) {
-		std::pair<RangeType, bool> p = nextLine(range);
+	LineReader<RangeType> reader(header);
+	while (reader.hasMoreElements()) {
+
+		RangeType head, tail;
+		RangeType line = reader.nextElement();
+		typedef LineEndFilter<typename RangeType::iterator> IterType;
+		if (reader.wasMultiline()) {
+		}
+		else {
+		}
 	}
 	
 	RangeType name, filename, type;
@@ -245,6 +254,10 @@ ContainerPostParser<IO, Container>::processPart(typename ContainerPostParser<IO,
 		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(filename, type, content));
 		fireAddFile(utils::toString(name), File(impl));
 	}
+}
+
+template <typename IO, typename Container> template <typename Sequence> NEXTWEB_INLINE bool
+ContainerPostParser<IO, Container>::parseHeader(Sequence const &s, RangeType &name, RangeType &value) {
 }
 
 template <typename IO, typename Container> NEXTWEB_INLINE std::string

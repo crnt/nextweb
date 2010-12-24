@@ -45,14 +45,6 @@ RequestTest::testGet() {
 
 void
 RequestTest::testPostN() {
-	
-	MockIO io;
-	io.add("REQUEST_METHOD=POST");
-	io.add("HTTP_CONTENT_LENGTH=1361");
-	io.add("CONTENT_TYPE=multipart/form-data; boundary=\"---------------------------15403834263040891721303455736\"");
-	io.attachFile("MultipartN.dat");
-	fastcgi::GenericRequest<MockIO> req(io, 1024);
-	
 }
 
 void
@@ -60,8 +52,9 @@ RequestTest::testPostRN() {
 	
 	MockIO io;
 	io.add("REQUEST_METHOD=POST");
-	io.add("HTTP_CONTENT_LENGTH=1361");
-	io.attachFile("MultipartRN.dat");
+	io.add("HTTP_CONTENT_LENGTH=14994");
+	io.add("multipart/form-data; boundary=---------------------------1038904665796182402052442922");
+	io.attachFile("data/multipart.tst");
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
 
