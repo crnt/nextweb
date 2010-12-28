@@ -8,4 +8,3 @@ templates_la_SOURCES = \
 AM_CXXFLAGS = -pthread
 AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/config @PYTHON_CPPFLAGS@
 AM_LDFLAGS = @PYTHON_LDFLAGS@
-

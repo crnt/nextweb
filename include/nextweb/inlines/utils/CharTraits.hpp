@@ -22,7 +22,7 @@ namespace nextweb { namespace utils {
 
 NEXTWEB_INLINE bool
 CharTraits<char>::isSpace(char value) {
-	return isspace(value);
+	return (' ' == value) || ('\t' == value);
 }
 
 NEXTWEB_INLINE bool

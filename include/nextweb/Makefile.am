@@ -13,6 +13,7 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/impl/GenericResponse.hpp \
 	fastcgi/impl/HttpUtils.hpp \
 	fastcgi/impl/IterFileImpl.hpp \
+	fastcgi/impl/LineEndFilter.hpp \
 	fastcgi/impl/PostParser.hpp \
 	fastcgi/impl/RequestImpl.hpp \
 	fastcgi/impl/ResponseImpl.hpp \

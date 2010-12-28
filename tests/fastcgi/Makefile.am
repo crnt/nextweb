@@ -6,7 +6,7 @@ fastcgi_tests_LDADD = ${top_srcdir}/fastcgi/libnextweb-fastcgi.la \
 fastcgi_tests_SOURCES = main.cpp MockIO.cpp \
 	CookieTest.cpp \
 	HttpDateTest.cpp \
-	LineReaderTest.cpp \
+	LineEndTest.cpp \
 	RequestTest.cpp \
 	StreamBufferTest.cpp \
 	UrlEncodeTest.cpp \

@@ -245,9 +245,9 @@ template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parsePost(std::size_t threshold) {
 	(void) threshold;
 	std::size_t postSize = utils::fromString<std::size_t>(getVar(HttpConstants::CONTENT_LENGTH));
-	typedef std::vector<char> CharVector;
 	if (!postParser_) {
-		postParser_.reset(new ContainerPostParser<IO, CharVector>(this));
+		typedef std::vector<char> CharVector;
+		postParser_.reset(new SequencePostParser<IO, CharVector>(this));
 	}
 	postParser_->parsePost(io_, postSize);
 }

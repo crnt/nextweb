@@ -1,9 +1,11 @@
 #include "acsetup.hpp"
 
+#include <string>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "MockIO.hpp"
+#include "nextweb/fastcgi/HttpError.hpp"
 #include "nextweb/fastcgi/impl/GenericRequest.hpp"
 
 namespace nextweb { namespace tests {
@@ -12,16 +14,23 @@ class RequestTest : public CppUnit::TestFixture {
 
 public:
 	void testGet();
-	void testPostN();
-	void testPostRN();
-	void testLargePost();
+	void testPost();
+	void testMultipart();
+	void testHeaderReader();
+	void testBadMethod();
+	void testBadMultipart();
+
+private:
+	std::size_t hashSum(std::istream &is) const;
 
 private:
 	CPPUNIT_TEST_SUITE(RequestTest);
 	CPPUNIT_TEST(testGet);
-	CPPUNIT_TEST(testPostN);
-	CPPUNIT_TEST(testPostRN);
-	CPPUNIT_TEST(testLargePost);
+	CPPUNIT_TEST(testPost);
+	CPPUNIT_TEST(testMultipart);
+	CPPUNIT_TEST(testHeaderReader);
+	CPPUNIT_TEST_EXCEPTION(testBadMethod, Error);
+	CPPUNIT_TEST_EXCEPTION(testBadMultipart, Error);
 	CPPUNIT_TEST_SUITE_END();
 };
 
@@ -38,28 +47,42 @@ RequestTest::testGet() {
 	io.checkIsValid();
 	
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
-	CPPUNIT_ASSERT_EQUAL(std::string("x=abc%20def&y=test"), req.getVar("QUERY_STRING"));
 	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
 	CPPUNIT_ASSERT_EQUAL(std::string("abc def"), req.getArg("x"));
+
 }
 
 void
-RequestTest::testPostN() {
+RequestTest::testPost() {
 }
 
 void
-RequestTest::testPostRN() {
-	
+RequestTest::testMultipart() {
+}
+
+void
+RequestTest::testHeaderReader() {
+}
+
+void
+RequestTest::testBadMethod() {
 	MockIO io;
-	io.add("REQUEST_METHOD=POST");
-	io.add("HTTP_CONTENT_LENGTH=14994");
-	io.add("multipart/form-data; boundary=---------------------------1038904665796182402052442922");
-	io.attachFile("data/multipart.tst");
+	io.add("METHOD=BAD");
+	io.checkIsValid();
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
 
 void
-RequestTest::testLargePost() {
+RequestTest::testBadMultipart() {
+}
+
+std::size_t
+RequestTest::hashSum(std::istream &is) const {
+	std::size_t result = 0;
+	for (std::istream_iterator<char> i(is), end; i != end; ++i) {
+		result += (*i) * 5;
+	}
+	return result;
 }
 
 }} // namespaces

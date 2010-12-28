@@ -17,22 +17,26 @@ class RangeTest : public CppUnit::TestFixture {
 
 public:
 	void testOutput();
+	void testReversed();
 	void testConstruct();
 	void testComparision();
 	void testReversedComparision();
 	
 private:
 	template <typename Sequence> void testOutputWith();
+	template <typename Sequence> void testReversedWith();
 	template <typename Sequence> void testConstructWith();
 	template <typename Sequence> void testComparisionWith();
 	template <typename Sequence> void testReversedComparisionWith();
 	
 	typedef std::list<char> CharList;
 	typedef std::vector<char> CharVector;
+	typedef utils::Range<char const*> CharSequence;
 
 private:
 	CPPUNIT_TEST_SUITE(RangeTest);
 	CPPUNIT_TEST(testOutput);
+	CPPUNIT_TEST(testReversed);
 	CPPUNIT_TEST(testConstruct);
 	CPPUNIT_TEST(testComparision);
 	CPPUNIT_TEST(testReversedComparision);
@@ -47,6 +51,15 @@ RangeTest::testOutput() {
 	testOutputWith<CharList>();
 	testOutputWith<CharVector>();
 	testOutputWith<std::string>();
+	testOutputWith<CharSequence>();
+}
+
+void
+RangeTest::testReversed() {
+	testReversedWith<CharList>();
+	testReversedWith<CharVector>();
+	testReversedWith<std::string>();
+	testReversedWith<CharSequence>();
 }
 
 void
@@ -54,6 +67,7 @@ RangeTest::testConstruct() {
 	testConstructWith<CharList>();
 	testConstructWith<CharVector>();
 	testConstructWith<std::string>();
+	testConstructWith<CharSequence>();
 }
 
 void
@@ -61,6 +75,7 @@ RangeTest::testComparision() {
 	testComparisionWith<CharList>();
 	testComparisionWith<CharVector>();
 	testComparisionWith<std::string>();
+	testComparisionWith<CharSequence>();
 }
 
 void
@@ -68,6 +83,7 @@ RangeTest::testReversedComparision() {
 	testReversedComparisionWith<CharList>();
 	testReversedComparisionWith<CharVector>();
 	testReversedComparisionWith<std::string>();
+	testReversedComparisionWith<CharSequence>();
 }
 
 template <typename Sequence> void
@@ -83,6 +99,17 @@ RangeTest::testOutputWith() {
 }
 
 template <typename Sequence> void
+RangeTest::testReversedWith() {
+
+	using namespace utils;
+	Sequence value = as<Sequence>("123 456");
+	Range<typename Sequence::iterator> range(value.begin(), value.end());
+	
+	CPPUNIT_ASSERT_EQUAL(std::string("654 321"), std::string(range.rbegin(), range.rend()));
+	CPPUNIT_ASSERT_EQUAL(std::string(value.rbegin(), value.rend()), std::string(range.rbegin(), range.rend()));
+}
+
+template <typename Sequence> void
 RangeTest::testConstructWith() {
 
 	using namespace utils;
@@ -90,13 +117,13 @@ RangeTest::testConstructWith() {
 	
 	TestRange range;
 	CPPUNIT_ASSERT_EQUAL(true, range.empty());
-	// CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(0), range.size());
+	CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(0), range.size());
 
-	// Sequence seq = as<Sequence>("12345");
-	// TestRange other = makeRange(seq);
+	Sequence seq = as<Sequence>("12345");
+	TestRange other = makeRange(seq);
 
-	// CPPUNIT_ASSERT_EQUAL(false, other.empty());	
-	// CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(5), other.size());
+	CPPUNIT_ASSERT_EQUAL(false, other.empty());	
+	CPPUNIT_ASSERT_EQUAL(static_cast<typename TestRange::size_type>(5), other.size());
 }
 
 template <typename Sequence> void

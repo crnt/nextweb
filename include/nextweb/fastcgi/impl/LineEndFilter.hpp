@@ -1,5 +1,5 @@
 // nextweb - modern web framework for Python and C++
-// Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
+// Copyright (C) 2011 Oleg Obolenskiy <highpower@yandex-team.ru>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,43 +15,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_LINE_END_FILTER_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_LINE_END_FILTER_HPP_INCLUDED
 
+#include <cassert>
 #include <iterator>
-#include <algorithm>
 
 #include "nextweb/Config.hpp"
-#include "nextweb/Enumeration.hpp"
+#include "nextweb/utils/Range.hpp"
 #include "nextweb/utils/Functors.hpp"
 #include "nextweb/utils/Iterator.hpp"
 #include "nextweb/utils/StringUtils.hpp"
 
 namespace nextweb { namespace fastcgi {
-
-template <typename Sequence>
-class LineReader : public Enumeration<Sequence> {
-
-public:
-	LineReader(Sequence const &seq);
-	virtual ~LineReader();
-	
-	bool wasMultiline() const;
-	bool hasMoreElements() const;
-	Sequence nextElement() const;
-
-private:
-	LineReader(LineReader const &);
-	LineReader& operator = (LineReader const &);
-
-	typedef typename Sequence::iterator IterType;
-	typedef typename Sequence::value_type CharType;
-
-private:
-	bool multiline_;
-	mutable Sequence source_;
-	utils::IsLineEnd<CharType> lineEndChecker_;
-};
 
 template <typename Iter>
 class LineEndFilter : public utils::Iterator<LineEndFilter<Iter>, std::bidirectional_iterator_tag, typename std::iterator_traits<Iter>::value_type> {
@@ -60,7 +36,7 @@ public:
 	LineEndFilter();
 	LineEndFilter(Iter begin, Iter end);
 
-	typedef typename std::iterator_traits<Iter>::value_type CharType;
+	typedef LineEndFilter<Iter> Type;
 	typedef typename std::iterator_traits<Iter>::reference ReferenceType;
 
 	void increment();
@@ -69,83 +45,86 @@ public:
 	ReferenceType dereference();
 
 private:
+	void seekForward();
+	void seekReverse();
+	
+	typedef typename std::iterator_traits<Iter>::value_type CharType;
+
+private:
 	Iter i_;
+	bool empty_;
 	Iter const begin_, end_;
 	utils::IsSpace<CharType> spaceChecker_;
 	utils::IsLineEnd<CharType> lineEndChecker_;
 };
 
-template <typename Sequence> NEXTWEB_INLINE
-LineReader<Sequence>::LineReader(Sequence const &seq) :
-	multiline_(false), source_(seq), lineEndChecker_()
-{
-}
-
-template <typename Sequence> NEXTWEB_INLINE
-LineReader<Sequence>::~LineReader() {
-}
-
-template <typename Sequence> NEXTWEB_INLINE bool
-LineReader<Sequence>::wasMultiline() const {
-	return multiline_;
-}
-
-template <typename Sequence> NEXTWEB_INLINE bool
-LineReader<Sequence>::hasMoreElements() const {
-	return !source_.empty();
-}
-
-template <typename Sequence> NEXTWEB_INLINE Sequence
-LineReader<Sequence>::nextElement() const {
-	
-	Sequence res;
-	IterType begin = source_.begin(), end = source_.end(), lineEnd, newLine = begin;
-	while (true) {
-		lineEnd = utils::nextMatched(newLine, end, lineEndChecker_);
-		newLine = utils::nextNotMatched(lineEnd, end, lineEndChecker_);
-		if (newLine == end) {
-			res = Sequence(begin, lineEnd);
-			source_.clear();
-			break;
-		}
-		else if (!utils::IsSpace<CharType>::check(*newLine)) {
-			res = Sequence(begin, lineEnd);
-			source_ = Sequence(newLine, end);
-			break;
-		}
-	}
-	return res;
-}
-
 template <typename Iter> NEXTWEB_INLINE 
 LineEndFilter<Iter>::LineEndFilter() :
-	i_(), begin_(), end_()
+	i_(), empty_(true), begin_(), end_()
 {
 }
 
 template <typename Iter> NEXTWEB_INLINE 
 LineEndFilter<Iter>::LineEndFilter(Iter begin, Iter end) :
-	i_(begin), begin_(), end_(end)
+	i_(begin), empty_(false), begin_(begin), end_(end)
 {
+	seekForward();
 }
 
 template <typename Iter> NEXTWEB_INLINE void
 LineEndFilter<Iter>::increment() {
+	assert(!empty_);
+	++i_;
+	seekForward();
 }
 
 template <typename Iter> NEXTWEB_INLINE void
 LineEndFilter<Iter>::decrement() {
+	assert(!empty_);
+	--i_;
+	seekReverse();
 }
 
 template <typename Iter> NEXTWEB_INLINE bool
 LineEndFilter<Iter>::equal(LineEndFilter<Iter> const &other) const {
-	return (i_ == other.i_) && (end_ == other.end_);
+	return (!empty_ && !other.empty_) ? i_ == other.i_ : other.empty_;
 }
 
 template <typename Iter> NEXTWEB_INLINE typename LineEndFilter<Iter>::ReferenceType
 LineEndFilter<Iter>::dereference() {
+	assert(!empty_);
+	return *i_;
+}
+
+template <typename Iter> NEXTWEB_INLINE void
+LineEndFilter<Iter>::seekForward() {
+	if ((end_ != i_) && lineEndChecker_(*i_)) {
+		Iter newLine = utils::nextNotMatched(i_, end_, lineEndChecker_);
+		if (end_ != newLine && spaceChecker_(*newLine)) {
+			i_ = utils::nextNotMatched(newLine, end_, spaceChecker_);
+		}
+	}
+}
+
+template <typename Iter> NEXTWEB_INLINE void
+LineEndFilter<Iter>::seekReverse() {
+	typedef std::reverse_iterator<Iter> IteratorType;
+	if ((end_ != i_) && spaceChecker_(*i_)) {
+		IteratorType rend(begin_);
+		IteratorType tokenEnd = utils::nextNotMatched(IteratorType(i_), rend, spaceChecker_);
+		if (lineEndChecker_(*tokenEnd)) {
+			i_ = --(nextNotMatched(tokenEnd, rend, lineEndChecker_).base());
+		}
+	}
+}
+
+template <typename Iter> NEXTWEB_INLINE utils::Range<typename LineEndFilter<Iter>::Type>
+makeLineEndFiltered(Iter begin, Iter end) {
+	typedef LineEndFilter<Iter> IteratorType;
+	IteratorType filteredBegin(begin, end), filteredEnd(end, end);
+	return utils::makeRange(filteredBegin, filteredEnd);
 }
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_LINE_READER_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_LINE_END_FILTER_HPP_INCLUDED

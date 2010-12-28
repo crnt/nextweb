@@ -26,6 +26,7 @@ private:
 	typedef std::list<char> CharList;
 	typedef std::vector<char> CharVector;
 	typedef utils::Range<char const*> CharSequence;
+
 	template <typename Sequence> void testGetLineWith();
 	template <typename Sequence> void testPutBackWith();
 	template <typename Sequence> void testPositionWith();

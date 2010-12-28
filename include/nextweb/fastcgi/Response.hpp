@@ -26,6 +26,7 @@
 namespace nextweb { namespace fastcgi {
 
 class Cookie;
+class HttpDate;
 
 class NEXTWEB_API Response {
 
@@ -38,6 +39,7 @@ public:
 	virtual void setHeader(std::string const &name, std::string const &value) = 0;
 	
 	virtual void redirect(std::string const &url) = 0;
+	virtual void setExpireTime(HttpDate const &date) = 0;
 	virtual void setExpireTime(std::string const &expires) = 0;
 	virtual std::size_t write(char const *buffer, std::size_t size) = 0;
 

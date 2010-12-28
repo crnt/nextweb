@@ -20,14 +20,16 @@
 
 #include <string>
 
+#include "nextweb/Config.hpp"
+
 namespace nextweb { namespace tests {
 
-template <typename Sequence> inline Sequence
+template <typename Sequence> NEXTWEB_INLINE Sequence
 as(char const *str) {
 	return Sequence(str, str + std::char_traits<char>::length(str));
 }
 
-template <typename Sequence> inline std::string
+template <typename Sequence> NEXTWEB_INLINE std::string
 makeString(Sequence const &seq) {
 	return std::string(seq.begin(), seq.end());
 }

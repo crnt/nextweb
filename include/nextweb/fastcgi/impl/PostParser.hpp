@@ -31,8 +31,8 @@
 #include "nextweb/fastcgi/HttpError.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
 #include "nextweb/fastcgi/impl/UrlEncode.hpp"
-#include "nextweb/fastcgi/impl/LineReader.hpp"
 #include "nextweb/fastcgi/impl/IterFileImpl.hpp"
+#include "nextweb/fastcgi/impl/LineEndFilter.hpp"
 
 namespace nextweb { namespace fastcgi {
 
@@ -75,39 +75,62 @@ private:
 	PostParserListener *listener_;
 };
 
-template <typename IO, typename Container>
-class ContainerPostParser : public PostParser<IO> {
+template <typename IO, typename Sequence>
+class SequencePostParser : public PostParser<IO> {
 
 public:
-	ContainerPostParser(PostParserListener *listener);
-	virtual ~ContainerPostParser();
+	SequencePostParser(PostParserListener *listener);
+	virtual ~SequencePostParser();
 	
 	virtual void clear();
 	virtual std::size_t available() const;
 	virtual void parsePost(IO &io, std::size_t size);
 
 private:
-	ContainerPostParser(ContainerPostParser const &);
-	ContainerPostParser& operator = (ContainerPostParser const &);
+	SequencePostParser(SequencePostParser const &);
+	SequencePostParser& operator = (SequencePostParser const &);
 	
 	using PostParser<IO>::contentType;
 	using PostParser<IO>::fireAddFile;
 	using PostParser<IO>::fireAddArg;
 
+	typedef utils::Range<typename Sequence::iterator> RangeType;
 	typedef utils::Range<std::string::const_iterator> StringRangeType;
-	typedef utils::Range<typename Container::iterator> RangeType;
 	
 	void parsePlainPost();
 	void parseArg(RangeType const &arg);
 	void parsePart(RangeType const &part);
 	void parseMultipart(std::string const &bound);
 	void processPart(RangeType const &header, RangeType const &content);
-	template <typename Sequence> bool parseHeader(Sequence const &s, RangeType &name, RangeType &value);
 	
 	std::string getBoundary(StringRangeType const &value) const;
 
 private:
-	Container container_;	
+	Sequence container_;	
+};
+
+template <typename Sequence>
+class HeaderReader {
+
+public:
+	HeaderReader(Sequence const &seq);
+	bool isFile() const;
+	Sequence name() const;
+	Sequence fileName() const;
+	Sequence contentType() const;
+
+private:
+	typedef typename Sequence::iterator IterType;
+	typedef typename Sequence::value_type CharType;
+	
+	HeaderReader(HeaderReader const &);
+	HeaderReader& operator = (HeaderReader const &);
+
+private:
+	Sequence source_;
+	Sequence name_, type_, fileName_;
+	utils::IsSpace<CharType> spaceChecker_;
+	utils::IsLineEnd<CharType> lineEndChecker_;
 };
 
 template <typename IO> NEXTWEB_INLINE
@@ -135,28 +158,28 @@ PostParser<IO>::fireAddArg(std::string const &name, std::string const &value) {
 	listener_->addArg(name, value);
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE
-ContainerPostParser<IO, Container>::ContainerPostParser(PostParserListener *listener) :
+template <typename IO, typename Sequence> NEXTWEB_INLINE
+SequencePostParser<IO, Sequence>::SequencePostParser(PostParserListener *listener) :
 	PostParser<IO>(listener), container_()
 {
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE
-ContainerPostParser<IO, Container>::~ContainerPostParser() {
+template <typename IO, typename Sequence> NEXTWEB_INLINE
+SequencePostParser<IO, Sequence>::~SequencePostParser() {
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::clear() {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::clear() {
 	container_.clear();
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE std::size_t
-ContainerPostParser<IO, Container>::available() const {
+template <typename IO, typename Sequence> NEXTWEB_INLINE std::size_t
+SequencePostParser<IO, Sequence>::available() const {
 	return container_.size();
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parsePost(IO &io, std::size_t size) {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::parsePost(IO &io, std::size_t size) {
 	
 	using namespace utils;
 
@@ -176,8 +199,8 @@ ContainerPostParser<IO, Container>::parsePost(IO &io, std::size_t size) {
 	}
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parsePlainPost() {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::parsePlainPost() {
 	using namespace utils;
 	RangeType range(container_.begin(), container_.end()), part;
 	while (!range.empty()) {
@@ -186,18 +209,18 @@ ContainerPostParser<IO, Container>::parsePlainPost() {
 	}
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parseArg(typename ContainerPostParser<IO, Container>::RangeType const &part) {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::parseArg(typename SequencePostParser<IO, Sequence>::RangeType const &part) {
 	RangeType head, tail;
 	utils::splitOnce(part, '=', head, tail);
 	fireAddArg(urlencode<std::string>(head), urlencode<std::string>(tail));
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, Container>::RangeType const &part) {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::parsePart(typename SequencePostParser<IO, Sequence>::RangeType const &part) {
 	
 	using namespace utils;
-	IsLineEnd<typename Container::value_type> checker;
+	IsLineEnd<typename Sequence::value_type> checker;
 	
 	typename RangeType::iterator const begin = part.begin(), end = part.end();
 	typename RangeType::iterator newLine = begin, lineEnd;
@@ -214,12 +237,13 @@ ContainerPostParser<IO, Container>::parsePart(typename ContainerPostParser<IO, C
 			break;
 		}
 	}
+	
 	RangeType header(begin, lineEnd), content(newLine, end);
 	processPart(header, content);
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::parseMultipart(std::string const &bound) {
 	using namespace utils;
 	RangeType range(container_.begin(), container_.end()), part;
 	while (!range.empty()) {
@@ -230,38 +254,22 @@ ContainerPostParser<IO, Container>::parseMultipart(std::string const &bound) {
 	}
 }
 
-template <typename IO, typename Container> NEXTWEB_INLINE void
-ContainerPostParser<IO, Container>::processPart(typename ContainerPostParser<IO, Container>::RangeType const &header, typename ContainerPostParser<IO, Container>::RangeType const &content) {
+template <typename IO, typename Sequence> NEXTWEB_INLINE void
+SequencePostParser<IO, Sequence>::processPart(typename SequencePostParser<IO, Sequence>::RangeType const &header, typename SequencePostParser<IO, Sequence>::RangeType const &content) {
 	
-	LineReader<RangeType> reader(header);
-	while (reader.hasMoreElements()) {
-
-		RangeType head, tail;
-		RangeType line = reader.nextElement();
-		typedef LineEndFilter<typename RangeType::iterator> IterType;
-		if (reader.wasMultiline()) {
-		}
-		else {
-		}
-	}
-	
-	RangeType name, filename, type;
-	typedef typename Container::iterator IteratorType;
-	if (filename.empty()) {
-		fireAddArg(utils::toString(name), utils::toString(content));
+	HeaderReader<RangeType> reader(header);
+	typedef typename RangeType::iterator IteratorType;
+	if (reader.isFile()) {
+		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(reader.fileName(), reader.contentType(), content));
+		fireAddFile(utils::toString(reader.name()), File(impl));
 	}
 	else {
-		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(filename, type, content));
-		fireAddFile(utils::toString(name), File(impl));
+		fireAddArg(utils::toString(reader.name()), utils::toString(content));
 	}
 }
 
-template <typename IO, typename Container> template <typename Sequence> NEXTWEB_INLINE bool
-ContainerPostParser<IO, Container>::parseHeader(Sequence const &s, RangeType &name, RangeType &value) {
-}
-
-template <typename IO, typename Container> NEXTWEB_INLINE std::string
-ContainerPostParser<IO, Container>::getBoundary(typename ContainerPostParser<IO, Container>::StringRangeType const &value) const {
+template <typename IO, typename Sequence> NEXTWEB_INLINE std::string
+SequencePostParser<IO, Sequence>::getBoundary(typename SequencePostParser<IO, Sequence>::StringRangeType const &value) const {
 
 	using namespace utils;
 	if (!startsWith(value, HttpConstants::BOUNDARY)) {
@@ -279,6 +287,32 @@ ContainerPostParser<IO, Container>::getBoundary(typename ContainerPostParser<IO,
 	tail = truncate(tail, 1, 1);
 	result.append(tail.begin(), tail.end());
 	return result;
+}
+
+template <typename Sequence> NEXTWEB_INLINE
+HeaderReader<Sequence>::HeaderReader(Sequence const &seq) :
+	source_(seq), name_(), type_(), fileName_()
+{
+}
+
+template <typename Sequence> NEXTWEB_INLINE bool
+HeaderReader<Sequence>::isFile() const {
+	return !fileName_.empty();
+}
+
+template <typename Sequence> NEXTWEB_INLINE Sequence
+HeaderReader<Sequence>::name() const {
+	return name_;
+}
+
+template <typename Sequence> NEXTWEB_INLINE Sequence
+HeaderReader<Sequence>::fileName() const {
+	return fileName_;
+}
+
+template <typename Sequence> NEXTWEB_INLINE Sequence
+HeaderReader<Sequence>::contentType() const {
+	return type_;
 }
 
 }} // namespaces
