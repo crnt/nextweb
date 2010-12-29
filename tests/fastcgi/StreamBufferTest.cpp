@@ -25,15 +25,12 @@ public:
 private:
 	typedef std::list<char> CharList;
 	typedef std::vector<char> CharVector;
+	typedef utils::Range<char*> CharBuffer;
 	typedef utils::Range<char const*> CharSequence;
 
 	template <typename Sequence> void testGetLineWith();
 	template <typename Sequence> void testPutBackWith();
 	template <typename Sequence> void testPositionWith();
-	
-	template <typename Sequence> void testGetLineImplWith(Sequence &seq);
-	template <typename Sequence> void testPutBackImplWith(Sequence &seq);
-	template <typename Sequence> void testPositionImplWith(Sequence &seq);
 	
 private:
 	CPPUNIT_TEST_SUITE(StreamBufferTest);
@@ -47,61 +44,36 @@ CPPUNIT_TEST_SUITE_REGISTRATION(StreamBufferTest);
 
 void
 StreamBufferTest::testGetLine() {
-	
 	testGetLineWith<CharList>();
+	testGetLineWith<CharBuffer>();
 	testGetLineWith<CharVector>();
 	testGetLineWith<std::string>();
 	testGetLineWith<CharSequence>();
-	
-	char buffer[] = "123 456\n789 012\n345 678\n901 234\n567 890";
-	utils::Range<char*> range = utils::makeRange(buffer);
-	testGetLineImplWith(range);
 }
 
 void
 StreamBufferTest::testPutBack() {
 	testPutBackWith<CharList>();
+	testPutBackWith<CharBuffer>();
 	testPutBackWith<CharVector>();
 	testPutBackWith<std::string>();
 	testPutBackWith<CharSequence>();
-
-	char buffer[] = "123 456 012 345 678 901 234 567 890";
-	utils::Range<char*> range = utils::makeRange(buffer);
-	testPutBackImplWith(range);
 }
 
 void
 StreamBufferTest::testPosition() {
 	testPositionWith<CharList>();
+	testPositionWith<CharBuffer>();
 	testPositionWith<CharVector>();
 	testPositionWith<std::string>();
 	testPositionWith<CharSequence>();
-
-	char buffer[] = "123 456 012 345 678 901 234 567 890";
-	utils::Range<char*> range = utils::makeRange(buffer);
-	testPositionImplWith(range);
 }
 
 template <typename Sequence> void
 StreamBufferTest::testGetLineWith() {
-	Sequence seq = as<Sequence>("123 456\n789 012\n345 678\n901 234\n567 890");
-	testGetLineImplWith(seq);
-}
 
-template <typename Sequence> void
-StreamBufferTest::testPutBackWith() {
-	Sequence seq = as<Sequence>("123 456 012 345 678 901 234 567 890");
-	testPutBackImplWith(seq);
-}
-
-template <typename Sequence> void
-StreamBufferTest::testPositionWith() {
-	Sequence seq = as<Sequence>("123 456 012 345 678 901 234 567 890");
-	testPositionImplWith(seq);
-}
-
-template <typename Sequence> void
-StreamBufferTest::testGetLineImplWith(Sequence &seq) {
+	char source[] = "123 456\n789 012\n345 678\n901 234\n567 890";
+	Sequence seq = as<Sequence>(source);
 
 	fastcgi::StreamBuffer<typename Sequence::const_iterator> buffer(seq.begin(), seq.end());
 	
@@ -120,7 +92,10 @@ StreamBufferTest::testGetLineImplWith(Sequence &seq) {
 }
 
 template <typename Sequence> void
-StreamBufferTest::testPutBackImplWith(Sequence &seq) {
+StreamBufferTest::testPutBackWith() {
+
+	char source[] = "123 456 012 345 678 901 234 567 890";
+	Sequence seq = as<Sequence>(source);
 
 	char value[8]; // sizeof("123 456")
 	fastcgi::StreamBuffer<typename Sequence::const_iterator> buffer(seq.begin(), seq.end());
@@ -153,8 +128,11 @@ StreamBufferTest::testPutBackImplWith(Sequence &seq) {
 }
 
 template <typename Sequence> void
-StreamBufferTest::testPositionImplWith(Sequence &seq) {
+StreamBufferTest::testPositionWith() {
 
+	char source[] = "123 456 012 345 678 901 234 567 890";
+	Sequence seq = as<Sequence>(source);
+	
 	char value[8]; // sizeof "123 456"
 	fastcgi::StreamBuffer<typename Sequence::const_iterator> buffer(seq.begin(), seq.end());
 	

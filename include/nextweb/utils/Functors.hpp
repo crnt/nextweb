@@ -129,15 +129,15 @@ IsNotLineEnd<Char>::check(Char value) {
 
 template <typename R1, typename R2> NEXTWEB_INLINE bool
 isCILess(R1 const &var, R2 const &target) {
-	return std::lexicographical_compare(var.begin(), var.end(), target.begin(), 
-		target.end(), CILess<typename R1::value_type>());
+	return (!var.empty() && !target.empty()) ? std::lexicographical_compare(var.begin(), 
+		var.end(), target.begin(), target.end(), CILess<typename R1::value_type>()) : !target.empty();
 }
 
 template <typename R1, typename R2> NEXTWEB_INLINE bool
 isCIEqual(R1 const &var, R2 const &target) {
 	if (var.size() == target.size()) {
-		return std::equal(var.begin(), var.end(), target.begin(), 
-			CIEqual<typename R1::value_type>());
+		return !var.empty() ? true : std::equal(var.begin(), 
+			var.end(), target.begin(), CIEqual<typename R1::value_type>());
 	}
 	return false;
 }

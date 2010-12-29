@@ -25,6 +25,11 @@
 namespace nextweb { namespace tests {
 
 template <typename Sequence> NEXTWEB_INLINE Sequence
+as(char *str) {
+	return Sequence(str, str + std::char_traits<char>::length(str));
+}
+
+template <typename Sequence> NEXTWEB_INLINE Sequence
 as(char const *str) {
 	return Sequence(str, str + std::char_traits<char>::length(str));
 }
@@ -32,6 +37,15 @@ as(char const *str) {
 template <typename Sequence> NEXTWEB_INLINE std::string
 makeString(Sequence const &seq) {
 	return std::string(seq.begin(), seq.end());
+}
+
+template <typename Iter> NEXTWEB_INLINE std::size_t
+hashSum(Iter begin, Iter end) {
+	std::size_t result = 0;
+	for (; begin  != end; ++begin) {
+		result += (*begin) * 5;
+	}
+	return result;
 }
 
 }} // namespaces

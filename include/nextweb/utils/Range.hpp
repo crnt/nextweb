@@ -72,10 +72,23 @@ class RangeBase<Iter, std::bidirectional_iterator_tag> : public RangeBase<Iter, 
 public:
 	RangeBase();
 	RangeBase(Iter begin, Iter end);
-	
-	typedef std::reverse_iterator<Iter> reverse_iterator;
-	typedef std::reverse_iterator<Iter> const_reverse_iterator;
+
 	typedef RangeBase<Iter, std::forward_iterator_tag> BaseType;
+
+	typedef typename BaseType::iterator iterator;
+	typedef typename BaseType::const_iterator const_iterator;
+	
+	typedef typename BaseType::pointer pointer;
+	typedef typename BaseType::value_type value_type;
+
+	typedef typename BaseType::reference reference;
+	typedef typename BaseType::reference const const_reference;
+
+	typedef typename BaseType::difference_type difference_type;
+	typedef typename BaseType::size_type size_type;
+
+	typedef std::reverse_iterator<iterator> reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	using BaseType::end;
 	using BaseType::begin;
@@ -94,8 +107,22 @@ public:
 	RangeBase();
 	RangeBase(Iter begin, Iter end);
 	
-	typedef typename std::iterator_traits<Iter>::reference const const_reference;
-	typedef typename MakeUnsigned<typename std::iterator_traits<Iter>::difference_type>::Type size_type;
+	typedef RangeBase<Iter, std::bidirectional_iterator_tag> BaseType;
+
+	typedef typename BaseType::iterator iterator;
+	typedef typename BaseType::const_iterator const_iterator;
+	
+	typedef typename BaseType::pointer pointer;
+	typedef typename BaseType::value_type value_type;
+
+	typedef typename BaseType::reference reference;
+	typedef typename BaseType::reference const const_reference;
+
+	typedef typename BaseType::difference_type difference_type;
+	typedef typename BaseType::size_type size_type;
+
+	typedef typename BaseType::reverse_iterator reverse_iterator;
+	typedef typename BaseType::const_reverse_iterator const_reverse_iterator;
 
 	const_reference operator [] (size_type index) const;
 };
@@ -219,19 +246,19 @@ Range<Iter>::Range(Iter begin, Iter end) :
 
 template <typename Iter, typename Other> NEXTWEB_INLINE bool
 operator < (Range<Iter> const &range, Range<Other> const &other) {
-	return std::lexicographical_compare(range.begin(), range.end(), other.begin(), other.end());
+	return (!range.empty() && !other.empty()) ? std::lexicographical_compare(range.begin(), range.end(), other.begin(), other.end()) : !other.empty();
 }
 
 template <typename Iter, typename Other> NEXTWEB_INLINE bool
 operator > (Range<Iter> const &range, Range<Other> const &other) {
 	std::greater<typename std::iterator_traits<Iter>::value_type> pred;
-	return std::lexicographical_compare(range.begin(), range.end(), other.begin(), other.end(), pred);
+	return (!range.empty() && !other.empty()) ? std::lexicographical_compare(range.begin(), range.end(), other.begin(), other.end(), pred) : !range.empty();
 }
 
 template <typename Iter, typename Other> NEXTWEB_INLINE bool
 operator == (Range<Iter> const &range, Range<Other> const &other) {
 	if (range.size() == other.size()) {
-		return std::equal(range.begin(), range.end(), other.begin());
+		return range.empty() ? true : std::equal(range.begin(), range.end(), other.begin());
 	}
 	return false;
 }
@@ -253,7 +280,9 @@ operator >= (Range<Iter> const &range, Range<Other> const &other) {
 
 template <typename Iter, typename Char, typename Traits> NEXTWEB_INLINE std::basic_ostream<Char, Traits>&
 operator << (std::basic_ostream<Char, Traits> &stream, Range<Iter> const &range) {
-	std::copy(range.begin(), range.end(), std::ostream_iterator<typename Range<Iter>::value_type, Char, Traits>(stream));
+	if (!range.empty()) {
+		std::copy(range.begin(), range.end(), std::ostream_iterator<typename Range<Iter>::value_type, Char, Traits>(stream));
+	}
 	return stream;
 }
 

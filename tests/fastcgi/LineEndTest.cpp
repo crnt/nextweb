@@ -1,4 +1,4 @@
-#include "acsetup.hpp"
+
 
 #include <list>
 #include <string>
@@ -70,15 +70,15 @@ LineEndTest::testEmptyWith() {
 template <typename Sequence> void
 LineEndTest::testForwardWith() {
 	using namespace fastcgi;
-	Sequence seq = as<Sequence>("abcdef abcdef\nabcdef abc\n def");
-	CPPUNIT_ASSERT_EQUAL(std::string("abcdef abcdef\nabcdef abcdef"), makeString(makeLineEndFiltered(seq.begin(), seq.end())));
+	Sequence seq = as<Sequence>("abcdef abcdef\r\n abcdef abcdef");
+	CPPUNIT_ASSERT_EQUAL(std::string("abcdef abcdef abcdef abcdef"), makeString(makeLineEndFiltered(seq.begin(), seq.end())));
 }
 
 template <typename Sequence> void
 LineEndTest::testReverseWith() {
 
 	using namespace fastcgi;
-	Sequence seq = as<Sequence>("abcdef abcdef abcdef abc\n def");
+	Sequence seq = as<Sequence>("abcdef abcdef\r\n abcdef abcdef");
 	typedef LineEndFilter<typename Sequence::iterator> IteratorType;
 	typedef std::reverse_iterator<IteratorType> ReverseIteratorType;
 	

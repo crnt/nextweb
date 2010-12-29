@@ -1,6 +1,7 @@
 check_PROGRAMS = utils-tests
 
 utils_tests_LDADD = ${top_srcdir}/utils/libnextweb.la
+
 utils_tests_SOURCES = main.cpp MockShared.cpp MockThread.cpp \
 	ConvertersTest.cpp \
 	EnumerationTest.cpp \

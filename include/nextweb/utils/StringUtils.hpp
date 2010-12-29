@@ -39,28 +39,39 @@ nextNotMatched(Iter begin, Iter end, Pred pred) {
 	return end;
 }
 
+template <typename Sequence, typename Pred> NEXTWEB_INLINE Sequence
+trimLeftIf(Sequence const &seq, Pred pred) {
+    return Sequence(nextNotMatched(seq.begin(), seq.end(), pred), seq.end());
+}
+
 template <typename Sequence> NEXTWEB_INLINE Sequence
 trimLeft(Sequence const &seq) {
-	IsSpace<typename Sequence::value_type> checker;
-	return Sequence(nextNotMatched(seq.begin(), seq.end(), checker), seq.end());
+	return trimLeftIf(seq, IsSpace<typename Sequence::value_type>());
 }
 
 template <typename Sequence> NEXTWEB_INLINE Sequence
 trimCharsLeft(Sequence const &seq, typename Sequence::value_type val) {
-	IsEqual<typename Sequence::value_type> checker(val);
-	return Sequence(seq.begin(), nextNotMatched(seq.rbegin(), seq.rend(), checker).base());
+	return trimLeftIf(seq, IsEqual<typename Sequence::value_type>(val));
+}
+
+template <typename Sequence, typename Pred> NEXTWEB_INLINE Sequence
+trimRightIf(Sequence const &seq, Pred pred) {
+	return Sequence(seq.begin(), nextNotMatched(seq.rbegin(), seq.rend(), pred).base());
 }
 
 template <typename Sequence> NEXTWEB_INLINE Sequence
 trimRight(Sequence const &seq) {
-	IsSpace<typename Sequence::value_type> checker;
-	return Sequence(seq.begin(), nextNotMatched(seq.rbegin(), seq.rend(), checker).base());
+    return trimRightIf(seq, IsSpace<typename Sequence::value_type>());
 }
 
 template <typename Sequence> NEXTWEB_INLINE Sequence
 trimCharsRight(Sequence const &seq, typename Sequence::value_type val) {
-	IsEqual<typename Sequence::value_type> checker(val);
-	return Sequence(seq.begin(), nextNotMatched(seq.rbegin(), seq.rend(), checker).base());
+	return trimRightIf(seq, IsEqual<typename Sequence::value_type>(val));
+}
+
+template <typename Sequence, typename Pred> NEXTWEB_INLINE Sequence
+trimIf(Sequence const &seq, Pred pred) {
+	return trimLeftIf(trimRightIf(seq, pred), pred);
 }
 
 template <typename Sequence> NEXTWEB_INLINE Sequence

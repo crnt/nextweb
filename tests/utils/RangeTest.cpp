@@ -132,12 +132,15 @@ RangeTest::testComparisionWith() {
 	using namespace utils;
 	Sequence seq = as<Sequence>("test string");
 	Range<char const*> pattern = makeRange("test string");
-	Range<typename Sequence::const_iterator> range(seq.begin(), seq.end());
-	
+	Range<typename Sequence::const_iterator> empty, range(seq.begin(), seq.end());
+
 	CPPUNIT_ASSERT_EQUAL(true, range == pattern);
 	CPPUNIT_ASSERT_EQUAL(true, range <= pattern);
 	CPPUNIT_ASSERT_EQUAL(true, range >= pattern);
 	CPPUNIT_ASSERT_EQUAL(false, range != pattern);
+
+	CPPUNIT_ASSERT_EQUAL(true, empty < pattern);
+	CPPUNIT_ASSERT_EQUAL(false, empty == pattern);
 }
 
 template <typename Sequence> void
@@ -147,12 +150,15 @@ RangeTest::testReversedComparisionWith() {
 	Sequence seq = as<Sequence>("test string");
 	Range<char const*> source = makeRange("test string");
 	Range<typename Sequence::const_reverse_iterator> range(seq.rbegin(), seq.rend());
-	Range<Range<char const*>::const_reverse_iterator> pattern(source.rbegin(), source.rend());
+	Range<Range<char const*>::const_reverse_iterator> empty, pattern(source.rbegin(), source.rend());
 	
 	CPPUNIT_ASSERT_EQUAL(true, range == pattern);
 	CPPUNIT_ASSERT_EQUAL(true, range <= pattern);
 	CPPUNIT_ASSERT_EQUAL(true, range >= pattern);
 	CPPUNIT_ASSERT_EQUAL(false, range != pattern);
+
+	CPPUNIT_ASSERT_EQUAL(true, empty < pattern);
+	CPPUNIT_ASSERT_EQUAL(false, empty == pattern);
 }
 
 }} // namespaces

@@ -104,31 +104,40 @@ private:
 	void processPart(RangeType const &header, RangeType const &content);
 	
 	std::string getBoundary(StringRangeType const &value) const;
+	StringRangeType stripBoundaryQuotes(StringRangeType const &value) const;
 
 private:
 	Sequence container_;	
 };
 
 template <typename Sequence>
-class HeaderReader {
+class MultipartHeaderParser {
 
 public:
-	HeaderReader(Sequence const &seq);
-	bool isFile() const;
-	Sequence name() const;
-	Sequence fileName() const;
-	Sequence contentType() const;
-
-private:
-	typedef typename Sequence::iterator IterType;
-	typedef typename Sequence::value_type CharType;
+	MultipartHeaderParser(Sequence const &seq);
 	
-	HeaderReader(HeaderReader const &);
-	HeaderReader& operator = (HeaderReader const &);
+	typedef typename Sequence::iterator IteratorType;
+	typedef LineEndFilter<IteratorType> FilteredIteratorType;
+	typedef utils::Range<FilteredIteratorType> FilteredType;
+	
+	
+	bool isFile() const;
+	FilteredType name() const;
+	FilteredType fileName() const;
+	FilteredType contentType() const;
 
 private:
-	Sequence source_;
-	Sequence name_, type_, fileName_;
+	MultipartHeaderParser(MultipartHeaderParser const &);
+	MultipartHeaderParser& operator = (MultipartHeaderParser const &);
+
+	typedef typename Sequence::value_type CharType;
+
+	void parse(FilteredType const &filtered);
+	void parseLine(FilteredType const &filtered);
+	void parseContentDisposition(FilteredType const &filtered);
+
+private:
+	FilteredType name_, type_, fileName_;
 	utils::IsSpace<CharType> spaceChecker_;
 	utils::IsLineEnd<CharType> lineEndChecker_;
 };
@@ -244,27 +253,38 @@ SequencePostParser<IO, Sequence>::parsePart(typename SequencePostParser<IO, Sequ
 
 template <typename IO, typename Sequence> NEXTWEB_INLINE void
 SequencePostParser<IO, Sequence>::parseMultipart(std::string const &bound) {
+
 	using namespace utils;
+	
+	bool endingFound = false;
+	IsLineEnd<typename RangeType::value_type> lineEnd;
 	RangeType range(container_.begin(), container_.end()), part;
 	while (!range.empty()) {
 		splitOnce(range, bound, part, range);
-		if (!part.empty()) {
+		part = trimIf(part, lineEnd);
+		if (HttpConstants::MULTIPART_ENDING == part) {
+			endingFound = true;
+		}
+		else if (!part.empty()) {
 			parsePart(part);
 		}
+	}
+	if (!endingFound) {
+		throw HttpError(HttpError::BAD_REQUEST);
 	}
 }
 
 template <typename IO, typename Sequence> NEXTWEB_INLINE void
 SequencePostParser<IO, Sequence>::processPart(typename SequencePostParser<IO, Sequence>::RangeType const &header, typename SequencePostParser<IO, Sequence>::RangeType const &content) {
 	
-	HeaderReader<RangeType> reader(header);
+	MultipartHeaderParser<RangeType> parser(header);
 	typedef typename RangeType::iterator IteratorType;
-	if (reader.isFile()) {
-		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(reader.fileName(), reader.contentType(), content));
-		fireAddFile(utils::toString(reader.name()), File(impl));
+	if (parser.isFile()) {
+		SharedPtr<FileImpl> impl(new IterFileImpl<IteratorType>(utils::toString(parser.fileName()), utils::toString(parser.contentType()), content));
+		fireAddFile(utils::toString(parser.name()), File(impl));
 	}
 	else {
-		fireAddArg(utils::toString(reader.name()), utils::toString(content));
+		fireAddArg(utils::toString(parser.name()), utils::toString(content));
 	}
 }
 
@@ -279,40 +299,84 @@ SequencePostParser<IO, Sequence>::getBoundary(typename SequencePostParser<IO, Se
 	std::string result("--");
 	StringRangeType head, tail;
 	splitOnce(value, '=', head, tail);
-	tail = trim(tail);
-	if ((tail.size() < static_cast<StringRangeType::size_type>(2)) || '"' != *(tail.begin()) || '"' != *(tail.rbegin())) {
-		throw HttpError(HttpError::BAD_REQUEST);
-	}
-
-	tail = truncate(tail, 1, 1);
+	tail = stripBoundaryQuotes(trim(tail));
 	result.append(tail.begin(), tail.end());
 	return result;
 }
 
+template <typename IO, typename Sequence> NEXTWEB_INLINE typename SequencePostParser<IO, Sequence>::StringRangeType
+SequencePostParser<IO, Sequence>::stripBoundaryQuotes(typename SequencePostParser<IO, Sequence>::StringRangeType const &value) const {
+	if ((value.size() < static_cast<typename StringRangeType::size_type>(2)) || '"' != *(value.begin())) {
+		return value;
+	}
+	if ('"' == *(value.rbegin())) {
+		return trimChars(value, '"');
+	}
+	throw HttpError(HttpError::BAD_REQUEST);
+}
+
 template <typename Sequence> NEXTWEB_INLINE
-HeaderReader<Sequence>::HeaderReader(Sequence const &seq) :
-	source_(seq), name_(), type_(), fileName_()
+MultipartHeaderParser<Sequence>::MultipartHeaderParser(Sequence const &seq) :
+	name_(), type_(), fileName_()
 {
+	parse(makeLineEndFiltered(seq.begin(), seq.end()));
 }
 
 template <typename Sequence> NEXTWEB_INLINE bool
-HeaderReader<Sequence>::isFile() const {
+MultipartHeaderParser<Sequence>::isFile() const {
 	return !fileName_.empty();
 }
 
-template <typename Sequence> NEXTWEB_INLINE Sequence
-HeaderReader<Sequence>::name() const {
+template <typename Sequence> NEXTWEB_INLINE typename MultipartHeaderParser<Sequence>::FilteredType
+MultipartHeaderParser<Sequence>::name() const {
 	return name_;
 }
 
-template <typename Sequence> NEXTWEB_INLINE Sequence
-HeaderReader<Sequence>::fileName() const {
+template <typename Sequence> NEXTWEB_INLINE typename MultipartHeaderParser<Sequence>::FilteredType
+MultipartHeaderParser<Sequence>::fileName() const {
 	return fileName_;
 }
 
-template <typename Sequence> NEXTWEB_INLINE Sequence
-HeaderReader<Sequence>::contentType() const {
+template <typename Sequence> NEXTWEB_INLINE typename MultipartHeaderParser<Sequence>::FilteredType
+MultipartHeaderParser<Sequence>::contentType() const {
 	return type_;
+}
+
+template <typename Sequence> NEXTWEB_INLINE void
+MultipartHeaderParser<Sequence>::parse(typename MultipartHeaderParser<Sequence>::FilteredType const &filtered) {
+	
+	using namespace utils;
+	
+	FilteredType range = filtered;
+	IsLineEnd<typename FilteredType::value_type> checker;
+	
+	while (!range.empty()) {
+		typename FilteredType::iterator begin = range.begin(), end = range.end();
+		typename FilteredType::iterator lineEnd = nextMatched(begin, end, checker);
+		typename FilteredType::iterator newLine = nextNotMatched(lineEnd, end, checker);
+		parseLine(makeRange(begin, lineEnd));
+		range = makeRange(newLine, end);
+	}
+}
+
+template <typename Sequence> NEXTWEB_INLINE void
+MultipartHeaderParser<Sequence>::parseLine(typename MultipartHeaderParser<Sequence>::FilteredType const &filtered) {
+	
+	using namespace utils;
+	
+	FilteredType head, tail;
+	splitOnce(filtered, ':', head, tail);
+	tail = trim(tail);
+	if (utils::isCIEqual(HttpConstants::CONTENT_DISPOSITION, head)) {
+		parseContentDisposition(tail);
+	}
+	else if (isCIEqual(HttpConstants::CONTENT_TYPE, head)) {
+		type_ = tail;
+	}
+}
+
+template <typename Sequence> NEXTWEB_INLINE void
+MultipartHeaderParser<Sequence>::parseContentDisposition(typename MultipartHeaderParser<Sequence>::FilteredType const &filtered) {
 }
 
 }} // namespaces

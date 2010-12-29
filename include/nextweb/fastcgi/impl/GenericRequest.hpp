@@ -130,12 +130,12 @@ GenericRequest<IO>::isSecure() const {
 
 template <typename IO> NEXTWEB_INLINE std::string const&
 GenericRequest<IO>::pathInfo() const {
-	return getVar(HttpConstants::PATH_INFO);
+	return getVar(HttpConstants::PATH_INFO_VAR_NAME);
 }
 
 template <typename IO> NEXTWEB_INLINE std::string const&
 GenericRequest<IO>::contentType() const {
-	return getVar(HttpConstants::CONTENT_TYPE);
+	return getVar(HttpConstants::CONTENT_TYPE_VAR_NAME);
 }
 
 template <typename IO> NEXTWEB_INLINE typename GenericRequest<IO>::StringMap const&
@@ -244,7 +244,7 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parsePost(std::size_t threshold) {
 	(void) threshold;
-	std::size_t postSize = utils::fromString<std::size_t>(getVar(HttpConstants::CONTENT_LENGTH));
+	std::size_t postSize = utils::fromString<std::size_t>(getVar(HttpConstants::CONTENT_LENGTH_VAR_NAME));
 	if (!postParser_) {
 		typedef std::vector<char> CharVector;
 		postParser_.reset(new SequencePostParser<IO, CharVector>(this));

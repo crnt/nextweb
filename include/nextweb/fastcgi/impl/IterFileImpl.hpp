@@ -28,7 +28,6 @@
 #include "nextweb/SharedPtr.hpp"
 #include "nextweb/utils/Range.hpp"
 #include "nextweb/utils/StaticAssert.hpp"
-#include "nextweb/utils/StringConverters.hpp"
 
 #include "nextweb/fastcgi/impl/FileImpl.hpp"
 #include "nextweb/fastcgi/impl/StreamBuffer.hpp"
@@ -41,7 +40,7 @@ class IterFileImpl : public FileImpl {
 public:
 	typedef utils::Range<Iter> RangeType;
 	
-	IterFileImpl(RangeType const &name, RangeType const &type, RangeType const &cont);
+	IterFileImpl(std::string const &name, std::string const &type, RangeType const &cont);
 	virtual ~IterFileImpl();
 
 	virtual std::streamsize size() const;
@@ -56,15 +55,15 @@ private:
 	IterFileImpl& operator = (IterFileImpl const &);
 
 private:
+	RangeType content_;
 	std::string name_, type_;
 	StreamBuffer<Iter> buffer_;
-	utils::Range<Iter> content_;	
 	std::istream stream_;
 };
 
 template <typename Iter> NEXTWEB_INLINE
-IterFileImpl<Iter>::IterFileImpl(typename IterFileImpl<Iter>::RangeType const &name, typename IterFileImpl<Iter>::RangeType const &type, typename IterFileImpl<Iter>::RangeType const &cont) :
-	name_(utils::toString(name)), type_(utils::toString(type)), buffer_(cont.begin(), cont.end()), content_(cont), stream_(&buffer_)
+IterFileImpl<Iter>::IterFileImpl(std::string const &name, std::string const &type, typename IterFileImpl<Iter>::RangeType const &cont) :
+	content_(cont), name_(name), type_(type), buffer_(content_.begin(), content_.end()), stream_(&buffer_)
 {
 }
 

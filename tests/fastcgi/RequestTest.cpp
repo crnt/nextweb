@@ -21,16 +21,13 @@ public:
 	void testBadMultipart();
 
 private:
-	std::size_t hashSum(std::istream &is) const;
-
-private:
 	CPPUNIT_TEST_SUITE(RequestTest);
 	CPPUNIT_TEST(testGet);
 	CPPUNIT_TEST(testPost);
 	CPPUNIT_TEST(testMultipart);
 	CPPUNIT_TEST(testHeaderReader);
-	CPPUNIT_TEST_EXCEPTION(testBadMethod, Error);
-	CPPUNIT_TEST_EXCEPTION(testBadMultipart, Error);
+	CPPUNIT_TEST_EXCEPTION(testBadMethod, fastcgi::HttpError);
+	CPPUNIT_TEST_EXCEPTION(testBadMultipart, fastcgi::HttpError);
 	CPPUNIT_TEST_SUITE_END();
 };
 
@@ -54,10 +51,32 @@ RequestTest::testGet() {
 
 void
 RequestTest::testPost() {
+
+	MockIO io;
+	io.add("REQUEST_METHOD=POST");
+	io.add("HTTP_CONTENT_LENGTH=1705");
+	io.attachFile("data/post.tst");
+	io.checkIsValid();
+	
+	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
+	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
 }
 
 void
 RequestTest::testMultipart() {
+
+	MockIO io;
+	io.add("REQUEST_METHOD=POST");
+	io.add("HTTP_CONTENT_LENGTH=15000");
+	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
+	io.attachFile("data/multipart.tst");
+	io.checkIsValid();
+
+	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
+	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
+	
 }
 
 void
@@ -66,6 +85,7 @@ RequestTest::testHeaderReader() {
 
 void
 RequestTest::testBadMethod() {
+
 	MockIO io;
 	io.add("METHOD=BAD");
 	io.checkIsValid();
@@ -74,15 +94,6 @@ RequestTest::testBadMethod() {
 
 void
 RequestTest::testBadMultipart() {
-}
-
-std::size_t
-RequestTest::hashSum(std::istream &is) const {
-	std::size_t result = 0;
-	for (std::istream_iterator<char> i(is), end; i != end; ++i) {
-		result += (*i) * 5;
-	}
-	return result;
 }
 
 }} // namespaces
