@@ -16,7 +16,6 @@ public:
 	void testGet();
 	void testPost();
 	void testMultipart();
-	void testHeaderReader();
 	void testBadMethod();
 	void testBadMultipart();
 
@@ -25,7 +24,6 @@ private:
 	CPPUNIT_TEST(testGet);
 	CPPUNIT_TEST(testPost);
 	CPPUNIT_TEST(testMultipart);
-	CPPUNIT_TEST(testHeaderReader);
 	CPPUNIT_TEST_EXCEPTION(testBadMethod, fastcgi::HttpError);
 	CPPUNIT_TEST_EXCEPTION(testBadMultipart, fastcgi::HttpError);
 	CPPUNIT_TEST_SUITE_END();
@@ -77,10 +75,6 @@ RequestTest::testMultipart() {
 	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
 	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
 	
-}
-
-void
-RequestTest::testHeaderReader() {
 }
 
 void

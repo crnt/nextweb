@@ -30,6 +30,9 @@ struct DescriptorTraits {
 	static int defaultValue();
 };
 
+// FIXME: implement all mapped-file stuff including "all-mapping" file 
+// and "paged-mapping" file.
+
 class MappedFileImpl : public Shared {
 
 public:

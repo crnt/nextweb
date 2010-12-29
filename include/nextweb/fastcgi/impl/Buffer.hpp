@@ -15,11 +15,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_CHAR_BUFFER_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_CHAR_BUFFER_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_BUFFER_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_BUFFER_HPP_INCLUDED
 
 namespace nextweb { namespace fastcgi {
 
+// FIXME: implement buffer to use as post container instead of vector<char>
+template <typename Type, typename Alloc>
+class Buffer {
+
+public:
+	Buffer();
+	Buffer(Alloc const &alloc);
+
+private:
+	Buffer(Buffer<Type, Alloc> const &);
+	Buffer<Type, Alloc>& operator = (Buffer<Type, Alloc> const &);
+};
+
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_CHAR_BUFFER_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_BUFFER_HPP_INCLUDED
