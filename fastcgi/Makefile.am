@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libnextweb-fastcgi.la
 
 libnextweb_fastcgi_la_LIBADD = ${top_srcdir}/utils/libnextweb.la
 libnextweb_fastcgi_la_SOURCES = \
+	CharBuffer.cpp \
 	Cookie.cpp \
 	FCGI.cpp \
 	File.cpp \

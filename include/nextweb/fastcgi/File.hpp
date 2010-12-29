@@ -45,10 +45,16 @@ public:
 	void save(char const *name) const;
 	void save(std::string const &name) const;
 
+	operator std::istream& ();
+
 private:
 	SharedPtr<FileImpl> impl_;
 };
 
 }} // namespaces
+
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/fastcgi/File.hpp"
+#endif
 
 #endif // NEXTWEB_FASTCGI_FILE_HPP_INCLUDED

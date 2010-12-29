@@ -74,7 +74,8 @@ public:
 	FileMap const& files() const;
 	bool hasFile(std::string const &name) const;
 	File getFile(std::string const &name) const;
-	virtual void addFile(std::string const &name, File const &file);
+	virtual void addFile(std::string const &name, SharedPtr<FileImpl> const &file);
+	virtual void store(char const *file);
 
 private:
 	GenericRequest(GenericRequest const &);
@@ -218,11 +219,11 @@ GenericRequest<IO>::getFile(std::string const &name) const {
 }
 
 template <typename IO> NEXTWEB_INLINE void
-GenericRequest<IO>::addFile(std::string const &name, File const &file) {
+GenericRequest<IO>::addFile(std::string const &name, SharedPtr<FileImpl> const &file) {
 	// FIXME: what should we do with multiple file instances with the same name?
 	FileMap::iterator i = files_.find(name);
 	if (files_.end() == i) {
-		files_.insert(std::make_pair(name, file));
+		files_.insert(std::make_pair(name, File(file)));
 	}
 }
 
@@ -254,16 +255,20 @@ GenericRequest<IO>::parsePost(std::size_t threshold) {
 
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parseArg(utils::Range<char const*> const &range) {
-	utils::Range<char const*> head, tail;
-	splitOnce(range, '=', head, tail);
-	args_.insert(std::make_pair(urldecode<std::string>(head), urldecode<std::string>(tail)));
+	
+	typedef utils::Range<char const*> RangeType;
+	std::pair<RangeType, RangeType> p = utils::splitKeyValue(range);
+	args_.insert(std::make_pair(urldecode<std::string>(p.first), urldecode<std::string>(p.second)));
 }
 
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parseVar(utils::Range<char const*> const &range) {
 
-	utils::Range<char const*> head, tail;
-	utils::splitOnce(range, '=', head, tail);
+	typedef utils::Range<char const*> RangeType;
+	std::pair<RangeType, RangeType> p = utils::splitKeyValue(range);
+	
+	RangeType const &head = p.first;
+	RangeType const &tail = p.second;
 	vars_.insert(std::make_pair(std::string(head.begin(), head.end()), 
 		std::string(tail.begin(), tail.end())));
 	if (HttpConstants::COOKIE_VAR_NAME == head) {
@@ -276,9 +281,9 @@ GenericRequest<IO>::parseVar(utils::Range<char const*> const &range) {
 
 template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parseCookie(utils::Range<char const*> const &range) {
-	utils::Range<char const*> head, tail;
-	splitOnce(range, '=', head, tail);
-	cookies_.insert(std::make_pair(urldecode<std::string>(head), urldecode<std::string>(tail)));
+	typedef utils::Range<char const*> RangeType;
+	std::pair<RangeType, RangeType> p = utils::splitKeyValue(range);
+	cookies_.insert(std::make_pair(urldecode<std::string>(p.first), urldecode<std::string>(p.second)));
 }
 
 template <typename IO> NEXTWEB_INLINE void
@@ -298,6 +303,12 @@ GenericRequest<IO>::parseQueryString(utils::Range<char const*> const &range) {
 		utils::splitFirstOfOnce(tail, "&;", head, tail);
 		parseArg(head);
 	}
+}
+
+template <typename IO> NEXTWEB_INLINE void
+GenericRequest<IO>::store(char const *file) {
+	// FIXME: implement storing to file
+	(void) file;
 }
 
 }} // namespaces

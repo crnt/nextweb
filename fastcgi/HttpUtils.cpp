@@ -38,6 +38,9 @@ utils::Range<char const*> const
 HttpConstants::BOUNDARY = utils::makeRange("boundary");
 
 utils::Range<char const*> const
+HttpConstants::FORM_DATA = utils::makeRange("form-data");
+
+utils::Range<char const*> const
 HttpConstants::MULTIPART_ENDING = utils::makeRange("--");
 
 utils::Range<char const*> const
@@ -47,13 +50,19 @@ utils::Range<char const*> const
 HttpConstants::CONTENT_TYPE = utils::makeRange("Content-Type");
 
 utils::Range<char const*> const
-HttpConstants::CONTENT_DISPOSITION = utils::makeRange("Content-Disposition");
+HttpConstants::CONTENT_DISP = utils::makeRange("Content-Disposition");
 
 utils::Range<char const*> const
 HttpConstants::COOKIE_VAR_NAME = utils::makeRange("HTTP_COOKIE");
 
 utils::Range<char const*> const
 HttpConstants::QUERY_STRING_VAR_NAME = utils::makeRange("QUERY_STRING");
+
+utils::Range<char const*> const
+HttpConstants::NAME = utils::makeRange("name");
+
+utils::Range<char const*> const
+HttpConstants::FILE_NAME = utils::makeRange("filename");
 
 char const*
 statusToString(unsigned short code) {

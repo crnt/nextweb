@@ -22,6 +22,8 @@ namespace nextweb { namespace fastcgi {
 
 template <> NEXTWEB_INLINE void
 IterFileImpl<char const*>::save(char const *name) const {
+	// FIXME: implement fast write to file
+	(void) name;
 }
 
 }} // namespaces

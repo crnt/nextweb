@@ -15,40 +15,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_TESTS_MOCK_IO_HPP_INCLUDED
-#define NEXTWEB_TESTS_MOCK_IO_HPP_INCLUDED
+#ifndef NEXTWEB_UTILS_SPLIT_KEY_VALUE_HPP_INCLUDED
+#define NEXTWEB_UTILS_SPLIT_KEY_VALUE_HPP_INCLUDED
 
-#include <string>
-#include <vector>
-#include <fstream>
+#include <utility>
 
-namespace nextweb { namespace tests {
+#include "nextweb/Config.hpp"
+#include "nextweb/utils/StringUtils.hpp"
 
-class MockIO {
+namespace nextweb { namespace utils {
 
-public:
-	MockIO();
-	virtual ~MockIO();
-
-	void checkIsValid() const;
-	void add(std::string const &value);
-	void attachFile(char const *fileName);
-
-	char const* const* environ() const; 
-	std::size_t read(char *buffer, std::size_t size); 
-	std::size_t write(char const *buffer, std::size_t size);
-	
-private:
-	MockIO(MockIO const &);
-	MockIO& operator = (MockIO const &);
-	void validate() const;
-
-private:
-	std::ifstream post_;
-	std::vector<std::string> strings_;
-	mutable std::vector<char const*> env_;
-};
+template <typename Sequence> NEXTWEB_INLINE std::pair<Sequence, Sequence>
+splitKeyValue(Sequence const &seq) {
+	Sequence head, tail;
+	splitOnce(seq, '=', head, tail);
+	return std::make_pair(trim(head), trim(tail));
+}
 
 }} // namespaces
 
-#endif // NEXTWEB_TESTS_MOCK_IO_HPP_INCLUDED
+#endif // NEXTWEB_UTILS_SPLIT_KEY_VALUE_HPP_INCLUDED

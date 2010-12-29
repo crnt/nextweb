@@ -41,10 +41,14 @@ struct HttpConstants {
 	static utils::Range<char const*> const NN;
 	static utils::Range<char const*> const RNRN;
 	static utils::Range<char const*> const BOUNDARY;
+	static utils::Range<char const*> const FORM_DATA;
 	static utils::Range<char const*> const MULTIPART_ENDING;
 	static utils::Range<char const*> const MULTIPART_FORM_DATA;
 	static utils::Range<char const*> const CONTENT_TYPE;
-	static utils::Range<char const*> const CONTENT_DISPOSITION;
+	static utils::Range<char const*> const CONTENT_DISP;
+	static utils::Range<char const*> const NAME;
+	static utils::Range<char const*> const FILE_NAME;
+
 	
 	static utils::Range<char const*> const COOKIE_VAR_NAME;
 	static utils::Range<char const*> const QUERY_STRING_VAR_NAME;

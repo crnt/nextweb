@@ -63,3 +63,8 @@ File::save(std::string const &name) const {
 }
 
 }} // namespaces
+
+#ifdef NEXTWEB_DEBUG
+#include "nextweb/inlines/fastcgi/File.hpp"
+#endif
+

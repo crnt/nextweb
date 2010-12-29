@@ -2,11 +2,14 @@ nobase_pkginclude_HEADERS = \
 	Config.hpp \
 	Enumeration.hpp \
 	Error.hpp \
+	Shared.hpp \
+	SharedPtr.hpp \
 	fastcgi/Cookie.hpp \
 	fastcgi/File.hpp \
 	fastcgi/Forward.hpp \
 	fastcgi/HttpDate.hpp \
 	fastcgi/HttpError.hpp \
+	fastcgi/impl/CharBuffer.hpp \
 	fastcgi/impl/FCGI.hpp \
 	fastcgi/impl/FileImpl.hpp \
 	fastcgi/impl/GenericRequest.hpp \
@@ -28,6 +31,7 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/Server.hpp \
 	fastcgi/Settings.hpp \
 	inlines/Error.hpp \
+	inlines/fastcgi/File.hpp \
 	inlines/fastcgi/HttpDate.hpp \
 	inlines/fastcgi/IterFileImpl.hpp \
 	inlines/Shared.hpp \
@@ -38,12 +42,9 @@ nobase_pkginclude_HEADERS = \
 	inlines/utils/ScopedLock.hpp \
 	inlines/utils/StringConverters.hpp \
 	inlines/utils/Threads.hpp \
-	Shared.hpp \
-	SharedPtr.hpp \
 	templates/impl/TemplateImpl.hpp \
 	templates/ParamSet.hpp \
 	templates/Template.hpp \
-	utils/CharBuffer.hpp \
 	utils/CharTraits.hpp \
 	utils/EnumerationImpl.hpp \
 	utils/Functors.hpp \
@@ -57,6 +58,7 @@ nobase_pkginclude_HEADERS = \
 	utils/Resource.hpp \
 	utils/ScopedLock.hpp \
 	utils/SingleThreaded.hpp \
+	utils/SplitKeyValue.hpp \
 	utils/StaticAssert.hpp \
 	utils/StringConverters.hpp \
 	utils/StringUtils.hpp \

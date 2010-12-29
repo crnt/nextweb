@@ -29,7 +29,7 @@ template <typename IO>
 class RequestImpl : public Request, private GenericRequest<IO> {
 
 public:
-	RequestImpl();
+	RequestImpl(IO &io, std::size_t threshold);
 	virtual ~RequestImpl();
 
 	virtual bool isSecure() const;
@@ -54,6 +54,8 @@ public:
 	virtual Enumeration<File>::Pointer files() const;
 	virtual bool hasFile(std::string const &name) const;
 	virtual File getFile(std::string const &name) const;
+
+	virtual void store(char const *file);
 	
 private:
 	RequestImpl(RequestImpl const &);
@@ -61,7 +63,8 @@ private:
 };
 
 template <typename IO> NEXTWEB_INLINE
-RequestImpl<IO>::RequestImpl() 
+RequestImpl<IO>::RequestImpl(IO &io, std::size_t threshold) :
+	GenericRequest<IO>::GenericRequest(io, threshold)
 {
 }
 
@@ -143,10 +146,17 @@ RequestImpl<IO>::files() const {
 
 template <typename IO> NEXTWEB_INLINE bool
 RequestImpl<IO>::hasFile(std::string const &name) const {
+	return GenericRequest<IO>::hasFile(name);
 }
 
 template <typename IO> NEXTWEB_INLINE File
 RequestImpl<IO>::getFile(std::string const &name) const {
+	return GenericRequest<IO>::getFile(name);
+}
+
+template <typename IO> NEXTWEB_INLINE void
+RequestImpl<IO>::store(char const *file) {
+	GenericRequest<IO>::store(file);
 }
 
 }} // namespaces

@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include <iostream>
+#include <fstream>
+#include <iterator>
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -21,6 +22,7 @@ public:
 	void testGetLine();
 	void testPutBack();
 	void testPosition();
+	void testChecksum();
 
 private:
 	typedef std::list<char> CharList;
@@ -31,12 +33,14 @@ private:
 	template <typename Sequence> void testGetLineWith();
 	template <typename Sequence> void testPutBackWith();
 	template <typename Sequence> void testPositionWith();
+	template <typename Sequence> void testChecksumWith();
 	
 private:
 	CPPUNIT_TEST_SUITE(StreamBufferTest);
 	CPPUNIT_TEST(testGetLine);
 	CPPUNIT_TEST(testPutBack);
 	CPPUNIT_TEST(testPosition);
+	CPPUNIT_TEST(testChecksum);
 	CPPUNIT_TEST_SUITE_END();
 };
 
@@ -67,6 +71,13 @@ StreamBufferTest::testPosition() {
 	testPositionWith<CharVector>();
 	testPositionWith<std::string>();
 	testPositionWith<CharSequence>();
+}
+
+void
+StreamBufferTest::testChecksum() {
+	testChecksumWith<CharList>();
+	testChecksumWith<CharVector>();
+	testChecksumWith<std::string>();
 }
 
 template <typename Sequence> void
@@ -162,6 +173,28 @@ StreamBufferTest::testPositionWith() {
 	CPPUNIT_ASSERT(stream.fail());
 	stream.clear();
 
+}
+
+template <typename Sequence> void
+StreamBufferTest::testChecksumWith() {
+	
+	Sequence seq;
+	std::ifstream file("data/copying.tst");
+	file.exceptions(std::ios::badbit);
+	std::copy(std::istream_iterator<char>(file), std::istream_iterator<char>(), std::back_inserter(seq));
+	std::size_t const target = hash(seq.begin(), seq.end());
+	
+	typedef fastcgi::StreamBuffer<typename Sequence::const_iterator> StreamBufferType;
+	StreamBufferType buffer(seq.begin(), seq.end());
+	std::istream stream(&buffer);
+	std::size_t result = hash(std::istream_iterator<char>(stream), std::istream_iterator<char>());
+	
+	CPPUNIT_ASSERT_EQUAL(target, result);
+	stream.clear();
+	stream.exceptions(std::ios::failbit);
+	
+	stream.seekg(0);
+	CPPUNIT_ASSERT_EQUAL(static_cast<std::streampos>(0), stream.tellg());
 }
 
 }} // namespaces

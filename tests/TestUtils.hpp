@@ -1,5 +1,5 @@
 // nextweb - modern web framework for Python and C++
-// Copyright (C) 2009 Oleg Obolenskiy <highpower@mail.ru>
+// Copyright (C) 2011 Oleg Obolenskiy <highpower@yandex-team.ru>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,10 +40,10 @@ makeString(Sequence const &seq) {
 }
 
 template <typename Iter> NEXTWEB_INLINE std::size_t
-hashSum(Iter begin, Iter end) {
+hash(Iter begin, Iter end) {
 	std::size_t result = 0;
 	for (; begin  != end; ++begin) {
-		result += (*begin) * 5;
+		result = (result * 5) + (*begin);
 	}
 	return result;
 }

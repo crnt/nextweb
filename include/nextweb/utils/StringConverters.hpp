@@ -1,6 +1,5 @@
-/** @file StringConverters.hpp */
 // nextweb - modern web framework for Python and C++
-// Copyright (C) 2011 Oleg Obolenskiy <highpower@nextweb.org>
+// Copyright (C) 2011 Oleg Obolenskiy <highpower@yandex-team.org>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -59,11 +58,6 @@ struct CharPtrConverter<X, true> {
 	static X fromCharPtr(char const *val);
 };
 
-template <typename X>
-struct CharPtrConverter<X, false> {
-	static X fromCharPtr(char const *val);
-};
-
 template <typename X, typename String, bool IsInteger>
 struct StringConverter;
 
@@ -71,19 +65,6 @@ template <typename X, typename String>
 struct StringConverter<X, String, true>  {
 	static String toString(X val);
 	static X fromString(String const &val);
-};
-
-template <typename X, typename String>
-struct StringConverter<X, String, false>  {
-	static String toString(X val);
-	static X fromString(String const &val);
-	typedef std::basic_stringstream<typename String::value_type> StreamType;
-};
-
-template <typename String>
-struct StringConverter<String, String, false> {
-	static String toString(String const &val);
-	static String fromString(String const &val);
 };
 
 template <typename String>
@@ -111,21 +92,6 @@ CharPtrConverter<X, true>::fromCharPtr(char const *val) {
 	return res;
 }
 
-template <typename X> NEXTWEB_INLINE X
-CharPtrConverter<X, false>::fromCharPtr(char const *val) {
-	try {
-		X res;
-		std::stringstream stream;
-		stream.exceptions(std::ios::failbit);
-		stream << val;
-		stream >> res;
-		return res;
-	}
-	catch (std::ios::failure const &) {
-		throw ConvertError();
-	}
-}
-
 template <typename X, typename String> NEXTWEB_INLINE String
 StringConverter<X, String, true>::toString(X val) {
 	typedef typename MaxInt<X>::Type ValueType;
@@ -136,46 +102,6 @@ template <typename X, typename String> NEXTWEB_INLINE X
 StringConverter<X, String, true>::fromString(String const &val) {
 	return fromCharPtr<X>(val.c_str());
 };
-
-template <typename X, typename String> NEXTWEB_INLINE String
-StringConverter<X, String, false>::toString(X val) {
-	try {
-		String res;
-		StreamType stream;
-		stream.exceptions(std::ios::badbit);
-		stream << val;
-		stream >> res;
-		return res;
-	}
-	catch (std::ios::failure const &) {
-		throw ConvertError();
-	}
-};
-
-template <typename X, typename String> NEXTWEB_INLINE X
-StringConverter<X, String, false>::fromString(String const &val) {
-	try {
-		X res;
-		StreamType stream;
-		stream.exceptions(std::ios::badbit);
-		stream << val;
-		stream >> res;
-		return res;
-	}
-	catch (std::ios::failure const &) {
-		throw ConvertError();
-	}
-}
-
-template <typename String> NEXTWEB_INLINE String
-StringConverter<String, String, false>::toString(String const &val) {
-	return val;
-}
-
-template <typename String> NEXTWEB_INLINE String
-StringConverter<String, String, false>::fromString(String const &val) {
-	return val;
-}
 
 template <typename String> NEXTWEB_INLINE String
 StringConverter<IntMax, String, true>::toString(IntMax val) {

@@ -56,6 +56,8 @@ public:
 	virtual Enumeration<File>::Pointer files() const = 0;
 	virtual bool hasFile(std::string const &name) const = 0;
 	virtual File getFile(std::string const &name) const = 0;
+
+	virtual void store(char const *file) = 0;
 	
 private:
 	Request(Request const &);

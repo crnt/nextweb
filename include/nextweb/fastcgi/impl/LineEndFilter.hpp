@@ -42,7 +42,10 @@ public:
 	void increment();
 	void decrement();
 	bool equal(LineEndFilter<Iter> const &other) const;
+	
 	ReferenceType dereference();
+
+	Iter base() const;
 
 private:
 	void seekForward();
@@ -109,6 +112,11 @@ LineEndFilter<Iter>::dereference() {
 	return (filterTriggered_) ? SPACE : *i_;
 }
 
+template <typename Iter> NEXTWEB_INLINE Iter
+LineEndFilter<Iter>::base() const {
+	return i_;
+}
+
 template <typename Iter> NEXTWEB_INLINE void
 LineEndFilter<Iter>::seekForward() {
 	if ((end_ != i_) && lineEndChecker_(*i_)) {
@@ -138,6 +146,11 @@ makeLineEndFiltered(Iter begin, Iter end) {
 	typedef LineEndFilter<Iter> IteratorType;
 	IteratorType filteredBegin(begin, end), filteredEnd(end, end);
 	return utils::makeRange(filteredBegin, filteredEnd);
+}
+
+template <typename Iter> NEXTWEB_INLINE utils::Range<Iter>
+makeLineEndUnfiltered(LineEndFilter<Iter> begin, LineEndFilter<Iter> end) {
+	return utils::makeRange(begin.base(), end.base());
 }
 
 }} // namespaces

@@ -162,7 +162,8 @@ StreamBuffer<Iter, Traits>::fill() {
 template <typename Iter, typename Traits> NEXTWEB_INLINE std::streamsize
 StreamBuffer<Iter, Traits>::showmanyc() {
 	assert(gptr() == egptr());
-	return static_cast<std::streamsize>(std::distance(current_, end_));
+	DistanceType dist = std::distance(current_, end_);
+	return (0 == dist) ? static_cast<std::streamsize>(-1) : static_cast<std::streamsize>(dist);
 }
 
 }} // namespaces
