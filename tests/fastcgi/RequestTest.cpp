@@ -72,9 +72,16 @@ RequestTest::testMultipart() {
 	io.checkIsValid();
 
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
+
 	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
 	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
-	
+	CPPUNIT_ASSERT_EQUAL(false, req.hasArg("nonexistent"));
+
+	fastcgi::File file = req.getFile("file");
+	CPPUNIT_ASSERT_EQUAL(std::string("install.tst"), file.name());
+	fastcgi::File anotherFile = req.getFile("another-file");
+	CPPUNIT_ASSERT_EQUAL(std::string("copying.tst"), anotherFile.name());
+	CPPUNIT_ASSERT_EQUAL(false, req.hasFile("nonexistent"));
 }
 
 void
@@ -88,6 +95,15 @@ RequestTest::testBadMethod() {
 
 void
 RequestTest::testBadMultipart() {
+
+	MockIO io;
+	io.add("REQUEST_METHOD=POST");
+	io.add("HTTP_CONTENT_LENGTH=5000");
+	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
+	io.attachFile("data/bad-multipart.tst");
+	io.checkIsValid();
+
+	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
 
 }} // namespaces

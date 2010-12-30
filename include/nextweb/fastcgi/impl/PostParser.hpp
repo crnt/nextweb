@@ -281,7 +281,7 @@ SequencePostParser<IO, Sequence>::processPart(typename SequencePostParser<IO, Se
 	MultipartHeaderParser<RangeType> parser(header);
 	typedef typename RangeType::iterator IteratorType;
 	
-	RangeType range = trimChars(parser.name(), '"');
+	RangeType const &range = parser.name();
 	std::string name = std::string(range.begin(), range.end());
 	if (parser.isFile()) {
 		RangeType const &fileName = parser.fileName();
@@ -399,7 +399,7 @@ MultipartHeaderParser<Sequence>::parseDispositionAttribute(typename MultipartHea
 	using namespace utils;
 	if (filtered != HttpConstants::FORM_DATA) {
 		std::pair<FilteredType, FilteredType> p = splitKeyValue(filtered);
-		FilteredType const &value = p.second;
+		FilteredType value = trimChars(p.second, '"');
 		if (utils::isCIEqual(HttpConstants::NAME, p.first)) {
 			name_ = makeLineEndUnfiltered(value.begin(), value.end());
 		}

@@ -27,20 +27,6 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ParamsTest);
 void
 ParamsTest::testOperations() {
 
-	using namespace utils;
-	using namespace templates;
-	
-	ParamSet params;
-	for (std::size_t i = 0; i < 10; ++i) {
-		params["data"][i] = i;
-	}
-	SubParam p = params["data"];
-	for (std::size_t i = 0; i < 10; ++i) {
-		std::stringstream stream;
-		stream << "data." << i;
-		CPPUNIT_ASSERT_EQUAL(utils::toString(i), params.get(stream.str()));
-		CPPUNIT_ASSERT_EQUAL(utils::toString(i), p[i].as<std::string>());
-	}
 }
 
 }} // namespaces

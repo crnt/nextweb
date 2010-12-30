@@ -61,6 +61,8 @@ struct CharPtrConverter<X, true> {
 template <typename X, typename String, bool IsInteger>
 struct StringConverter;
 
+// FIXME: implement lexicalCast instead of string conversion
+
 template <typename X, typename String>
 struct StringConverter<X, String, true>  {
 	static String toString(X val);

@@ -44,16 +44,18 @@ class NEXTWEB_API SubParam : public Param {
 public:
 	SubParam(Param *parent, std::string const &prefix);
 	virtual ~SubParam();
-	virtual std::string const& get(std::string const &name) const;
-	virtual void set(std::string const &name, std::string const &value);
 	
 	SubParam(SubParam const &other);
 	SubParam& operator = (SubParam const &other);
+	
 	void swap(SubParam &other) throw ();
-
+	
 	template <typename T> T as() const;
-	template <typename T> void operator = (T const &value);
-	template <typename T> SubParam operator [] (T const &prefix);
+	void operator = (std::string const &value);
+	SubParam operator [] (std::string const &prefix);
+	
+	virtual std::string const& get(std::string const &name) const;
+	virtual void set(std::string const &name, std::string const &value);
 	
 private:
 	std::string const& getValue() const;
@@ -69,11 +71,11 @@ class NEXTWEB_API ParamSet : public Param {
 public:
 	ParamSet();
 	virtual ~ParamSet();
+
+	SubParam operator [] (std::string const &prefix);
 	virtual std::string const& get(std::string const &name) const;
 	virtual void set(std::string const &name, std::string const &value);
-	
-	template <typename T> SubParam operator [] (T const &prefix);
-	
+
 private:
 	ParamSet(ParamSet const &);
 	ParamSet& operator = (ParamSet const &);
@@ -87,19 +89,9 @@ SubParam::as() const {
 	return utils::fromString<T>(getValue());
 }
 
-template <typename T> NEXTWEB_INLINE void
-SubParam::operator = (T const &value) {
-	setValue(utils::toString(value));
-}
-
-template <typename T> NEXTWEB_INLINE SubParam
-SubParam::operator [] (T const &prefix) {
-	return SubParam(this, utils::toString(prefix));
-}
-
-template <typename T> NEXTWEB_INLINE SubParam
-ParamSet::operator [] (T const &prefix) {
-	return SubParam(this, utils::toString(prefix));
+template <> NEXTWEB_INLINE std::string
+SubParam::as<std::string>() const {
+	return getValue();
 }
 
 }} // namespaces

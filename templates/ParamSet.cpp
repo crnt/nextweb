@@ -51,14 +51,14 @@ SubParam::swap(SubParam &other) throw () {
 	std::swap(prefix_, other.prefix_);
 }
 
-std::string const&
-SubParam::getValue() const {
-	return parent_->get(prefix_);
+void
+SubParam::operator = (std::string const &value) {
+	setValue(value);
 }
 
-void
-SubParam::setValue(std::string const &value) {
-	parent_->set(prefix_, value);
+SubParam
+SubParam::operator [] (std::string const &prefix) {
+	return SubParam(this, prefix);
 }
 
 std::string const&
@@ -73,6 +73,16 @@ SubParam::set(std::string const &name, std::string const &value) {
 	std::stringstream stream;
 	stream << prefix_ << "." << name;
 	parent_->set(stream.str(), value);
+}
+
+std::string const&
+SubParam::getValue() const {
+	return parent_->get(prefix_);
+}
+
+void
+SubParam::setValue(std::string const &value) {
+	parent_->set(prefix_, value);
 }
 
 ParamSet::ParamSet()
