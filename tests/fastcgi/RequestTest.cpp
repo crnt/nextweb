@@ -6,6 +6,7 @@
 
 #include "MockIO.hpp"
 #include "nextweb/fastcgi/HttpError.hpp"
+#include "nextweb/fastcgi/impl/RequestImpl.hpp"
 #include "nextweb/fastcgi/impl/GenericRequest.hpp"
 
 namespace nextweb { namespace tests {
@@ -16,6 +17,7 @@ public:
 	void testGet();
 	void testPost();
 	void testMultipart();
+	void testRequestImpl();
 	void testBadMethod();
 	void testBadMultipart();
 
@@ -24,6 +26,7 @@ private:
 	CPPUNIT_TEST(testGet);
 	CPPUNIT_TEST(testPost);
 	CPPUNIT_TEST(testMultipart);
+	CPPUNIT_TEST(testRequestImpl);
 	CPPUNIT_TEST_EXCEPTION(testBadMethod, fastcgi::HttpError);
 	CPPUNIT_TEST_EXCEPTION(testBadMultipart, fastcgi::HttpError);
 	CPPUNIT_TEST_SUITE_END();
@@ -95,15 +98,37 @@ RequestTest::testBadMethod() {
 
 void
 RequestTest::testBadMultipart() {
-
 	MockIO io;
 	io.add("REQUEST_METHOD=POST");
 	io.add("HTTP_CONTENT_LENGTH=5000");
 	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
 	io.attachFile("data/bad-multipart.tst");
 	io.checkIsValid();
-
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
+
+void
+RequestTest::testRequestImpl() {
+
+	using namespace fastcgi;
+
+	MockIO io;
+	io.add("HTTPS=on");
+	io.add("PATH_INFO=/");
+	io.add("REQUEST_METHOD=GET");
+	io.add("QUERY_STRING=x=abc%20def&x=ghi%20jkl&y=test");
+	io.checkIsValid();
+	
+	RequestImpl<MockIO> req(io, 1024);
+	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
+	
+	std::size_t i = 0;
+	char const* patterns[] = { "abc def", "ghi jkl" }; 
+	Enumeration<std::string const&>::Pointer x = req.getArgList("x");
+	for (; x->hasMoreElements(); ++i) {
+		CPPUNIT_ASSERT_EQUAL(std::string(patterns[i]), x->nextElement());
+	}
+}
+
 
 }} // namespaces

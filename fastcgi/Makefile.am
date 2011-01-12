@@ -4,7 +4,7 @@ libnextweb_fastcgi_la_LIBADD = ${top_srcdir}/utils/libnextweb.la
 libnextweb_fastcgi_la_SOURCES = \
 	Buffer.cpp \
 	Cookie.cpp \
-	FCGI.cpp \
+	FastCgiIO.cpp \
 	File.cpp \
 	FileImpl.cpp \
 	HttpDate.cpp \

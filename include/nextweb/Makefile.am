@@ -10,7 +10,7 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/HttpDate.hpp \
 	fastcgi/HttpError.hpp \
 	fastcgi/impl/Buffer.hpp \
-	fastcgi/impl/FCGI.hpp \
+	fastcgi/impl/FastCgiIO.hpp \
 	fastcgi/impl/FileImpl.hpp \
 	fastcgi/impl/GenericRequest.hpp \
 	fastcgi/impl/GenericResponse.hpp \

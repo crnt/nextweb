@@ -37,6 +37,8 @@ public:
 	char const* const* environ() const; 
 	std::size_t read(char *buffer, std::size_t size); 
 	std::size_t write(char const *buffer, std::size_t size);
+
+	template <typename Request> void setup(Request const &request);
 	
 private:
 	MockIO(MockIO const &);
@@ -46,8 +48,13 @@ private:
 private:
 	std::ifstream post_;
 	std::vector<std::string> strings_;
-	mutable std::vector<char const*> env_;
+	std::vector<char const*> mutable env_;
 };
+
+template <typename Request> void
+MockIO::setup(Request const &request) {
+	(void) request;
+}
 
 }} // namespaces
 

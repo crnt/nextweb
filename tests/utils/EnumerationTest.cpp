@@ -37,23 +37,38 @@ void
 EnumerationTest::testMap() {
 
 	using namespace utils;
-	
 	typedef std::map<std::size_t, std::string> TestMap;
-	char const* values[] = { "one", "two", "three", "four", "five" };
-
-	TestMap m;	
-	for (std::size_t i = 0; i < sizeof(values) / sizeof(char const*); ++i) {
-		m.insert(std::make_pair(i, std::string(values[i])));
-	}
-	Enumeration<TestMap::value_type>::Pointer en = makeEnumeration(m.begin(), m.end());
 	
-	std::size_t i = 0;
-	for (; en->hasMoreElements(); ++i) {
-		TestMap::value_type val = en->nextElement();
-		CPPUNIT_ASSERT_EQUAL(i, val.first);
-		CPPUNIT_ASSERT_EQUAL(std::string(values[i]), val.second);
+	TestMap m;	
+	std::size_t i;
+	char const* patterns[] = { "one", "two", "three", "four", "five" };
+	
+	for (std::size_t count = 0; count < sizeof(patterns) / sizeof(char const*); ++count) {
+		m.insert(std::make_pair(count, std::string(patterns[count])));
 	}
-	CPPUNIT_ASSERT_EQUAL(sizeof(values) / sizeof(char const*), i);
+	
+	i = 0;
+	Enumeration<TestMap::value_type const&>::Pointer en = makeIterEnumeration(m.begin(), m.end());
+	for (; en->hasMoreElements(); ++i) {
+		TestMap::value_type const& val = en->nextElement();
+		CPPUNIT_ASSERT_EQUAL(i, val.first);
+		CPPUNIT_ASSERT_EQUAL(std::string(patterns[i]), val.second);
+	}
+	CPPUNIT_ASSERT_EQUAL(sizeof(patterns) / sizeof(char const*), i);
+	
+	i = 0;
+	Enumeration<TestMap::key_type const&>::Pointer keys = makeSelectFirstEnumeration(m.begin(), m.end());
+	for (; keys->hasMoreElements(); ++i) {
+		CPPUNIT_ASSERT_EQUAL(i, keys->nextElement());
+	}
+	CPPUNIT_ASSERT_EQUAL(sizeof(patterns) / sizeof(char const*), i);
+	
+	i = 0;
+	Enumeration<TestMap::mapped_type const&>::Pointer values = makeSelectSecondEnumeration(m.begin(), m.end());
+	for (; values->hasMoreElements(); ++i) {
+		CPPUNIT_ASSERT_EQUAL(std::string(patterns[i]), values->nextElement());
+	}
+	CPPUNIT_ASSERT_EQUAL(sizeof(patterns) / sizeof(char const*), i);
 }
 
 void
@@ -72,7 +87,7 @@ EnumerationTest::testSequenceWith() {
 	for (std::size_t i = 0; i < sizeof(values) / sizeof(char const*); ++i) {
 		seq.push_back(values[i]);
 	}
-	typename Enumeration<typename Sequence::value_type>::Pointer en = makeEnumeration(seq.begin(), seq.end());
+	typename Enumeration<typename Sequence::value_type const&>::Pointer en = makeIterEnumeration(seq.begin(), seq.end());
 	
 	std::size_t i = 0;
 	for (; en->hasMoreElements(); ++i) {

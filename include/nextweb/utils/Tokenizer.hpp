@@ -80,7 +80,7 @@ public:
 
 private:
 	Pred pred_;
-	mutable Sequence sequence_;
+	Sequence mutable sequence_;
 	typename IteratorRange<Sequence>::Type head_, tail_;
 };
 

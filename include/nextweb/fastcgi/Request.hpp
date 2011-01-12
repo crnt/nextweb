@@ -32,30 +32,35 @@ public:
 	Request();
 	virtual ~Request();
 
+	typedef std::pair<std::string const, File> FileParam;
 	typedef std::pair<std::string const, std::string> Param;
 
 	virtual bool isSecure() const = 0;
 	virtual std::string const& pathInfo() const = 0;
 
-	virtual Enumeration<Param>::Pointer vars() const = 0;
 	virtual bool hasVar(std::string const &name) const = 0;
 	virtual std::string const& getVar(std::string const &name) const = 0;
-
-	virtual Enumeration<Param>::Pointer cookies() const = 0;
+	virtual Enumeration<Param const&>::Pointer getVars() const = 0;
+	virtual Enumeration<std::string const&>::Pointer getVarNames() const = 0;
+	
 	virtual bool hasCookie(std::string const &name) const = 0;
 	virtual std::string const& getCookie(std::string const &name) const = 0;
+	virtual Enumeration<Param const&>::Pointer getCookies() const = 0;
+	virtual Enumeration<std::string const&>::Pointer getCookieNames() const = 0;
 
-	virtual Enumeration<Param>::Pointer args() const = 0;
 	virtual bool hasArg(std::string const &name) const = 0;
 	virtual std::string const& getArg(std::string const &name) const = 0;
-	virtual Enumeration<std::string>::Pointer argList(std::string const &name) const = 0;
+	virtual Enumeration<Param const&>::Pointer getArgs() const = 0;
+	virtual Enumeration<std::string const&>::Pointer getArgList(std::string const &name) const = 0;
+	virtual Enumeration<std::string const&>::Pointer getArgNames() const = 0;
 
-	virtual bool hasHeader(std::string const &name) const = 0;
-	virtual std::string const& getHeader(std::string const &name) const = 0;
-
-	virtual Enumeration<File>::Pointer files() const = 0;
 	virtual bool hasFile(std::string const &name) const = 0;
 	virtual File getFile(std::string const &name) const = 0;
+	virtual Enumeration<FileParam const&>::Pointer getFiles() const = 0;
+	virtual Enumeration<std::string const&>::Pointer getFileNames() const = 0;
+	
+	virtual bool hasHeader(std::string const &name) const = 0;
+	virtual std::string const& getHeader(std::string const &name) const = 0;
 
 	virtual void store(char const *file) = 0;
 	

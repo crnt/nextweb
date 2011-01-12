@@ -50,7 +50,7 @@ private:
 private:
 	bool stopped_;
 	Condition condition_;
-	mutable Mutex mutex_;
+	Mutex mutable mutex_;
 	std::queue<Item> items_;
 };
 

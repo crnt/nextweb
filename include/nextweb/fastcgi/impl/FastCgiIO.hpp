@@ -15,35 +15,42 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_FCGI_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_FCGI_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_FAST_CGI_IO_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_FAST_CGI_IO_HPP_INCLUDED
 
 #include <cstddef>
 #include <fcgiapp.h>
 
+#include "nextweb/Config.hpp"
+
 namespace nextweb { namespace fastcgi {
 
-class FCGI {
+class FastCgiIO {
 
 public:
-	FCGI(int socket);
-	virtual ~FCGI();
+	FastCgiIO(int socket);
+	virtual ~FastCgiIO();
 
-	void accept();
-	void finish();
+	void acceptRequest();
+	void finishRequest();
 
 	char const* const* environ() const; 
-	std::size_t read(char *buffer, std::size_t size); 
+	std::size_t read(char *buffer, std::size_t size);
 	std::size_t write(char const *buffer, std::size_t size);
+	template <typename Request> void setup(Request const &request);
 
 private:
-	FCGI(FCGI const &);
-	FCGI& operator = (FCGI const &);
+	FastCgiIO(FastCgiIO const &);
+	FastCgiIO& operator = (FastCgiIO const &);
 
 private:
 	FCGX_Request request_;
 };
 
+template <typename Request> NEXTWEB_INLINE void
+FastCgiIO::setup(Request const &request) {
+}
+
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_FCGI_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_FAST_CGI_IO_HPP_INCLUDED

@@ -18,4 +18,70 @@
 #ifndef NEXTWEB_FASTCGI_RESPONSE_IMPL_HPP_INCLUDED
 #define NEXTWEB_FASTCGI_RESPONSE_IMPL_HPP_INCLUDED
 
+#include "nextweb/fastcgi/Response.hpp"
+#include "nextweb/fastcgi/impl/GenericResponse.hpp"
+
+namespace nextweb { namespace fastcgi {
+
+template <typename IO>
+class ResponseImpl : public Response, public GenericResponse<IO> {
+
+public:
+	ResponseImpl(IO &io);
+	virtual ~ResponseImpl();
+
+	virtual void setCookie(Cookie const &cookie);
+	virtual void setStatus(unsigned short status);
+	virtual void setHeader(std::string const &name, std::string const &value);
+	
+	virtual void redirect(std::string const &url);
+	virtual void setExpireTime(HttpDate const &date);
+	virtual void setExpireTime(std::string const &expires);
+	virtual std::size_t write(char const *buffer, std::size_t size);
+
+private:
+	ResponseImpl(ResponseImpl const &);
+	ResponseImpl& operator = (ResponseImpl const &);
+};
+
+template <typename IO> NEXTWEB_INLINE 
+ResponseImpl<IO>::ResponseImpl(IO &io) :
+	GenericResponse<IO>(io)
+{
+}
+
+template <typename IO> NEXTWEB_INLINE 
+ResponseImpl<IO>::~ResponseImpl() {
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::setCookie(Cookie const &cookie) {
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::setStatus(unsigned short status) {
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::setHeader(std::string const &name, std::string const &value) {
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::redirect(std::string const &url) {
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::setExpireTime(HttpDate const &date) {
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::setExpireTime(std::string const &expires) {
+}
+
+template <typename IO> NEXTWEB_INLINE std::size_t
+ResponseImpl<IO>::write(char const *buffer, std::size_t size) {
+}
+
+}} // namespsaces
+
 #endif // NEXTWEB_FASTCGI_RESPONSE_IMPL_HPP_INCLUDED

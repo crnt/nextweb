@@ -240,6 +240,7 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 	else if (HttpConstants::GET != method && HttpConstants::HEAD != method) {
 		throw HttpError(HttpError::METHOD_NOT_ALLOWED);
 	}
+	io_.setup(*this);
 }
 
 template <typename IO> NEXTWEB_INLINE void

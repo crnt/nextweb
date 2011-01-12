@@ -8,6 +8,7 @@ fastcgi_tests_SOURCES = main.cpp MockIO.cpp \
 	HttpDateTest.cpp \
 	LineEndTest.cpp \
 	RequestTest.cpp \
+	ResponseTest.cpp \
 	StreamBufferTest.cpp \
 	UrlEncodeTest.cpp \
 	UrlMatchTest.cpp \
