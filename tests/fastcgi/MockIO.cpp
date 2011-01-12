@@ -20,15 +20,6 @@ MockIO::~MockIO() {
 }
 
 void
-MockIO::checkIsValid() const {
-	assert(env_.size() == strings_.size() + 1);
-	for (std::size_t i = 0; i < env_.size() - 1; ++i) {
-		assert(static_cast<char const*>(0) != env_[i]);
-	}
-	assert(static_cast<char const*>(0) == env_.back());
-}
-
-void
 MockIO::add(std::string const &env) {
 	strings_.push_back(env);
 	validate();

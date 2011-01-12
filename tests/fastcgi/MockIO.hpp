@@ -30,7 +30,6 @@ public:
 	MockIO();
 	virtual ~MockIO();
 
-	void checkIsValid() const;
 	void add(std::string const &value);
 	void attachFile(char const *fileName);
 

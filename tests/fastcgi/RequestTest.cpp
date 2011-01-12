@@ -36,18 +36,16 @@ CPPUNIT_TEST_SUITE_REGISTRATION(RequestTest);
 
 void
 RequestTest::testGet() {
-	
+
 	MockIO io;
 	io.add("HTTPS=on");
 	io.add("PATH_INFO=/");
 	io.add("REQUEST_METHOD=GET");
 	io.add("QUERY_STRING=x=abc%20def&y=test");
-	io.checkIsValid();
-	
+
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
 	CPPUNIT_ASSERT_EQUAL(std::string("abc def"), req.getArg("x"));
-
 }
 
 void
@@ -57,7 +55,6 @@ RequestTest::testPost() {
 	io.add("REQUEST_METHOD=POST");
 	io.add("HTTP_CONTENT_LENGTH=1705");
 	io.attachFile("data/post.tst");
-	io.checkIsValid();
 	
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
@@ -72,10 +69,8 @@ RequestTest::testMultipart() {
 	io.add("HTTP_CONTENT_LENGTH=15000");
 	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
 	io.attachFile("data/multipart.tst");
-	io.checkIsValid();
 
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
-
 	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
 	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
 	CPPUNIT_ASSERT_EQUAL(false, req.hasArg("nonexistent"));
@@ -88,11 +83,42 @@ RequestTest::testMultipart() {
 }
 
 void
+RequestTest::testRequestImpl() {
+
+	using namespace fastcgi;
+
+	MockIO io;
+	io.add("HTTPS=on");
+	io.add("PATH_INFO=/");
+	io.add("REQUEST_METHOD=GET");
+	io.add("QUERY_STRING=x=abc%20def&x=ghi%20jkl&y=test");
+	
+	std::size_t i;
+	RequestImpl<MockIO> req(io, 1024);
+	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
+	
+	i = 0;
+	char const* names[] = { "x", "y" }; 
+	char const* patterns[] = { "abc def", "ghi jkl" }; 
+	Enumeration<std::string const&>::Pointer x = req.getArgList("x");
+	for (; x->hasMoreElements(); ++i) {
+		CPPUNIT_ASSERT_EQUAL(std::string(patterns[i]), x->nextElement());
+	}
+	CPPUNIT_ASSERT_EQUAL(sizeof(patterns) / sizeof(char const*), i);
+	
+	i = 0;
+	Enumeration<std::string const&>::Pointer n = req.getArgNames();
+	for (; n->hasMoreElements(); ++i) {
+		CPPUNIT_ASSERT_EQUAL(std::string(names[i]), n->nextElement());
+	}
+	CPPUNIT_ASSERT_EQUAL(sizeof(names) / sizeof(char const*), i);
+}
+
+void
 RequestTest::testBadMethod() {
 
 	MockIO io;
 	io.add("METHOD=BAD");
-	io.checkIsValid();
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
 
@@ -103,32 +129,7 @@ RequestTest::testBadMultipart() {
 	io.add("HTTP_CONTENT_LENGTH=5000");
 	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
 	io.attachFile("data/bad-multipart.tst");
-	io.checkIsValid();
 	fastcgi::GenericRequest<MockIO> req(io, 1024);
 }
-
-void
-RequestTest::testRequestImpl() {
-
-	using namespace fastcgi;
-
-	MockIO io;
-	io.add("HTTPS=on");
-	io.add("PATH_INFO=/");
-	io.add("REQUEST_METHOD=GET");
-	io.add("QUERY_STRING=x=abc%20def&x=ghi%20jkl&y=test");
-	io.checkIsValid();
-	
-	RequestImpl<MockIO> req(io, 1024);
-	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
-	
-	std::size_t i = 0;
-	char const* patterns[] = { "abc def", "ghi jkl" }; 
-	Enumeration<std::string const&>::Pointer x = req.getArgList("x");
-	for (; x->hasMoreElements(); ++i) {
-		CPPUNIT_ASSERT_EQUAL(std::string(patterns[i]), x->nextElement());
-	}
-}
-
 
 }} // namespaces

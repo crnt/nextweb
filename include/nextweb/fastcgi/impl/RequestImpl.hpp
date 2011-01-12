@@ -18,7 +18,10 @@
 #ifndef NEXTWEB_FASTCGI_REQUEST_IMPL_HPP_INCLUDED
 #define NEXTWEB_FASTCGI_REQUEST_IMPL_HPP_INCLUDED
 
+#include <iterator>
+
 #include "nextweb/Config.hpp"
+#include "nextweb/utils/Iterator.hpp"
 #include "nextweb/utils/EnumerationImpl.hpp"
 
 #include "nextweb/fastcgi/Request.hpp"
@@ -26,6 +29,21 @@
 #include "nextweb/fastcgi/impl/GenericRequest.hpp"
 
 namespace nextweb { namespace fastcgi {
+
+template <typename Map>
+class UniqueKeyIterator : public utils::Iterator<UniqueKeyIterator<Map>, std::forward_iterator_tag, typename Map::key_type const> {
+
+public:
+	UniqueKeyIterator(typename Map::const_iterator begin, typename Map::const_iterator end);
+
+	void increment();
+	typename Map::key_type const& dereference();
+	bool equal(UniqueKeyIterator<Map> const &other) const;
+
+private:
+	typename Map::const_iterator i_;
+	typename Map::const_iterator const end_;
+};
 
 template <typename IO>
 class RequestImpl : public Request, private GenericRequest<IO> {
@@ -67,6 +85,30 @@ private:
 	RequestImpl(RequestImpl const &);
 	RequestImpl& operator = (RequestImpl const &);
 };
+
+template <typename Map> NEXTWEB_INLINE 
+UniqueKeyIterator<Map>::UniqueKeyIterator(typename Map::const_iterator begin, typename Map::const_iterator end) :
+	i_(begin), end_(end)
+{
+}
+
+template <typename Map> NEXTWEB_INLINE void
+UniqueKeyIterator<Map>::increment() {
+	typename Map::const_iterator copy = i_;
+	while (end_ != i_ && (i_->first == copy->first)) {
+		++i_;
+	}
+}
+
+template <typename Map> NEXTWEB_INLINE bool
+UniqueKeyIterator<Map>::equal(UniqueKeyIterator<Map> const &other) const {
+	return (i_ == other.i_);
+}
+
+template <typename Map> NEXTWEB_INLINE typename Map::key_type const&
+UniqueKeyIterator<Map>::dereference() {
+	return i_->first;
+}
 
 template <typename IO> NEXTWEB_INLINE
 RequestImpl<IO>::RequestImpl(IO &io, std::size_t threshold) :
@@ -160,6 +202,8 @@ template <typename IO> NEXTWEB_INLINE Enumeration<std::string const&>::Pointer
 RequestImpl<IO>::getArgNames() const {
 	typedef typename GenericRequest<IO>::StringMultiMap MapType;
 	MapType const &m = GenericRequest<IO>::args();
+	UniqueKeyIterator<MapType> begin(m.begin(), m.end()), end(m.end(), m.end());
+	return utils::makeIterEnumeration(begin, end);
 }
 
 template <typename IO> NEXTWEB_INLINE bool
