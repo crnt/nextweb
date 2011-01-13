@@ -15,26 +15,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_HTTP_ERROR_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_HTTP_ERROR_HPP_INCLUDED
-
-#include "nextweb/Error.hpp"
-#include "nextweb/Config.hpp"
-#include "nextweb/fastcgi/HttpStatus.hpp"
+#ifndef NEXTWEB_INLINES_FASTCGI_GENERIC_RESPONSE_HPP_INCLUDED
+#define NEXTWEB_INLINES_FASTCGI_GENERIC_RESPONSE_HPP_INCLUDED
 
 namespace nextweb { namespace fastcgi {
 
-class NEXTWEB_API HttpError : public Error {
-
-public:
-	HttpError(HttpStatus const &code);
-	virtual ~HttpError() throw ();
-	HttpStatus status() const;
-	
-private:
-	HttpStatus status_;
-};
+NEXTWEB_INLINE bool
+CookieLess::operator () (Cookie const &target, Cookie const &other) const {
+	return target.name() < other.name();
+}
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_HTTP_ERROR_HPP_INCLUDED
+#endif // NEXTWEB_INLINES_FASTCGI_GENERIC_RESPONSE_HPP_INCLUDED

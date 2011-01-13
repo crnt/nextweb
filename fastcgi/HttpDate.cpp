@@ -126,7 +126,7 @@ struct EvaluatorList {
 };
 
 template <typename Range> void
-evaluateRange(Range const &range, std::tm &when);
+evaluateRange(Range const &range, std::tm &when, int majorSign);
 
 } // namespace periods
 
@@ -232,17 +232,22 @@ HttpDate::asAsctime() const {
 	return std::string(buffer, buffer + res);
 }
 
-void
+HttpDate&
 HttpDate::add(char const *period) {
 	std::tm rep;
 	utils::SystemError::throwUnless(gmtime_r(&when_, &rep));
-	periods::evaluateRange(utils::makeRange(period), rep);
+	periods::evaluateRange(utils::makeRange(period), rep, 1);
 	when_ = timegm(&rep);
+	return *this;
 }
 
-void
-HttpDate::add(std::string const &period) {
-	add(period.c_str());
+HttpDate&
+HttpDate::sub(char const *period) {
+	std::tm rep;
+	utils::SystemError::throwUnless(gmtime_r(&when_, &rep));
+	periods::evaluateRange(utils::makeRange(period), rep, -1);
+	when_ = timegm(&rep);
+	return *this;
 }
 
 HttpDate
@@ -253,7 +258,7 @@ HttpDate::fromString(char const *str) {
 			return HttpDate(timegm(&rep));
 		}
 	}
-	throw Error("can not parse http date <%s>", str);
+	return HttpDate().add(str);
 }
 
 HttpDate
@@ -399,11 +404,11 @@ nextChunk(Range const &range) {
 }
 
 template <typename Range> void
-evaluateRange(Range const &range, std::tm &when) {
+evaluateRange(Range const &range, std::tm &when, int majorSign) {
 	
-	int sign = 1;
 	typedef typename Range::value_type Char;
 	
+	int sign = 1;
 	Range copy = utils::trim(range);
 	while (!copy.empty()) {
 		if (SignTraits<Char>::isSign(copy[0])) {
@@ -411,7 +416,7 @@ evaluateRange(Range const &range, std::tm &when) {
 			copy = utils::truncate(copy, 1, 0);
 		}
 		std::pair<Chunk<Range>, Range> p = nextChunk(copy);
-		EvaluatorImpl<Range, typename EvaluatorList<Range>::Type>::evaluate(p.first, sign, when);
+		EvaluatorImpl<Range, typename EvaluatorList<Range>::Type>::evaluate(p.first, sign * majorSign, when);
 		copy = utils::trimLeft(p.second);
 	}
 }

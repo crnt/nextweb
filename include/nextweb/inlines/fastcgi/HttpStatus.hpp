@@ -15,47 +15,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_INLINES_FASTCGI_HTTP_DATE_HPP_INCLUDED
-#define NEXTWEB_INLINES_FASTCGI_HTTP_DATE_HPP_INCLUDED
+#ifndef NEXTWEB_INLINES_FASTCGI_HTTP_STATUS_HPP_INCLUDED
+#define NEXTWEB_INLINES_FASTCGI_HTTP_STATUS_HPP_INCLUDED
 
 namespace nextweb { namespace fastcgi {
 
-NEXTWEB_API NEXTWEB_INLINE HttpDate&
-HttpDate::operator += (char const *value) {
-	add(value);
-	return *this;
+NEXTWEB_INLINE bool
+HttpStatus::operator == (HttpStatus const &other) const {
+	return code_ == other.code_;
 }
 
-NEXTWEB_API NEXTWEB_INLINE HttpDate&
-HttpDate::operator -= (char const *value) {
-	sub(value);
-	return *this;
-}
-
-NEXTWEB_API NEXTWEB_INLINE HttpDate
-operator + (HttpDate const &source, char const *value) {
-	HttpDate copy(source);
-	copy += value;
-	return copy;
-}
-
-NEXTWEB_API NEXTWEB_INLINE HttpDate
-operator + (char const *value, HttpDate const &source) {
-	return source + value;
-}
-
-NEXTWEB_API NEXTWEB_INLINE HttpDate
-operator - (HttpDate const &source, char const *value) {
-	HttpDate copy(source);
-	copy -= value;
-	return copy;
-}
-
-NEXTWEB_API NEXTWEB_INLINE void
-swap(HttpDate &date, HttpDate &other) {
-	date.swap(other);
+NEXTWEB_INLINE bool
+HttpStatus::operator != (HttpStatus const &other) const {
+	return code_ != other.code_;
 }
 
 }} // namespaces
 
-#endif // NEXTWEB_INLINES_FASTCGI_HTTP_DATE_HPP_INCLUDED
+#endif // NEXTWEB_INLINES_FASTCGI_HTTP_STATUS_HPP_INCLUDED

@@ -7,8 +7,10 @@ libnextweb_fastcgi_la_SOURCES = \
 	FastCgiIO.cpp \
 	File.cpp \
 	FileImpl.cpp \
+	GenericResponse.cpp \
 	HttpDate.cpp \
 	HttpError.cpp \
+	HttpStatus.cpp \
 	HttpUtils.cpp \
 	IterFileImpl.cpp \
 	Logger.cpp \

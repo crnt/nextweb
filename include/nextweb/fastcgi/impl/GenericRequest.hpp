@@ -33,7 +33,7 @@
 
 #include "nextweb/fastcgi/File.hpp"
 #include "nextweb/fastcgi/HttpError.hpp"
-
+#include "nextweb/fastcgi/HttpStatus.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
 #include "nextweb/fastcgi/impl/UrlEncode.hpp"
 #include "nextweb/fastcgi/impl/PostParser.hpp"
@@ -238,7 +238,7 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 		parsePost(threshold);
 	}
 	else if (HttpConstants::GET != method && HttpConstants::HEAD != method) {
-		throw HttpError(HttpError::METHOD_NOT_ALLOWED);
+		throw HttpError(HttpStatus::METHOD_NOT_ALLOWED);
 	}
 	io_.setup(*this);
 }

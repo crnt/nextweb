@@ -42,47 +42,57 @@ template <typename Char>
 struct IsEqual : public std::unary_function<Char, bool> {
 	IsEqual(Char pattern);
 	bool operator () (Char value) const;
+	typedef IsEqual<Char> Type;
+
 private:
 	Char value_;
 };
 
 template <typename Char>
 struct IsSpace : public UnaryPredicate<IsSpace<Char>, Char> {
+	typedef IsSpace<Char> Type;
 	static bool check(Char value);
 };
 
 template <typename Char>
 struct IsNumeric : public UnaryPredicate<IsNumeric<Char>, Char> {
+	typedef IsNumeric<Char> Type;
 	static bool check(Char value);
 };
 
 template <typename Char>
 struct IsLineEnd : public UnaryPredicate<IsLineEnd<Char>, Char> {
+	typedef IsLineEnd<Char> Type;
 	static bool check(Char value);
 };
 
 template <typename Char>
 struct IsNotLineEnd : public UnaryPredicate<IsNotLineEnd<Char>, Char> {
+	typedef IsNotLineEnd<Char> Type;
 	static bool check(Char value);
 };
 
 template <typename Sequence>
 struct CILess : public BinaryPredicate<CILess<Sequence>, Sequence> {
+	typedef CILess<Sequence> Type;
 	static bool check(Sequence const &var, Sequence const &target);
 };
 
 template <typename Sequence>
 struct CIEqual : public BinaryPredicate<CIEqual<Sequence>, Sequence> {
+	typedef CIEqual<Sequence> Type;
 	static bool check(Sequence const &var, Sequence const &target);
 };
 
 template <>
 struct CILess<char> : public std::binary_function<char, char, bool> {
+	typedef CILess<char> Type;
 	bool operator () (char var, char target) const;
 };
 
 template <>
 struct CIEqual<char> : public std::binary_function<char, char, bool> {
+	typedef CIEqual<char> Type;
 	bool operator () (char var, char target) const;
 };
 

@@ -9,6 +9,7 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/Forward.hpp \
 	fastcgi/HttpDate.hpp \
 	fastcgi/HttpError.hpp \
+	fastcgi/HttpStatus.hpp \
 	fastcgi/impl/Buffer.hpp \
 	fastcgi/impl/FastCgiIO.hpp \
 	fastcgi/impl/FileImpl.hpp \
@@ -32,7 +33,9 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/Settings.hpp \
 	inlines/Error.hpp \
 	inlines/fastcgi/File.hpp \
+	inlines/fastcgi/GenericResponse.hpp \
 	inlines/fastcgi/HttpDate.hpp \
+	inlines/fastcgi/HttpStatus.hpp \
 	inlines/fastcgi/IterFileImpl.hpp \
 	inlines/Shared.hpp \
 	inlines/utils/CharTraits.hpp \

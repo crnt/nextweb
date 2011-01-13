@@ -45,8 +45,9 @@ HttpDateTest::testPeriod() {
 	using namespace fastcgi;
 	HttpDate date(static_cast<std::time_t>(1170416178));
 	CPPUNIT_ASSERT_EQUAL(HttpDate::fromString("Fri, 02 Feb 2007 11:36:18 GMT"), date);
-	date.add("1h1m1s");
-	CPPUNIT_ASSERT_EQUAL(HttpDate::fromString("Fri, 02 Feb 2007 12:37:19 GMT"), date);
+	CPPUNIT_ASSERT_EQUAL(HttpDate::fromString("Fri, 02 Feb 2007 12:37:20 GMT"), date + std::string("1h1m2s"));
+	date -= "1h1m2s";
+	CPPUNIT_ASSERT_EQUAL(HttpDate::fromString("Fri, 02 Feb 2007 10:35:16 GMT"), date);
 }
 
 void
@@ -55,15 +56,16 @@ HttpDateTest::testParsing() {
 	CPPUNIT_ASSERT_EQUAL(HttpDate(static_cast<std::time_t>(1170416178)), HttpDate::fromString("Fri, 02 Feb 2007 11:36:18 GMT"));
 	CPPUNIT_ASSERT_EQUAL(HttpDate(static_cast<std::time_t>(1170416178)), HttpDate::fromString("Friday, 02-Feb-07 11:36:18 GMT"));
 	CPPUNIT_ASSERT_EQUAL(HttpDate(static_cast<std::time_t>(1170416178)), HttpDate::fromString("Fri Feb 2 11:36:18 2007"));
+	HttpDate::fromString("+2h 3m");
 }
 
 void
 HttpDateTest::testPeriodParsing() {
 	using namespace fastcgi;
 	HttpDate date(static_cast<std::time_t>(1170416178));
-	date.add("+3m1d");
-	date.add("-20000h 30M");
-	date.add("2y");
+	date += "+3m1d";
+	date += "-20000h +30M";
+	date += "2y";
 }
 
 void

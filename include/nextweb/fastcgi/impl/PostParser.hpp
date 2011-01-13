@@ -29,6 +29,7 @@
 #include "nextweb/utils/StringConverters.hpp"
 
 #include "nextweb/fastcgi/HttpError.hpp"
+#include "nextweb/fastcgi/HttpStatus.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
 #include "nextweb/fastcgi/impl/UrlEncode.hpp"
 #include "nextweb/fastcgi/impl/IterFileImpl.hpp"
@@ -239,7 +240,7 @@ SequencePostParser<IO, Sequence>::parsePart(typename SequencePostParser<IO, Sequ
 		RangeType token(lineEnd, newLine);
 
 		if (token.empty()) {
-			throw HttpError(HttpError::BAD_REQUEST);
+			throw HttpError(HttpStatus::BAD_REQUEST);
 		}
 		else if (HttpConstants::RNRN == token || HttpConstants::NN == token) {
 			break;
@@ -269,7 +270,7 @@ SequencePostParser<IO, Sequence>::parseMultipart(std::string const &bound) {
 		}
 	}
 	if (!endingFound) {
-		throw HttpError(HttpError::BAD_REQUEST);
+		throw HttpError(HttpStatus::BAD_REQUEST);
 	}
 }
 
@@ -300,7 +301,7 @@ SequencePostParser<IO, Sequence>::getBoundary(typename SequencePostParser<IO, Se
 
 	using namespace utils;
 	if (!startsWith(value, HttpConstants::BOUNDARY)) {
-		throw HttpError(HttpError::BAD_REQUEST);
+		throw HttpError(HttpStatus::BAD_REQUEST);
 	}
 
 	std::string result("--");
@@ -318,7 +319,7 @@ SequencePostParser<IO, Sequence>::stripBoundaryQuotes(typename SequencePostParse
 	if ('"' == *(value.rbegin())) {
 		return trimChars(value, '"');
 	}
-	throw HttpError(HttpError::BAD_REQUEST);
+	throw HttpError(HttpStatus::BAD_REQUEST);
 }
 
 template <typename Sequence> NEXTWEB_INLINE
@@ -384,7 +385,7 @@ template <typename Sequence> NEXTWEB_INLINE void
 MultipartHeaderParser<Sequence>::parseContentDisposition(typename MultipartHeaderParser<Sequence>::FilteredType const &filtered) {
 	using namespace utils;
 	if (!startsWith(filtered, HttpConstants::FORM_DATA)) {
-		throw HttpError(HttpError::BAD_REQUEST);
+		throw HttpError(HttpStatus::BAD_REQUEST);
 	}
 	FilteredType range = filtered, part;
 	while (!range.empty()) {

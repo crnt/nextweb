@@ -37,6 +37,9 @@ public:
 	HttpDate& operator = (HttpDate const &other);
 
 	void swap(HttpDate &other) throw ();
+	HttpDate& operator += (char const *value);
+	HttpDate& operator -= (char const *value);
+	
 	bool operator == (HttpDate const &other) const;
 	bool operator != (HttpDate const &other) const;
 
@@ -45,9 +48,6 @@ public:
 	std::string asRFC1036() const;
 	std::string asAsctime() const;
 	
-	void add(char const *period);
-	void add(std::string const &period);
-
 	static HttpDate BAD;
 	static HttpDate fromString(char const *str);
 	static HttpDate fromString(std::string const &str);
@@ -56,8 +56,31 @@ public:
 	static HttpDate fromPeriod(std::string const &period);
 
 private:
+	HttpDate& add(char const *period);
+	HttpDate& sub(char const *period);
+
+private:
 	std::time_t when_;
 };
+
+HttpDate operator + (HttpDate const &source, char const *value);
+HttpDate operator + (char const *value, HttpDate const &source);
+HttpDate operator - (HttpDate const &source, char const *value);
+
+template <typename String> NEXTWEB_INLINE HttpDate
+operator + (HttpDate const &source, String const &value) {
+	return source + value.c_str();
+}
+
+template <typename String> NEXTWEB_INLINE HttpDate
+operator + (String const &value, HttpDate const &source) {
+	return source + value.c_str();
+}
+
+template <typename String> NEXTWEB_INLINE HttpDate
+operator - (HttpDate const &source, String const &value) {
+	return source - value.c_str();
+}
 
 template <typename Char, typename Traits> NEXTWEB_INLINE std::basic_ostream<Char, Traits>&
 operator << (std::basic_ostream<Char, Traits> &stream, HttpDate const &date) {

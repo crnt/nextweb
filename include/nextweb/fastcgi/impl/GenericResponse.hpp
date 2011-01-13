@@ -23,13 +23,18 @@
 #include <string>
 
 #include "nextweb/Config.hpp"
+#include "nextweb/utils/Functors.hpp"
+#include "nextweb/utils/StringConverters.hpp"
+
 #include "nextweb/fastcgi/Cookie.hpp"
 #include "nextweb/fastcgi/HttpDate.hpp"
+#include "nextweb/fastcgi/HttpStatus.hpp"
+#include "nextweb/fastcgi/impl/HttpUtils.hpp"
 
 namespace nextweb { namespace fastcgi {
 
 struct CookieLess {
-	bool operator () (Cookie const &target, Cookie const &other) const;
+bool operator () (Cookie const &target, Cookie const &other) const;
 };
 
 template <typename IO>
@@ -38,32 +43,41 @@ class GenericResponse {
 public:
 	GenericResponse(IO &io);
 	virtual ~GenericResponse();
-	
+
 	void setCookie(Cookie const &cookie);
-	void setStatus(unsigned short status);
 	void setHeader(std::string const &name, std::string const &value);
-	
+	void setHttpStatus(HttpStatus const &status);
 	void redirect(std::string const &url);
-	void setExpireTime(HttpDate const &expires);
-	void setExpireTime(std::string const &expires);
+
+	void setExpireTime(HttpDate const &exp);
+	void setExpireTime(std::string const &exp);
 	std::size_t write(char const *buffer, std::size_t size);
+
+	void clear();
 
 private:
 	GenericResponse(GenericResponse const &);
 	GenericResponse& operator = (GenericResponse const &);
 	
+	typedef std::set<Cookie, CookieLess> CookieSet;
+	typedef std::map<std::string, std::string, utils::CILess<std::string>::Type> HeaderMap;
+	
+	void sendHeaders();
+	
 private:	
 	IO &io_;
+	bool headersSent_;
+	CookieSet cookies_;
+	HeaderMap headers_;
 	HttpDate expireTime_;
-	unsigned short httpStatus_;
-	std::set<Cookie, CookieLess> cookies_;
-	std::map<std::string, std::string> headers_;
+	HttpStatus httpStatus_;
 };
 
 template <typename IO> NEXTWEB_INLINE
- GenericResponse<IO>::GenericResponse(IO &io) :
-	io_(io)
+GenericResponse<IO>::GenericResponse(IO &io) :
+	io_(io), httpStatus_(HttpStatus::BAD)
 {
+	clear();
 }
 
 template <typename IO> NEXTWEB_INLINE 
@@ -73,35 +87,89 @@ GenericResponse<IO>::~GenericResponse() {
 template <typename IO> NEXTWEB_INLINE void
 GenericResponse<IO>::setCookie(Cookie const &cookie) {
 	cookies_.insert(cookie);
+	headersSent_ = false;
 }
- 
-template <typename IO> NEXTWEB_INLINE void
-GenericResponse<IO>::setStatus(unsigned short status) {
-}
- 
+
 template <typename IO> NEXTWEB_INLINE void
 GenericResponse<IO>::setHeader(std::string const &name, std::string const &value) {
-	headers_[name] = value;
+	if (utils::isCIEqual(HttpConstants::STATUS, name)) {
+		setHttpStatus(HttpStatus::fromString(value));
+	}
+	else if (utils::isCIEqual(HttpConstants::EXPIRES, name)) {
+		setExpireTime(value);
+	}
+	else {
+		headers_[name] = value;
+		headersSent_ = false;
+	}
+}
+
+template <typename IO> NEXTWEB_INLINE void
+GenericResponse<IO>::setHttpStatus(HttpStatus const& status) {
+	httpStatus_ = status;
+	headersSent_ = false;
 }
 
 template <typename IO> NEXTWEB_INLINE void
 GenericResponse<IO>::redirect(std::string const &url) {
-	setStatus(301);
+	setHeader(HttpConstants::LOCATION, url);
+	setHttpStatus(HttpStatus::MOVED_TEMPORARILY);
 }
 
 template <typename IO> NEXTWEB_INLINE void
-GenericResponse<IO>::setExpireTime(HttpDate const &expires) {
-	expireTime_ = expires;
+GenericResponse<IO>::setExpireTime(HttpDate const &exp) {
+	expireTime_ = exp;
+	headersSent_ = false;
 }
 
 template <typename IO> NEXTWEB_INLINE void
-GenericResponse<IO>::setExpireTime(std::string const &expires) {
+GenericResponse<IO>::setExpireTime(std::string const &exp) {
+	setExpireTime(HttpDate::fromString(exp));
 }
 
 template <typename IO> NEXTWEB_INLINE std::size_t
 GenericResponse<IO>::write(char const *buffer, std::size_t size) {
+	if (HttpStatus::NO_CONTENT == httpStatus_) {
+		throw Error("trying to write content while http status doen not allow it");
+	}
+	if (!headersSent_) {
+		sendHeaders();
+	}
+	return io_.write(buffer, size);
+}
+
+template <typename IO> NEXTWEB_INLINE void
+GenericResponse<IO>::clear() {
+	cookies_.clear();
+	headers_.clear();
+	headersSent_ = false;
+	httpStatus_ = HttpStatus::BAD;
+	expireTime_.swap(HttpDate::BAD);
+}
+
+template <typename IO> NEXTWEB_INLINE void
+GenericResponse<IO>::sendHeaders() {
+	if (HttpStatus::BAD == httpStatus_) {
+		throw Error("http status has not set explicitly");
+	}
+	io_.setStatus(httpStatus_);
+	io_.writeHeader(HttpConstants::STATUS, httpStatus_.message());
+	if (HttpDate::BAD != expireTime_) {
+		io_.writeHeader(HttpConstants::EXPIRES, expireTime_.str());
+	}
+	for (CookieSet::const_iterator i = cookies_.begin(), end = cookies_.end(); i != end; ++i) {
+		io_.writeHeader(HttpConstants::SET_COOKIE, i->str());
+	}
+	for (HeaderMap::const_iterator i = headers_.begin(), end = headers_.end(); i != end; ++i) {
+		io_.writeHeader(i->first, i->second);
+	}
+	clear();
 }
 
 }} // namespaces
+
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/fastcgi/GenericResponse.hpp"
+#endif
 
 #endif // NEXTWEB_FASTCGI_GENERIC_RESPONSE_HPP_INCLUDED

@@ -24,15 +24,16 @@
 
 namespace nextweb { namespace fastcgi {
 
-char const*
-statusToString(unsigned short code);
-
 struct HttpConstants {
 
 	static std::string const GET;
 	static std::string const HEAD;
 	static std::string const POST;
 	static std::string const METHOD;
+	static std::string const STATUS;
+	static std::string const EXPIRES;
+	static std::string const LOCATION;
+	static std::string const SET_COOKIE;
 	static std::string const EMPTY_STRING;
 	static std::string const PATH_INFO_VAR_NAME;
 	static std::string const CONTENT_TYPE_VAR_NAME;
@@ -48,7 +49,6 @@ struct HttpConstants {
 	static utils::Range<char const*> const CONTENT_DISP;
 	static utils::Range<char const*> const NAME;
 	static utils::Range<char const*> const FILE_NAME;
-
 	
 	static utils::Range<char const*> const COOKIE_VAR_NAME;
 	static utils::Range<char const*> const QUERY_STRING_VAR_NAME;
