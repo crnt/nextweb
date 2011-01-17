@@ -8,8 +8,8 @@ utils_tests_SOURCES = main.cpp MockShared.cpp MockThread.cpp \
 	FunctorsTest.cpp \
 	IntegerTest.cpp \
 	IteratorTest.cpp \
+	PassingTypeTest.cpp \
 	RangeTest.cpp \
-	ReturnTypeTest.cpp \
 	SharedPtrTest.cpp \
 	StaticAssertTest.cpp \
 	StringTest.cpp \

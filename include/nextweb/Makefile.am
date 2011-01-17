@@ -62,10 +62,10 @@ nobase_pkginclude_HEADERS = \
 	utils/Macros.hpp \
 	utils/MappedFile.hpp \
 	utils/MultiThreaded.hpp \
+	utils/PassingType.hpp \
 	utils/PosixThreads.hpp \
 	utils/Range.hpp \
 	utils/Resource.hpp \
-	utils/ReturnType.hpp \
 	utils/ScopedLock.hpp \
 	utils/SingleThreaded.hpp \
 	utils/SplitKeyValue.hpp \

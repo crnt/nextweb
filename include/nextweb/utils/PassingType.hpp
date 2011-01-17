@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_UTILS_RETURN_TYPE_HPP_INCLUDED
-#define NEXTWEB_UTILS_RETURN_TYPE_HPP_INCLUDED
+#ifndef NEXTWEB_UTILS_PASSING_TYPE_HPP_INCLUDED
+#define NEXTWEB_UTILS_PASSING_TYPE_HPP_INCLUDED
 
 #include "nextweb/SharedPtr.hpp"
 #include "nextweb/utils/Integer.hpp"
@@ -25,28 +25,28 @@
 namespace nextweb { namespace utils {
 
 template <typename T, bool ByVal>
-struct ReturnTypeImpl;
+struct PassingTypeImpl;
 
 template <typename T>
-struct ReturnType {
-	typedef typename ReturnTypeImpl<T, IsInt<T>::RESULT || IsPointer<T>::RESULT>::Type Type;
+struct PassingType {
+	typedef typename PassingTypeImpl<T, IsInt<T>::RESULT || IsPointer<T>::RESULT>::Type Type;
 };
 
 template <typename T>
-struct ReturnTypeImpl<T, true> {
+struct PassingTypeImpl<T, true> {
 	typedef T Type;
 };
 
 template <typename T>
-struct ReturnTypeImpl<T, false> {
+struct PassingTypeImpl<T, false> {
 	typedef T const& Type;
 };
 
 template <typename T>
-struct ReturnTypeImpl<SharedPtr<T>, false> {
+struct PassingTypeImpl<SharedPtr<T>, false> {
 	typedef SharedPtr<T> Type;
 };
 
 }} // namespaces
 
-#endif // NEXTWEB_UTILS_RETURN_TYPE_HPP_INCLUDED
+#endif // NEXTWEB_UTILS_PASSING_TYPE_HPP_INCLUDED

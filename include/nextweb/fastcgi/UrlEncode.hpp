@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_URLENCODE_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_URLENCODE_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_URL_ENCODE_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_URL_ENCODE_HPP_INCLUDED
 
 #include <string>
 
@@ -32,5 +32,4 @@ NEXTWEB_API std::string urldecode(std::string const &value);
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_URLENCODE_HPP_INCLUDED
-
+#endif // NEXTWEB_FASTCGI_URL_ENCODE_HPP_INCLUDED

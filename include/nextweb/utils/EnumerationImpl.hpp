@@ -22,19 +22,19 @@
 
 #include "nextweb/Config.hpp"
 #include "nextweb/Enumeration.hpp"
-#include "nextweb/utils/ReturnType.hpp"
+#include "nextweb/utils/PassingType.hpp"
 
 namespace nextweb { namespace utils {
 
 template <typename Type>
-class SingleValueEnumeration : public Enumeration<typename ReturnType<Type>::Type> {
+class SingleValueEnumeration : public Enumeration<typename PassingType<Type>::Type> {
 
 public:
-	SingleValueEnumeration(Type const &value);
+	SingleValueEnumeration(typename PassingType<Type>::Type value);
 	virtual ~SingleValueEnumeration();
 
 	virtual bool hasMoreElements() const;
-	virtual typename ReturnType<Type>::Type nextElement() const;
+	virtual typename PassingType<Type>::Type nextElement() const;
 	
 	
 private:
@@ -49,21 +49,21 @@ private:
 template <typename Iter>
 struct Identity {
 	typedef Identity<Iter> Type;
-	typedef typename ReturnType<typename std::iterator_traits<Iter>::value_type>::Type ValueType;
+	typedef typename PassingType<typename std::iterator_traits<Iter>::value_type>::Type ValueType;
 	static ValueType getValue(Iter iter);
 };
 
 template <typename Iter>
 struct MapSelectFirst {
 	typedef MapSelectFirst<Iter> Type;
-	typedef typename ReturnType<typename std::iterator_traits<Iter>::value_type::first_type>::Type ValueType;
+	typedef typename PassingType<typename std::iterator_traits<Iter>::value_type::first_type>::Type ValueType;
 	static ValueType getValue(Iter iter);
 };
 
 template <typename Iter>
 struct MapSelectSecond {
 	typedef MapSelectSecond<Iter> Type;
-	typedef typename ReturnType<typename std::iterator_traits<Iter>::value_type::second_type>::Type ValueType;
+	typedef typename PassingType<typename std::iterator_traits<Iter>::value_type::second_type>::Type ValueType;
 	static ValueType getValue(Iter iter);
 };
 
@@ -87,7 +87,7 @@ private:
 };
 
 template <typename Type> NEXTWEB_INLINE
-SingleValueEnumeration<Type>::SingleValueEnumeration(Type const &value) :
+SingleValueEnumeration<Type>::SingleValueEnumeration(typename PassingType<Type>::Type value) :
 	value_(value), exhausted_(false)
 {
 }
@@ -96,7 +96,7 @@ template <typename Type> NEXTWEB_INLINE
 SingleValueEnumeration<Type>::~SingleValueEnumeration() {
 }
 
-template <typename Type> NEXTWEB_INLINE typename ReturnType<Type>::Type
+template <typename Type> NEXTWEB_INLINE typename PassingType<Type>::Type
 SingleValueEnumeration<Type>::nextElement() const {
 	assert(!exhausted_);
 	exhausted_ = true;

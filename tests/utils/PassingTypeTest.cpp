@@ -11,12 +11,12 @@
 #include "nextweb/Enumeration.hpp"
 #include "nextweb/utils/Integer.hpp"
 #include "nextweb/utils/TypeList.hpp"
-#include "nextweb/utils/ReturnType.hpp"
 #include "nextweb/utils/TypeTraits.hpp"
+#include "nextweb/utils/PassingType.hpp"
 
 namespace nextweb { namespace tests {
 
-class ReturnTypeTest : public CppUnit::TestFixture {
+class PassingTypeTest : public CppUnit::TestFixture {
 
 public:
 	void testInteger();
@@ -29,7 +29,7 @@ private:
 	template <typename List> void testConstReferenceWith();
 
 private:
-	CPPUNIT_TEST_SUITE(ReturnTypeTest);
+	CPPUNIT_TEST_SUITE(PassingTypeTest);
 	CPPUNIT_TEST(testInteger);
 	CPPUNIT_TEST(testPointer);
 	CPPUNIT_TEST(testSharedPtr);
@@ -37,23 +37,23 @@ private:
 	CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(ReturnTypeTest, "ReturnTypeTest");
-CPPUNIT_REGISTRY_ADD("ReturnTypeTest", "dependent");
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(PassingTypeTest, "PassingTypeTest");
+CPPUNIT_REGISTRY_ADD("PassingTypeTest", "dependent");
 
 void
-ReturnTypeTest::testInteger() {
+PassingTypeTest::testInteger() {
 	testIdentityWith<utils::SignedIntegerList>();
 	testIdentityWith<utils::UnsignedIntegerList>();
 }
 
 void
-ReturnTypeTest::testPointer() {
+PassingTypeTest::testPointer() {
 	typedef NEXTWEB_MAKE_TYPE_LIST3(std::string const*, std::list<char>*, std::vector<char> const*) TestList;
 	testIdentityWith<TestList>();
 }
 
 void
-ReturnTypeTest::testSharedPtr() {
+PassingTypeTest::testSharedPtr() {
 	typedef Enumeration<int> IntEnumeration;
 	typedef Enumeration<double> DoubleEnumeration;
 	typedef Enumeration<std::string> StringEnumeration;
@@ -62,33 +62,33 @@ ReturnTypeTest::testSharedPtr() {
 }
 
 void
-ReturnTypeTest::testComplicated() {
+PassingTypeTest::testComplicated() {
 	typedef NEXTWEB_MAKE_TYPE_LIST3(std::string, std::list<char>, std::vector<char>) TestList;
 	testConstReferenceWith<TestList>();
 }
 
 template <typename List> void
-ReturnTypeTest::testIdentityWith() {
+PassingTypeTest::testIdentityWith() {
 	using namespace utils;
 	typedef typename List::Value ValueType;
-	CPPUNIT_ASSERT_EQUAL(true, (IsSame<typename ReturnType<ValueType>::Type, ValueType>::RESULT));
+	CPPUNIT_ASSERT_EQUAL(true, (IsSame<typename PassingType<ValueType>::Type, ValueType>::RESULT));
 	testIdentityWith<typename List::Next>();
 }
 
 template <> void
-ReturnTypeTest::testIdentityWith<utils::NullType>() {
+PassingTypeTest::testIdentityWith<utils::NullType>() {
 }
 
 template <typename List> void
-ReturnTypeTest::testConstReferenceWith() {
+PassingTypeTest::testConstReferenceWith() {
 	using namespace utils;
 	typedef typename List::Value ValueType;
-	CPPUNIT_ASSERT_EQUAL(true, (IsSame<typename ReturnType<ValueType>::Type, ValueType const&>::RESULT));
+	CPPUNIT_ASSERT_EQUAL(true, (IsSame<typename PassingType<ValueType>::Type, ValueType const&>::RESULT));
 	testConstReferenceWith<typename List::Next>();
 }
 
 template <> void
-ReturnTypeTest::testConstReferenceWith<utils::NullType>() {
+PassingTypeTest::testConstReferenceWith<utils::NullType>() {
 }
 
 }} // namespaces
