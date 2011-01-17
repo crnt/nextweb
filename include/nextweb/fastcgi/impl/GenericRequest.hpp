@@ -20,6 +20,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "nextweb/Error.hpp"
 #include "nextweb/Config.hpp"
@@ -35,8 +36,8 @@
 #include "nextweb/fastcgi/HttpError.hpp"
 #include "nextweb/fastcgi/HttpStatus.hpp"
 #include "nextweb/fastcgi/impl/HttpUtils.hpp"
-#include "nextweb/fastcgi/impl/UrlEncode.hpp"
 #include "nextweb/fastcgi/impl/PostParser.hpp"
+#include "nextweb/fastcgi/impl/UrlEncodeImpl.hpp"
 
 namespace nextweb { namespace fastcgi {
 

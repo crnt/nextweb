@@ -23,6 +23,7 @@
 #include "nextweb/Config.hpp"
 #include "nextweb/Shared.hpp"
 #include "nextweb/SharedPtr.hpp"
+#include "nextweb/Enumeration.hpp"
 
 namespace nextweb { namespace fastcgi {
 
@@ -39,41 +40,53 @@ public:
 	virtual void start(Settings const &set) = 0;
 	virtual void addHandler(std::string const &url, SharedPtr<RequestHandler> const &handler) = 0;
 
+	static SharedPtr<ServerImpl> create(Settings const &set);
+
 private:
 	ServerImpl(ServerImpl const &);
 	ServerImpl& operator = (ServerImpl const &);
 };
 
 template <typename Setup>
-class TunableServerImpl : public ServerImpl, public Setup::SocketPolicy {
+class TuneableServerImpl : public ServerImpl, public Setup::SocketPolicyType {
 
 public:
-	TunableServerImpl();
-	virtual ~TunableServerImpl();
+	TuneableServerImpl();
+	virtual ~TuneableServerImpl();
+	
+	typedef typename Setup::SocketPolicyType SocketPolicyType;
 
 	virtual void stop();
 	virtual void start(Settings const &set);
 
+	using SocketPolicyType::init;
+	using SocketPolicyType::socketSet;
+
 private:
-	TunableServerImpl(TunableServerImpl const &);
-	TunableServerImpl& operator = (TunableServerImpl const &);
+	TuneableServerImpl(TuneableServerImpl const &);
+	TuneableServerImpl& operator = (TuneableServerImpl const &);
 };
 
 template <typename Setup> NEXTWEB_INLINE
-TunableServerImpl<Setup>::TunableServerImpl()
+TuneableServerImpl<Setup>::TuneableServerImpl()
 {
 }
 
 template <typename Setup> NEXTWEB_INLINE  
-TunableServerImpl<Setup>::~TunableServerImpl() {
+TuneableServerImpl<Setup>::~TuneableServerImpl() {
 }
 
 template <typename Setup> NEXTWEB_INLINE void
-TunableServerImpl<Setup>::stop() {
+TuneableServerImpl<Setup>::stop() {
 }
 
 template <typename Setup> NEXTWEB_INLINE void
-TunableServerImpl<Setup>::start(Settings const &set) {
+TuneableServerImpl<Setup>::start(Settings const &set) {
+	init(set);
+	Enumeration<int>::Pointer sockSet = socketSet();
+	while (sockSet->hasMoreElements()) {
+		sockSet->nextElement();
+	}
 }
 
 }} // namespaces

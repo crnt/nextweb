@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "nextweb/Error.hpp"
-#include "nextweb/fastcgi/impl/UrlEncode.hpp"
+#include "nextweb/fastcgi/impl/UrlEncodeImpl.hpp"
 
 namespace nextweb { namespace fastcgi {
 

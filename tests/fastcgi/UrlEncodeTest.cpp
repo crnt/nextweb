@@ -8,7 +8,7 @@
 
 #include "TestUtils.hpp"
 #include "nextweb/utils/Range.hpp"
-#include "nextweb/fastcgi/impl/UrlEncode.hpp"
+#include "nextweb/fastcgi/impl/UrlEncodeImpl.hpp"
 
 namespace nextweb { namespace tests {
 
