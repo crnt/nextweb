@@ -28,6 +28,8 @@
 
 namespace nextweb { namespace fastcgi {
 
+// FIXME: implement fast StreamBuffer<char*, Traits>
+
 template <typename Iter, typename Traits = std::char_traits<typename std::iterator_traits<Iter>::value_type> >
 class StreamBuffer : public std::basic_streambuf<typename std::iterator_traits<Iter>::value_type, Traits> {
 
