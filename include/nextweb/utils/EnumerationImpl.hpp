@@ -18,10 +18,31 @@
 #ifndef NEXTWEB_UTILS_ENUMERATION_IMPL_HPP_INCLUDED
 #define NEXTWEB_UTILS_ENUMERATION_IMPL_HPP_INCLUDED
 
+#include <cassert>
+
 #include "nextweb/Config.hpp"
 #include "nextweb/Enumeration.hpp"
 
 namespace nextweb { namespace utils {
+
+template <typename Type>
+class SingleValueEnumeration : public Enumeration<Type> {
+
+public:
+	SingleValueEnumeration(Type const &value);
+	virtual ~SingleValueEnumeration();
+
+	virtual Type nextElement() const;
+	virtual bool hasMoreElements() const;
+	
+private:
+	SingleValueEnumeration(SingleValueEnumeration const &);
+	SingleValueEnumeration& operator = (SingleValueEnumeration const &);
+
+private:
+	Type value_;
+	bool exhausted_;
+};
 
 template <typename Iter>
 struct Identity {
@@ -63,6 +84,28 @@ private:
 	Iter mutable begin_;
 };
 
+template <typename Type> NEXTWEB_INLINE
+SingleValueEnumeration<Type>::SingleValueEnumeration(Type const &value) :
+	value_(value), exhausted_(false)
+{
+}
+
+template <typename Type> NEXTWEB_INLINE
+SingleValueEnumeration<Type>::~SingleValueEnumeration() {
+}
+
+template <typename Type> NEXTWEB_INLINE Type
+SingleValueEnumeration<Type>::nextElement() const {
+	assert(!exhausted_);
+	exhausted_ = true;
+	return value_;
+}
+
+template <typename Type> NEXTWEB_INLINE bool
+SingleValueEnumeration<Type>::hasMoreElements() const {
+	return !exhausted_;
+}
+
 template <typename Iter> NEXTWEB_INLINE typename Identity<Iter>::ValueType const&
 Identity<Iter>::getValue(Iter iter) {
 	return *iter;
@@ -95,6 +138,7 @@ IterEnumerationImpl<Iter, Filter>::hasMoreElements() const {
 
 template <typename Iter, typename Filter> NEXTWEB_INLINE typename Filter::ValueType const&
 IterEnumerationImpl<Iter, Filter>::nextElement() const {
+	assert(begin_ != end_);
 	return Filter::getValue(begin_++);
 }
 
