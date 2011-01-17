@@ -9,6 +9,7 @@ utils_tests_SOURCES = main.cpp MockShared.cpp MockThread.cpp \
 	IntegerTest.cpp \
 	IteratorTest.cpp \
 	RangeTest.cpp \
+	ReturnTypeTest.cpp \
 	SharedPtrTest.cpp \
 	StaticAssertTest.cpp \
 	StringTest.cpp \

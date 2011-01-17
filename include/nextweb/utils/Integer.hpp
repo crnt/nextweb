@@ -30,9 +30,9 @@ namespace nextweb { namespace utils {
 typedef NEXTWEB_MAKE_TYPE_LIST5(signed char, signed short, signed int, signed long, signed long long) SignedIntegerList;
 typedef NEXTWEB_MAKE_TYPE_LIST5(unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long) UnsignedIntegerList;
 
-template <typename X>
+template <typename Arg>
 struct IsInt {
-	static bool const RESULT = (TypeListIndexOf<SignedIntegerList, X>::RESULT != -1) || (TypeListIndexOf<UnsignedIntegerList, X>::RESULT != -1);
+	static bool const RESULT = (TypeListIndexOf<SignedIntegerList, Arg>::RESULT != -1) || (TypeListIndexOf<UnsignedIntegerList, Arg>::RESULT != -1);
 };
 
 template <>
@@ -93,39 +93,39 @@ struct MaxIntImpl<false> {
 	typedef UIntMax Type;
 };
 
-template <typename X>
+template <typename Arg>
 struct MakeSigned {
-	NEXTWEB_STATIC_ASSERT(IsInt<X>::RESULT);
-	static int const SP = TypeListIndexOf<SignedIntegerList, X>::RESULT;
-	static int const UP = TypeListIndexOf<UnsignedIntegerList, X>::RESULT;
+	NEXTWEB_STATIC_ASSERT(IsInt<Arg>::RESULT);
+	static int const SP = TypeListIndexOf<SignedIntegerList, Arg>::RESULT;
+	static int const UP = TypeListIndexOf<UnsignedIntegerList, Arg>::RESULT;
 	typedef typename TypeListNthItem<SignedIntegerList, (-1 != SP) ? SP : UP>::Type Type;
 };
 
-template <typename X> int const
-MakeSigned<X>::SP;
+template <typename Arg> int const
+MakeSigned<Arg>::SP;
 
-template <typename X> int const
-MakeSigned<X>::UP;
+template <typename Arg> int const
+MakeSigned<Arg>::UP;
 
 template <>
 struct MakeSigned<char> {
 	typedef signed char Type;
 };
 
-template <typename X>
+template <typename Arg>
 struct MakeUnsigned {
-	NEXTWEB_STATIC_ASSERT(IsInt<X>::RESULT);
-	static int const SP = TypeListIndexOf<SignedIntegerList, X>::RESULT;
-	static int const UP = TypeListIndexOf<UnsignedIntegerList, X>::RESULT;
+	NEXTWEB_STATIC_ASSERT(IsInt<Arg>::RESULT);
+	static int const SP = TypeListIndexOf<SignedIntegerList, Arg>::RESULT;
+	static int const UP = TypeListIndexOf<UnsignedIntegerList, Arg>::RESULT;
 	typedef typename TypeListNthItem<UnsignedIntegerList, (-1 != SP) ? SP : UP>::Type Type;
 };
 
 
-template <typename X> int const
-MakeUnsigned<X>::SP;
+template <typename Arg> int const
+MakeUnsigned<Arg>::SP;
 
-template <typename X> int const
-MakeUnsigned<X>::UP;
+template <typename Arg> int const
+MakeUnsigned<Arg>::UP;
 
 template <>
 struct MakeUnsigned<char> {

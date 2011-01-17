@@ -18,6 +18,8 @@
 #ifndef NEXTWEB_FASTCGI_SOCKET_POLICY_HPP_INCLUDED
 #define NEXTWEB_FASTCGI_SOCKET_POLICY_HPP_INCLUDED
 
+#include <vector>
+
 #include "nextweb/Config.hpp"
 #include "nextweb/Enumeration.hpp"
 
@@ -53,7 +55,7 @@ private:
 	TuneableSocketPolicy& operator = (TuneableSocketPolicy const &);
 
 private:
-	Enumeration<int>::Pointer socketSet_;
+	std::vector<int> socketSet_;
 };
 
 }} // namespaces

@@ -45,6 +45,14 @@ struct IsConst<Arg const> : public TrueType {
 };
 
 template <typename Arg>
+struct IsPointer : public FalseType {
+};
+
+template <typename Arg>
+struct IsPointer<Arg*> : public TrueType {
+};
+
+template <typename Arg>
 struct AddConst {
 	typedef Arg const Type;
 };

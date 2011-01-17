@@ -22,18 +22,20 @@
 
 #include "nextweb/Config.hpp"
 #include "nextweb/Enumeration.hpp"
+#include "nextweb/utils/ReturnType.hpp"
 
 namespace nextweb { namespace utils {
 
 template <typename Type>
-class SingleValueEnumeration : public Enumeration<Type> {
+class SingleValueEnumeration : public Enumeration<typename ReturnType<Type>::Type> {
 
 public:
 	SingleValueEnumeration(Type const &value);
 	virtual ~SingleValueEnumeration();
 
-	virtual Type nextElement() const;
 	virtual bool hasMoreElements() const;
+	virtual typename ReturnType<Type>::Type nextElement() const;
+	
 	
 private:
 	SingleValueEnumeration(SingleValueEnumeration const &);
@@ -41,39 +43,39 @@ private:
 
 private:
 	Type value_;
-	bool exhausted_;
+	bool mutable exhausted_;
 };
 
 template <typename Iter>
 struct Identity {
 	typedef Identity<Iter> Type;
-	typedef typename std::iterator_traits<Iter>::value_type ValueType;
-	static ValueType const& getValue(Iter iter);
+	typedef typename ReturnType<typename std::iterator_traits<Iter>::value_type>::Type ValueType;
+	static ValueType getValue(Iter iter);
 };
 
 template <typename Iter>
 struct MapSelectFirst {
 	typedef MapSelectFirst<Iter> Type;
-	typedef typename std::iterator_traits<Iter>::value_type::first_type ValueType;
-	static ValueType const& getValue(Iter iter);
+	typedef typename ReturnType<typename std::iterator_traits<Iter>::value_type::first_type>::Type ValueType;
+	static ValueType getValue(Iter iter);
 };
 
 template <typename Iter>
 struct MapSelectSecond {
 	typedef MapSelectSecond<Iter> Type;
-	typedef typename std::iterator_traits<Iter>::value_type::second_type ValueType;
-	static ValueType const& getValue(Iter iter);
+	typedef typename ReturnType<typename std::iterator_traits<Iter>::value_type::second_type>::Type ValueType;
+	static ValueType getValue(Iter iter);
 };
 
 template <typename Iter, typename Filter = typename Identity<Iter>::Type>
-class IterEnumerationImpl : public Enumeration<typename Filter::ValueType const&> {
+class IterEnumerationImpl : public Enumeration<typename Filter::ValueType> {
 
 public:
 	IterEnumerationImpl(Iter begin, Iter end);
 	virtual ~IterEnumerationImpl();
 	
 	virtual bool hasMoreElements() const;
-	virtual typename Filter::ValueType const& nextElement() const;
+	virtual typename Filter::ValueType nextElement() const;
 
 private:
 	IterEnumerationImpl(IterEnumerationImpl const &);
@@ -94,7 +96,7 @@ template <typename Type> NEXTWEB_INLINE
 SingleValueEnumeration<Type>::~SingleValueEnumeration() {
 }
 
-template <typename Type> NEXTWEB_INLINE Type
+template <typename Type> NEXTWEB_INLINE typename ReturnType<Type>::Type
 SingleValueEnumeration<Type>::nextElement() const {
 	assert(!exhausted_);
 	exhausted_ = true;
@@ -106,17 +108,17 @@ SingleValueEnumeration<Type>::hasMoreElements() const {
 	return !exhausted_;
 }
 
-template <typename Iter> NEXTWEB_INLINE typename Identity<Iter>::ValueType const&
+template <typename Iter> NEXTWEB_INLINE typename Identity<Iter>::ValueType
 Identity<Iter>::getValue(Iter iter) {
 	return *iter;
 }
 
-template <typename Iter> NEXTWEB_INLINE typename MapSelectFirst<Iter>::ValueType const&
+template <typename Iter> NEXTWEB_INLINE typename MapSelectFirst<Iter>::ValueType
 MapSelectFirst<Iter>::getValue(Iter iter) {
 	return iter->first;
 }
 
-template <typename Iter> NEXTWEB_INLINE typename MapSelectSecond<Iter>::ValueType const&
+template <typename Iter> NEXTWEB_INLINE typename MapSelectSecond<Iter>::ValueType
 MapSelectSecond<Iter>::getValue(Iter iter) {
 	return iter->second;
 }
@@ -136,25 +138,30 @@ IterEnumerationImpl<Iter, Filter>::hasMoreElements() const {
 	return begin_ != end_;
 }
 
-template <typename Iter, typename Filter> NEXTWEB_INLINE typename Filter::ValueType const&
+template <typename Iter, typename Filter> NEXTWEB_INLINE typename Filter::ValueType
 IterEnumerationImpl<Iter, Filter>::nextElement() const {
 	assert(begin_ != end_);
 	return Filter::getValue(begin_++);
 }
 
-template <typename Iter> NEXTWEB_INLINE typename Enumeration<typename Identity<Iter>::ValueType const&>::Pointer
+template <typename Type> NEXTWEB_INLINE typename Enumeration<Type>::Pointer
+makeSingleValueEnumeration(Type const &value) {
+	return typename Enumeration<Type>::Pointer(new SingleValueEnumeration<Type>(value));
+}
+
+template <typename Iter> NEXTWEB_INLINE typename Enumeration<typename Identity<Iter>::ValueType>::Pointer
 makeIterEnumeration(Iter begin, Iter end) {
-	return typename Enumeration<typename Identity<Iter>::ValueType const&>::Pointer(new IterEnumerationImpl<Iter, typename Identity<Iter>::Type>(begin, end));
+	return typename Enumeration<typename Identity<Iter>::ValueType>::Pointer(new IterEnumerationImpl<Iter, typename Identity<Iter>::Type>(begin, end));
 }
 
-template <typename Iter> NEXTWEB_INLINE typename Enumeration<typename MapSelectFirst<Iter>::ValueType const&>::Pointer
+template <typename Iter> NEXTWEB_INLINE typename Enumeration<typename MapSelectFirst<Iter>::ValueType>::Pointer
 makeSelectFirstEnumeration(Iter begin, Iter end) {
-	return typename Enumeration<typename MapSelectFirst<Iter>::ValueType const&>::Pointer(new IterEnumerationImpl<Iter, typename MapSelectFirst<Iter>::Type>(begin, end));
+	return typename Enumeration<typename MapSelectFirst<Iter>::ValueType>::Pointer(new IterEnumerationImpl<Iter, typename MapSelectFirst<Iter>::Type>(begin, end));
 }
 
-template <typename Iter> NEXTWEB_INLINE typename Enumeration<typename MapSelectSecond<Iter>::ValueType const&>::Pointer
+template <typename Iter> NEXTWEB_INLINE typename Enumeration<typename MapSelectSecond<Iter>::ValueType>::Pointer
 makeSelectSecondEnumeration(Iter begin, Iter end) {
-	return typename Enumeration<typename MapSelectSecond<Iter>::ValueType const&>::Pointer(new IterEnumerationImpl<Iter, typename MapSelectSecond<Iter>::Type>(begin, end));
+	return typename Enumeration<typename MapSelectSecond<Iter>::ValueType>::Pointer(new IterEnumerationImpl<Iter, typename MapSelectSecond<Iter>::Type>(begin, end));
 }
 
 }} // namespaces

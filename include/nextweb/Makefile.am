@@ -60,6 +60,7 @@ nobase_pkginclude_HEADERS = \
 	utils/PosixThreads.hpp \
 	utils/Range.hpp \
 	utils/Resource.hpp \
+	utils/ReturnType.hpp \
 	utils/ScopedLock.hpp \
 	utils/SingleThreaded.hpp \
 	utils/SplitKeyValue.hpp \
