@@ -152,7 +152,7 @@ GenericResponse<IO>::sendHeaders() {
 	if (HttpStatus::BAD == httpStatus_) {
 		throw Error("http status has not set explicitly");
 	}
-	io_.setStatus(httpStatus_);
+	io_.setStatus(httpStatus_.code());
 	io_.writeHeader(HttpConstants::STATUS, httpStatus_.message());
 	if (HttpDate::BAD != expireTime_) {
 		io_.writeHeader(HttpConstants::EXPIRES, expireTime_.str());

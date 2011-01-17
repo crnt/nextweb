@@ -27,10 +27,12 @@ void
 ResponseTest::testHeaders() {
 
 	using namespace fastcgi;
+	
 	MockIO io;
 	GenericResponse<MockIO> response(io);
-	
-	
+	response.setHttpStatus(HttpStatus::OK);
+	response.setCookie(Cookie("test", "test-value"));
+	response.write("12345", sizeof("12345") - 1);
 }
 
 void

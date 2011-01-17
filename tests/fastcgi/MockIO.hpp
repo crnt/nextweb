@@ -30,12 +30,16 @@ public:
 	MockIO();
 	virtual ~MockIO();
 
+	unsigned short getStatus() const;
 	void add(std::string const &value);
 	void attachFile(char const *fileName);
 
 	char const* const* environ() const; 
 	std::size_t read(char *buffer, std::size_t size); 
+	
+	void setStatus(unsigned short code);
 	std::size_t write(char const *buffer, std::size_t size);
+	std::size_t writeHeader(std::string const &name, std::string const &value);
 
 	template <typename Request> void setup(Request const &request);
 	
@@ -46,6 +50,7 @@ private:
 
 private:
 	std::ifstream post_;
+	unsigned short status_;
 	std::vector<std::string> strings_;
 	std::vector<char const*> mutable env_;
 };

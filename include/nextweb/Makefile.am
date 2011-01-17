@@ -22,6 +22,7 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/impl/RequestImpl.hpp \
 	fastcgi/impl/ResponseImpl.hpp \
 	fastcgi/impl/ServerImpl.hpp \
+	fastcgi/impl/SocketPolicy.hpp \
 	fastcgi/impl/StreamBuffer.hpp \
 	fastcgi/impl/UrlEncode.hpp \
 	fastcgi/impl/UrlMatch.hpp \

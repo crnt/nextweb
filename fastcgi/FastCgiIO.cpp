@@ -42,6 +42,10 @@ FastCgiIO::read(char *buf, std::size_t size) {
 	throw Error("fastcgi request already read");
 }
 
+void
+FastCgiIO::setStatus(unsigned short status) {
+}
+
 std::size_t
 FastCgiIO::write(char const *buf, std::size_t size) {
 	int result = FCGX_PutStr(buf, size, request_.out);

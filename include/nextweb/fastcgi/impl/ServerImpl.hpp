@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "nextweb/Config.hpp"
 #include "nextweb/Shared.hpp"
 #include "nextweb/SharedPtr.hpp"
 
@@ -42,6 +43,38 @@ private:
 	ServerImpl(ServerImpl const &);
 	ServerImpl& operator = (ServerImpl const &);
 };
+
+template <typename Setup>
+class TunableServerImpl : public ServerImpl, public Setup::SocketPolicy {
+
+public:
+	TunableServerImpl();
+	virtual ~TunableServerImpl();
+
+	virtual void stop();
+	virtual void start(Settings const &set);
+
+private:
+	TunableServerImpl(TunableServerImpl const &);
+	TunableServerImpl& operator = (TunableServerImpl const &);
+};
+
+template <typename Setup> NEXTWEB_INLINE
+TunableServerImpl<Setup>::TunableServerImpl()
+{
+}
+
+template <typename Setup> NEXTWEB_INLINE  
+TunableServerImpl<Setup>::~TunableServerImpl() {
+}
+
+template <typename Setup> NEXTWEB_INLINE void
+TunableServerImpl<Setup>::stop() {
+}
+
+template <typename Setup> NEXTWEB_INLINE void
+TunableServerImpl<Setup>::start(Settings const &set) {
+}
 
 }} // namespaces
 

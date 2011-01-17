@@ -27,7 +27,11 @@ namespace nextweb { namespace fastcgi {
 class NEXTWEB_API HttpStatus {
 
 public:
+	explicit HttpStatus(unsigned short code);
+	
+	unsigned short code() const;
 	char const* message() const;
+	
 	bool operator == (HttpStatus const &other) const;
 	bool operator != (HttpStatus const &other) const;
 
@@ -61,9 +65,6 @@ public:
 	static HttpStatus const GATEWAY_TIMEOUT;
 	static HttpStatus const VERSION_NOT_SUPPORTED;
 	static HttpStatus const BAD;
-
-private:
-	explicit HttpStatus(unsigned short code);
 
 private:
 	unsigned short code_;

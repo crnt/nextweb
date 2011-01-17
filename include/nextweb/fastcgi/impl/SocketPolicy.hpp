@@ -15,47 +15,47 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_FAST_CGI_IO_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_FAST_CGI_IO_HPP_INCLUDED
-
-#include <string>
-#include <cstddef>
-#include <fcgiapp.h>
+#ifndef NEXTWEB_FASTCGI_SOCKET_POLICY_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_SOCKET_POLICY_HPP_INCLUDED
 
 #include "nextweb/Config.hpp"
+#include "nextweb/Enumeration.hpp"
 
 namespace nextweb { namespace fastcgi {
 
-class FastCgiIO {
+class Settings;
+
+class DefaultSocketPolicy {
 
 public:
-	FastCgiIO(int socket);
-	virtual ~FastCgiIO();
-
-	void acceptRequest();
-	void finishRequest();
-
-	char const* const* environ() const;
-	std::size_t read(char *buffer, std::size_t size);
+	DefaultSocketPolicy();
+	virtual ~DefaultSocketPolicy();
 	
-	void setStatus(unsigned short status);
-	std::size_t write(char const *buffer, std::size_t size);
-	std::size_t writeHeader(std::string const &name, std::string const &value);
-	
-	template <typename Request> void setup(Request const &request);
+	void init(Settings const &set);
+	Enumeration<int>::Pointer socketSet() const;
 
 private:
-	FastCgiIO(FastCgiIO const &);
-	FastCgiIO& operator = (FastCgiIO const &);
-
-private:
-	FCGX_Request request_;
+	DefaultSocketPolicy(DefaultSocketPolicy const &);
+	DefaultSocketPolicy& operator = (DefaultSocketPolicy const &);
 };
 
-template <typename Request> NEXTWEB_INLINE void
-FastCgiIO::setup(Request const &request) {
-}
+class TuneableSocketPolicy {
+
+public:
+	TuneableSocketPolicy();
+	virtual ~TuneableSocketPolicy();
+
+	void init(Settings const &set);
+	Enumeration<int>::Pointer socketSet() const;
+	
+private:
+	TuneableSocketPolicy(TuneableSocketPolicy const &);
+	TuneableSocketPolicy& operator = (TuneableSocketPolicy const &);
+
+private:
+	Enumeration<int>::Pointer socketSet_;
+};
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_FAST_CGI_IO_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_SOCKET_POLICY_HPP_INCLUDED

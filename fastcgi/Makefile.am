@@ -21,6 +21,7 @@ libnextweb_fastcgi_la_SOURCES = \
 	Server.cpp \
 	ServerImpl.cpp \
 	Settings.cpp \
+	SocketPolicy.cpp \
 	UrlMatch.cpp
 
 AM_CXXFLAGS = -pthread

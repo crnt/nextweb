@@ -47,11 +47,20 @@ MockIO::read(char *buffer, std::size_t size) {
 	return result;
 }
 
+void
+MockIO::setStatus(unsigned short status) {
+	status_ = status;
+}
+
 std::size_t
 MockIO::write(char const *buffer, std::size_t size) {
 	(void) size;
 	(void) buffer;
 	return 0;
+}
+
+std::size_t
+MockIO::writeHeader(std::string const &name, std::string const &value) {
 }
 
 void

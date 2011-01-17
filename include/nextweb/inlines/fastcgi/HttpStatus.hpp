@@ -20,6 +20,11 @@
 
 namespace nextweb { namespace fastcgi {
 
+NEXTWEB_INLINE unsigned short
+HttpStatus::code() const {
+	return code_;
+}
+
 NEXTWEB_INLINE bool
 HttpStatus::operator == (HttpStatus const &other) const {
 	return code_ == other.code_;
