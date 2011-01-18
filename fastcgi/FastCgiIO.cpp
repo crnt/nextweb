@@ -17,14 +17,14 @@ FastCgiIO::~FastCgiIO() {
 }
 
 void
-FastCgiIO::acceptRequest() {
+FastCgiIO::accept() {
 	if (FCGX_Accept_r(&request_) < 0) {
 		throw Error("can not accept fastcgi request");
 	}
 }
 
 void
-FastCgiIO::finishRequest() {
+FastCgiIO::finish() {
 	FCGX_Finish_r(&request_);
 }
 

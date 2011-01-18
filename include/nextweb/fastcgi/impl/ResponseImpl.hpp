@@ -31,12 +31,12 @@ public:
 	virtual ~ResponseImpl();
 
 	virtual void setCookie(Cookie const &cookie);
-	virtual void setStatus(unsigned short status);
 	virtual void setHeader(std::string const &name, std::string const &value);
-	
+	virtual void setHttpStatus(HttpStatus const &status);
 	virtual void redirect(std::string const &url);
-	virtual void setExpireTime(HttpDate const &date);
-	virtual void setExpireTime(std::string const &expires);
+
+	virtual void setExpireTime(HttpDate const &exp);
+	virtual void setExpireTime(std::string const &exp);
 	virtual std::size_t write(char const *buffer, std::size_t size);
 
 private:
@@ -56,30 +56,37 @@ ResponseImpl<IO>::~ResponseImpl() {
 
 template <typename IO> NEXTWEB_INLINE void
 ResponseImpl<IO>::setCookie(Cookie const &cookie) {
-}
-
-template <typename IO> NEXTWEB_INLINE void
-ResponseImpl<IO>::setStatus(unsigned short status) {
+	GenericResponse<IO>::setCookie(cookie);
 }
 
 template <typename IO> NEXTWEB_INLINE void
 ResponseImpl<IO>::setHeader(std::string const &name, std::string const &value) {
+	GenericResponse<IO>::setHeader(name, value);
+}
+
+template <typename IO> NEXTWEB_INLINE void
+ResponseImpl<IO>::setHttpStatus(HttpStatus const &status) {
+	GenericResponse<IO>::setHttpStatus(status);
 }
 
 template <typename IO> NEXTWEB_INLINE void
 ResponseImpl<IO>::redirect(std::string const &url) {
+	GenericResponse<IO>::redirect(url);
 }
 
 template <typename IO> NEXTWEB_INLINE void
-ResponseImpl<IO>::setExpireTime(HttpDate const &date) {
+ResponseImpl<IO>::setExpireTime(HttpDate const &exp) {
+	GenericResponse<IO>::setExpireTime(exp);
 }
 
 template <typename IO> NEXTWEB_INLINE void
-ResponseImpl<IO>::setExpireTime(std::string const &expires) {
+ResponseImpl<IO>::setExpireTime(std::string const &exp) {
+	GenericResponse<IO>::setExpireTime(exp);
 }
 
 template <typename IO> NEXTWEB_INLINE std::size_t
 ResponseImpl<IO>::write(char const *buffer, std::size_t size) {
+	return GenericResponse<IO>::write(buffer, size);
 }
 
 }} // namespsaces

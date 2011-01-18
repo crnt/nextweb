@@ -43,7 +43,9 @@ RequestTest::testGet() {
 	io.add("REQUEST_METHOD=GET");
 	io.add("QUERY_STRING=x=abc%20def&y=test");
 
-	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	fastcgi::GenericRequest<MockIO> req(io);
+	req.parse(0);
+	
 	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
 	CPPUNIT_ASSERT_EQUAL(std::string("abc def"), req.getArg("x"));
 }
@@ -56,7 +58,9 @@ RequestTest::testPost() {
 	io.add("HTTP_CONTENT_LENGTH=1705");
 	io.attachFile("data/post.tst");
 	
-	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	fastcgi::GenericRequest<MockIO> req(io);
+	req.parse(0);
+	
 	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
 	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
 }
@@ -70,7 +74,9 @@ RequestTest::testMultipart() {
 	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
 	io.attachFile("data/multipart.tst");
 
-	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	fastcgi::GenericRequest<MockIO> req(io);
+	req.parse(0);
+
 	CPPUNIT_ASSERT_EQUAL(std::string("field"), req.getArg("field"));
 	CPPUNIT_ASSERT_EQUAL(std::string("test-field"), req.getArg("another-field"));
 	CPPUNIT_ASSERT_EQUAL(false, req.hasArg("nonexistent"));
@@ -92,9 +98,10 @@ RequestTest::testRequestImpl() {
 	io.add("PATH_INFO=/");
 	io.add("REQUEST_METHOD=GET");
 	io.add("QUERY_STRING=x=abc%20def&x=ghi%20jkl&y=test");
+	RequestImpl<MockIO> req(io);
+	req.parse(0);
 	
 	std::size_t i;
-	RequestImpl<MockIO> req(io, 1024);
 	CPPUNIT_ASSERT_EQUAL(std::string("test"), req.getArg("y"));
 	
 	i = 0;
@@ -119,7 +126,8 @@ RequestTest::testBadMethod() {
 
 	MockIO io;
 	io.add("METHOD=BAD");
-	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	fastcgi::GenericRequest<MockIO> req(io);
+	req.parse(0);
 }
 
 void
@@ -129,7 +137,9 @@ RequestTest::testBadMultipart() {
 	io.add("HTTP_CONTENT_LENGTH=5000");
 	io.add("CONTENT_TYPE=multipart/form-data; boundary=---------------------------68126048419810193861179415823");
 	io.attachFile("data/bad-multipart.tst");
-	fastcgi::GenericRequest<MockIO> req(io, 1024);
+	
+	fastcgi::GenericRequest<MockIO> req(io);
+	req.parse(0);
 }
 
 }} // namespaces

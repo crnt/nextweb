@@ -26,7 +26,7 @@ class ThreadedInvoker {
 public:
 	ThreadedInvoker();
 	virtual ~ThreadedInvoker();
-	
+
 private:
 	ThreadedInvoker(ThreadedInvoker const &);
 	ThreadedInvoker& operator = (ThreadedInvoker const &);

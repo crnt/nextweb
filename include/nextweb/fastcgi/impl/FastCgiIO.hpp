@@ -32,8 +32,8 @@ public:
 	FastCgiIO(int socket);
 	virtual ~FastCgiIO();
 
-	void acceptRequest();
-	void finishRequest();
+	void accept();
+	void finish();
 
 	char const* const* environ() const;
 	std::size_t read(char *buffer, std::size_t size);

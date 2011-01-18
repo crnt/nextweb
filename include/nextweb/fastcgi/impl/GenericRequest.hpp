@@ -45,7 +45,7 @@ template <typename IO>
 class GenericRequest : public PostParserListener {
 
 public:
-	GenericRequest(IO &io, std::size_t threshold);
+	GenericRequest(IO &io);
 	virtual ~GenericRequest();
 
 	typedef std::map<std::string, File> FileMap;
@@ -76,6 +76,9 @@ public:
 	bool hasFile(std::string const &name) const;
 	File getFile(std::string const &name) const;
 	virtual void addFile(std::string const &name, SharedPtr<FileImpl> const &file);
+	
+	void clear();
+	void parse(std::size_t threshold);
 	virtual void store(char const *file);
 
 private:
@@ -83,7 +86,6 @@ private:
 	GenericRequest& operator = (GenericRequest const &);
 	typedef PostParser<IO> ParserType;
 
-	void parse(std::size_t threshold);
 	void parsePost(std::size_t threshold);
 	void parseArg(utils::Range<char const*> const &range);
 	void parseVar(utils::Range<char const*> const &range);
@@ -115,10 +117,9 @@ mapGet(Map const &map, std::string const &key) {
 }
 
 template <typename IO> NEXTWEB_INLINE 
-GenericRequest<IO>::GenericRequest(IO &io, std::size_t threshold) :
+GenericRequest<IO>::GenericRequest(IO &io) :
 	io_(io)
 {
-	parse(threshold);
 }
 
 template <typename IO> NEXTWEB_INLINE 
@@ -229,6 +230,14 @@ GenericRequest<IO>::addFile(std::string const &name, SharedPtr<FileImpl> const &
 }
 
 template <typename IO> NEXTWEB_INLINE void
+GenericRequest<IO>::clear() {
+	vars_.clear();
+	args_.clear();
+	files_.clear();
+	cookies_.clear();
+}
+
+template <typename IO> NEXTWEB_INLINE void
 GenericRequest<IO>::parse(std::size_t threshold) {
 	char const* const* env = io_.environ();
 	for (std::size_t i = 0; static_cast<char const*>(0) != env[i]; ++i) {
@@ -242,6 +251,12 @@ GenericRequest<IO>::parse(std::size_t threshold) {
 		throw HttpError(HttpStatus::METHOD_NOT_ALLOWED);
 	}
 	io_.setup(*this);
+}
+
+template <typename IO> NEXTWEB_INLINE void
+GenericRequest<IO>::store(char const *file) {
+	// FIXME: implement storing to file
+	(void) file;
 }
 
 template <typename IO> NEXTWEB_INLINE void
@@ -305,12 +320,6 @@ GenericRequest<IO>::parseQueryString(utils::Range<char const*> const &range) {
 		utils::splitFirstOfOnce(tail, "&;", head, tail);
 		parseArg(head);
 	}
-}
-
-template <typename IO> NEXTWEB_INLINE void
-GenericRequest<IO>::store(char const *file) {
-	// FIXME: implement storing to file
-	(void) file;
 }
 
 }} // namespaces

@@ -49,7 +49,7 @@ template <typename IO>
 class RequestImpl : public Request, private GenericRequest<IO> {
 
 public:
-	RequestImpl(IO &io, std::size_t threshold);
+	RequestImpl(IO &io);
 	virtual ~RequestImpl();
 
 	virtual bool isSecure() const;
@@ -79,6 +79,9 @@ public:
 	virtual Enumeration<Request::FileParam const&>::Pointer getFiles() const;
 	virtual Enumeration<std::string const&>::Pointer getFileNames() const;
 
+	void clear();
+	void parse(std::size_t threshold);
+	
 	virtual void store(char const *file);
 	
 private:
@@ -111,8 +114,8 @@ UniqueKeyIterator<Map>::dereference() {
 }
 
 template <typename IO> NEXTWEB_INLINE
-RequestImpl<IO>::RequestImpl(IO &io, std::size_t threshold) :
-	GenericRequest<IO>::GenericRequest(io, threshold)
+RequestImpl<IO>::RequestImpl(IO &io) :
+	GenericRequest<IO>::GenericRequest(io)
 {
 }
 
@@ -236,6 +239,16 @@ RequestImpl<IO>::hasHeader(std::string const &name) const {
 template <typename IO> NEXTWEB_INLINE std::string const&
 RequestImpl<IO>::getHeader(std::string const &name) const {
 	return GenericRequest<IO>::getHeader(name);
+}
+
+template <typename IO> NEXTWEB_INLINE void
+RequestImpl<IO>::clear() {
+	GenericRequest<IO>::clear();
+}
+
+template <typename IO> NEXTWEB_INLINE void
+RequestImpl<IO>::parse(std::size_t threshold) {
+	GenericRequest<IO>::parse(threshold);
 }
 
 template <typename IO> NEXTWEB_INLINE void

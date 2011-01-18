@@ -1,7 +1,7 @@
 #include "acsetup.hpp"
 #include "nextweb/fastcgi/impl/ServerImpl.hpp"
 
-
+#include "nextweb/fastcgi/impl/Acceptor.hpp"
 #include "nextweb/fastcgi/impl/FastCgiIO.hpp"
 #include "nextweb/fastcgi/impl/RequestImpl.hpp"
 #include "nextweb/fastcgi/impl/ResponseImpl.hpp"

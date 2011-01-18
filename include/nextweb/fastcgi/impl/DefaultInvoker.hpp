@@ -18,15 +18,22 @@
 #ifndef NEXTWEB_FASTCGI_DEFAULT_INVOKER_HPP_INCLUDED
 #define NEXTWEB_FASTCGI_DEFAULT_INVOKER_HPP_INCLUDED
 
+#include "nextweb/Config.hpp"
+#include "nextweb/Shared.hpp"
+
 namespace nextweb { namespace fastcgi {
 
 template <typename Setup>
-class DefaultInvoker {
+class DefaultInvoker : public Shared {
 
 public:
 	DefaultInvoker();
 	virtual ~DefaultInvoker();
-	
+
+	typedef typename Setup::IOType IOType;
+	typedef typename Setup::RequestType RequestType;
+	typedef typename Setup::ResponseType ResponseType;
+
 private:
 	DefaultInvoker(DefaultInvoker const &);
 	DefaultInvoker& operator = (DefaultInvoker const &);
