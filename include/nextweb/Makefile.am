@@ -10,27 +10,21 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/HttpDate.hpp \
 	fastcgi/HttpError.hpp \
 	fastcgi/HttpStatus.hpp \
-	fastcgi/impl/Acceptor.hpp \
 	fastcgi/impl/Buffer.hpp \
-	fastcgi/impl/DefaultInvoker.hpp \
-	fastcgi/impl/FastCgiIO.hpp \
 	fastcgi/impl/FileImpl.hpp \
 	fastcgi/impl/GenericRequest.hpp \
 	fastcgi/impl/GenericResponse.hpp \
-	fastcgi/impl/HandlerData.hpp \
 	fastcgi/impl/HttpUtils.hpp \
 	fastcgi/impl/IterFileImpl.hpp \
 	fastcgi/impl/LineEndFilter.hpp \
+	fastcgi/impl/NullLogger.hpp \
 	fastcgi/impl/PostParser.hpp \
 	fastcgi/impl/RequestImpl.hpp \
 	fastcgi/impl/ResponseImpl.hpp \
 	fastcgi/impl/ServerImpl.hpp \
 	fastcgi/impl/SocketPolicy.hpp \
 	fastcgi/impl/StreamBuffer.hpp \
-	fastcgi/impl/ThreadedInvoker.hpp \
 	fastcgi/impl/UrlEncodeImpl.hpp \
-	fastcgi/impl/UrlMapDispatch.hpp \
-	fastcgi/impl/UrlMatchDispatch.hpp \
 	fastcgi/impl/UrlMatch.hpp \
 	fastcgi/Logger.hpp \
 	fastcgi/RequestHandler.hpp \

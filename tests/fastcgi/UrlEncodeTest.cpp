@@ -1,4 +1,3 @@
-#include "acsetup.hpp"
 
 #include <list>
 #include <vector>
@@ -118,7 +117,7 @@ template <typename Sequence> inline void
 UrlEncodeTest::testUrlencodeEmptyWith() {
 
 	using namespace fastcgi;
-	Sequence seq;
+	Sequence seq = as<Sequence>("");
 	std::string res = urlencode<std::string, Sequence>(seq);
 	CPPUNIT_ASSERT_EQUAL(std::string(""), res);
 }
@@ -145,7 +144,7 @@ template <typename Sequence> inline void
 UrlEncodeTest::testUrldecodeEmptyWith() {
 	
 	using namespace fastcgi;
-	Sequence seq;
+	Sequence seq = as<Sequence>("");
 	std::string res = urldecode<std::string, Sequence>(seq);
 	CPPUNIT_ASSERT_EQUAL(std::string(""), res);
 }

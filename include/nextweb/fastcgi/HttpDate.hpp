@@ -32,28 +32,30 @@ public:
 	HttpDate();
 	explicit HttpDate(std::time_t t);
 	virtual ~HttpDate();
-	
+
 	HttpDate(HttpDate const &other);
 	HttpDate& operator = (HttpDate const &other);
 
 	void swap(HttpDate &other) throw ();
-	HttpDate& operator += (char const *value);
-	HttpDate& operator -= (char const *value);
-	
-	bool operator == (HttpDate const &other) const;
-	bool operator != (HttpDate const &other) const;
+
+	static HttpDate fromString(char const *str);
+	static HttpDate fromString(std::string const &str);
+
+	static HttpDate fromPeriod(char const *period);
+	static HttpDate fromPeriod(std::string const &period);
 
 	std::string str() const;
 	std::string asRFC1123() const;
 	std::string asRFC1036() const;
 	std::string asAsctime() const;
 	
-	static HttpDate BAD;
-	static HttpDate fromString(char const *str);
-	static HttpDate fromString(std::string const &str);
+	HttpDate& operator += (char const *value);
+	HttpDate& operator -= (char const *value);
+	
+	bool operator == (HttpDate const &other) const;
+	bool operator != (HttpDate const &other) const;
 
-	static HttpDate fromPeriod(char const *period);
-	static HttpDate fromPeriod(std::string const &period);
+	static HttpDate const BAD;
 
 private:
 	HttpDate& add(char const *period);

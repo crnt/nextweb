@@ -35,9 +35,6 @@ public:
 	bool operator == (HttpStatus const &other) const;
 	bool operator != (HttpStatus const &other) const;
 
-	static HttpStatus fromString(char const *value);
-	template <typename String> static HttpStatus fromString(String const &value);
-
 	static HttpStatus const OK;
 	static HttpStatus const CREATED;
 	static HttpStatus const ACCEPTED;
@@ -69,11 +66,6 @@ public:
 private:
 	unsigned short code_;
 };
-
-template <typename String> NEXTWEB_INLINE HttpStatus
-HttpStatus::fromString(String const &value) {
-	return fromString(value.c_str());
-}
 
 }} // namespaces
 

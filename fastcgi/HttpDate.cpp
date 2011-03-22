@@ -37,7 +37,7 @@ SHORT_WEEKDAY_NAMES[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
 
-HttpDate
+HttpDate const
 HttpDate::BAD(std::numeric_limits<std::time_t>::max());
 
 namespace periods {
@@ -160,14 +160,32 @@ HttpDate::swap(HttpDate &other) throw () {
 	std::swap(when_, other.when_);
 } 
 
-bool
-HttpDate::operator == (HttpDate const &other) const {
-	return when_ == other.when_;
+HttpDate
+HttpDate::fromString(char const *str) {
+	std::tm rep;
+	for (unsigned int i = 0; i < sizeof(DATE_FORMATS) / sizeof(char const*); ++i) {
+		if (NULL != strptime(str, DATE_FORMATS[i], &rep)) {
+			return HttpDate(timegm(&rep));
+		}
+	}
+	return HttpDate().add(str);
 }
 
-bool
-HttpDate::operator != (HttpDate const &other) const {
-	return when_ != other.when_;
+HttpDate
+HttpDate::fromString(std::string const &str) {
+	return fromString(str.c_str());
+}
+
+HttpDate
+HttpDate::fromPeriod(char const *period) {
+	HttpDate date;
+	date.add(period);
+	return date;
+}
+
+HttpDate
+HttpDate::fromPeriod(std::string const &period) {
+	return fromPeriod(period.c_str());
 }
 
 std::string
@@ -248,34 +266,6 @@ HttpDate::sub(char const *period) {
 	periods::evaluateRange(utils::makeRange(period), rep, -1);
 	when_ = timegm(&rep);
 	return *this;
-}
-
-HttpDate
-HttpDate::fromString(char const *str) {
-	std::tm rep;
-	for (unsigned int i = 0; i < sizeof(DATE_FORMATS) / sizeof(char const*); ++i) {
-		if (NULL != strptime(str, DATE_FORMATS[i], &rep)) {
-			return HttpDate(timegm(&rep));
-		}
-	}
-	return HttpDate().add(str);
-}
-
-HttpDate
-HttpDate::fromString(std::string const &str) {
-	return fromString(str.c_str());
-}
-
-HttpDate
-HttpDate::fromPeriod(char const *period) {
-	HttpDate date;
-	date.add(period);
-	return date;
-}
-
-HttpDate
-HttpDate::fromPeriod(std::string const &period) {
-	return fromPeriod(period.c_str());
 }
 
 namespace periods {

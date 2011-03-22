@@ -22,7 +22,6 @@
 #include <functional>
 
 #include "nextweb/Config.hpp"
-#include "nextweb/SharedPtr.hpp"
 #include "nextweb/utils/Threads.hpp"
 
 namespace nextweb { namespace utils {
@@ -34,9 +33,6 @@ public:
 	ThreadQueue();
 	virtual ~ThreadQueue();
 	
-	typedef ThreadQueue<Item> Type;
-	typedef SharedPtr<Type> Pointer;
-
 	bool pop(Item &item);
 	void push(Item const &item);
 	

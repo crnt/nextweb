@@ -125,7 +125,7 @@ template <typename Sequence> inline void
 StringTest::testTrimWith() {
 
 	using namespace utils;
-	Sequence value, result = trim(value);
+	Sequence value = as<Sequence>(""), result = trim(value);
 	CPPUNIT_ASSERT_EQUAL(std::string(), makeString(result));
 	CPPUNIT_ASSERT_EQUAL(std::string("test"), makeString(trim(as<Sequence>("  test  "))));
 }

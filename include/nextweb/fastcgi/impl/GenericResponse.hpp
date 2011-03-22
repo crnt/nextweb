@@ -93,7 +93,8 @@ GenericResponse<IO>::setCookie(Cookie const &cookie) {
 template <typename IO> NEXTWEB_INLINE void
 GenericResponse<IO>::setHeader(std::string const &name, std::string const &value) {
 	if (utils::isCIEqual(HttpConstants::STATUS, name)) {
-		setHttpStatus(HttpStatus::fromString(value));
+		unsigned short status = utils::fromString<unsigned short>(value);
+		setHttpStatus(HttpStatus(status));
 	}
 	else if (utils::isCIEqual(HttpConstants::EXPIRES, name)) {
 		setExpireTime(value);
@@ -143,14 +144,14 @@ GenericResponse<IO>::clear() {
 	cookies_.clear();
 	headers_.clear();
 	headersSent_ = false;
+	expireTime_ = HttpDate::BAD;
 	httpStatus_ = HttpStatus::BAD;
-	expireTime_.swap(HttpDate::BAD);
 }
 
 template <typename IO> NEXTWEB_INLINE void
 GenericResponse<IO>::sendHeaders() {
 	if (HttpStatus::BAD == httpStatus_) {
-		throw Error("http status has not set explicitly");
+		throw Error("http status has not been set explicitly");
 	}
 	io_.setStatus(httpStatus_.code());
 	io_.writeHeader(HttpConstants::STATUS, httpStatus_.message());

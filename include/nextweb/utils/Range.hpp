@@ -18,7 +18,7 @@
 #ifndef NEXTWEB_UTILS_RANGE_HPP_INCLUDED
 #define NEXTWEB_UTILS_RANGE_HPP_INCLUDED
 
-#include <cstring>
+#include <cassert>
 #include <iterator>
 #include <iostream>
 #include <algorithm>
@@ -149,21 +149,25 @@ RangeBase<Iter, std::forward_iterator_tag>::RangeBase(Iter begin, Iter end) :
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::forward_iterator_tag>::iterator 
 RangeBase<Iter, std::forward_iterator_tag>::end() {
+	assert(!empty_);
 	return end_;
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::forward_iterator_tag>::const_iterator
 RangeBase<Iter, std::forward_iterator_tag>::end() const {
+	assert(!empty_);
 	return end_;
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::forward_iterator_tag>::iterator 
 RangeBase<Iter, std::forward_iterator_tag>::begin() {
+	assert(!empty_);
 	return begin_;
 }
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::forward_iterator_tag>::const_iterator
 RangeBase<Iter, std::forward_iterator_tag>::begin() const {
+	assert(!empty_);
 	return begin_;
 }
 
@@ -229,7 +233,7 @@ RangeBase<Iter, std::random_access_iterator_tag>::RangeBase(Iter begin, Iter end
 
 template <typename Iter> NEXTWEB_INLINE typename RangeBase<Iter, std::random_access_iterator_tag>::const_reference
 RangeBase<Iter, std::random_access_iterator_tag>::operator [] (typename RangeBase<Iter, typename std::random_access_iterator_tag>::size_type index) const {
- 	return *(this->begin() + index);
+	return *(this->begin() + index);
 }
 
 template <typename Iter> NEXTWEB_INLINE

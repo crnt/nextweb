@@ -28,13 +28,13 @@ namespace nextweb { namespace tests {
 class MockThread : public utils::SharedThread {
 
 public:
-	MockThread(utils::ThreadQueue<std::size_t>::Pointer const &queue, std::size_t count);
+	MockThread(utils::ThreadQueue<std::size_t> &queue, std::size_t count);
 	virtual ~MockThread();
 	virtual void run();
 
 private:
 	std::size_t const count_;
-	utils::ThreadQueue<size_t>::Pointer queue_;
+	utils::ThreadQueue<size_t> &queue_;
 };
 
 }} // namespaces

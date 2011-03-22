@@ -15,34 +15,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_URL_MAP_DISPATH_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_URL_MAP_DISPATH_HPP_INCLUDED
+#ifndef NEXTWEB_FASTCGI_NULL_LOGGER_HPP_INCLUDED
+#define NEXTWEB_FASTCGI_NULL_LOGGER_HPP_INCLUDED
 
-#include "nextweb/fastcgi/impl/HandlerData.hpp"
+#include "nextweb/fastcgi/Logger.hpp"
 
 namespace nextweb { namespace fastcgi {
 
-template <typename Setup>
-class UrlMapDispatch {
+class Settings;
+
+class NullLogger : public Logger {
 
 public:
-	UrlMapDispatch();
-	virtual ~UrlMapDispatch();
+	NullLogger();
+	virtual ~NullLogger();
+
+	virtual void init(Settings const &set);
+	virtual void info(char const *format, ...);
+	virtual void debug(char const *format, ...);
+	virtual void error(char const *format, ...);
 
 private:
-	UrlMapDispatch(UrlMapDispatch const &);
-	UrlMapDispatch& operator = (UrlMapDispatch const &);
+	NullLogger(NullLogger const &);
+	NullLogger& operator = (NullLogger const &);
 };
-
-template <typename Setup> NEXTWEB_INLINE
-UrlMapDispatch<Setup>::UrlMapDispatch()
-{
-}
-
-template <typename Setup> NEXTWEB_INLINE 
-UrlMapDispatch<Setup>::~UrlMapDispatch() {
-}
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_URL_MAP_DISPATH_HPP_INCLUDED
+#endif // NEXTWEB_FASTCGI_NULL_LOGGER_HPP_INCLUDED

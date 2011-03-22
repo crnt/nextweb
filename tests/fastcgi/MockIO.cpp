@@ -61,6 +61,9 @@ MockIO::write(char const *buffer, std::size_t size) {
 
 std::size_t
 MockIO::writeHeader(std::string const &name, std::string const &value) {
+	(void) name;
+	(void) value;
+	return 0;
 }
 
 void

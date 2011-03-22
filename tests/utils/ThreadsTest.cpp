@@ -28,15 +28,15 @@ ThreadsTest::testQueue() {
 	
 	using namespace utils;
 	
-	ThreadQueue<size_t>::Pointer queue(new ThreadQueue<size_t>());
+	ThreadQueue<size_t> queue;
 	SharedPtr<SharedThread> thread(new MockThread(queue, 15));
 	thread->start();
 
 	std::size_t i = 0, item;
-	for (; i < 15 && queue->pop(item); ++i) {
+	for (; i < 15 && queue.pop(item); ++i) {
 		CPPUNIT_ASSERT_EQUAL(i, item);
 	}
-	queue->stop();
+	queue.stop();
 	thread->join();
 	CPPUNIT_ASSERT_EQUAL(i, static_cast<std::size_t>(15));
 }

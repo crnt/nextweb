@@ -20,6 +20,16 @@
 
 namespace nextweb { namespace fastcgi {
 
+NEXTWEB_INLINE bool
+HttpDate::operator == (HttpDate const &other) const {
+	return when_ == other.when_;
+}
+
+NEXTWEB_INLINE bool
+HttpDate::operator != (HttpDate const &other) const {
+	return when_ != other.when_;
+}
+
 NEXTWEB_API NEXTWEB_INLINE HttpDate&
 HttpDate::operator += (char const *value) {
 	add(value);

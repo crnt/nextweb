@@ -38,7 +38,7 @@ public:
 
 	virtual void stop() = 0;
 	virtual void start(Settings const &set) = 0;
-	virtual void addHandler(std::string const &url, SharedPtr<RequestHandler> const &handler) = 0;
+	virtual void addHandler(std::string const &pathInfo, SharedPtr<RequestHandler> const &handler) = 0;
 
 	static SharedPtr<ServerImpl> create(Settings const &set);
 
@@ -46,48 +46,6 @@ private:
 	ServerImpl(ServerImpl const &);
 	ServerImpl& operator = (ServerImpl const &);
 };
-
-template <typename Setup>
-class TuneableServerImpl : public ServerImpl, public Setup::SocketPolicyType {
-
-public:
-	TuneableServerImpl();
-	virtual ~TuneableServerImpl();
-	
-	typedef typename Setup::SocketPolicyType SocketPolicyType;
-
-	virtual void stop();
-	virtual void start(Settings const &set);
-
-	using SocketPolicyType::init;
-	using SocketPolicyType::socketSet;
-
-private:
-	TuneableServerImpl(TuneableServerImpl const &);
-	TuneableServerImpl& operator = (TuneableServerImpl const &);
-};
-
-template <typename Setup> NEXTWEB_INLINE
-TuneableServerImpl<Setup>::TuneableServerImpl()
-{
-}
-
-template <typename Setup> NEXTWEB_INLINE  
-TuneableServerImpl<Setup>::~TuneableServerImpl() {
-}
-
-template <typename Setup> NEXTWEB_INLINE void
-TuneableServerImpl<Setup>::stop() {
-}
-
-template <typename Setup> NEXTWEB_INLINE void
-TuneableServerImpl<Setup>::start(Settings const &set) {
-	init(set);
-	Enumeration<int>::Pointer sockSet = socketSet();
-	while (sockSet->hasMoreElements()) {
-		sockSet->nextElement();
-	}
-}
 
 }} // namespaces
 
