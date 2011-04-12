@@ -21,17 +21,18 @@
 #include <queue>
 #include <functional>
 
+#include "nextweb/Error.hpp"
 #include "nextweb/Config.hpp"
 #include "nextweb/utils/Threads.hpp"
 
 namespace nextweb { namespace utils {
 
-template <typename Item>
-class ThreadQueue : public LockableShared {
+template <typename Item, typename BoundsChecker>
+class ThreadQueueBase : public AtomicShared, private BoundsChecker {
 
 public:
-	ThreadQueue();
-	virtual ~ThreadQueue();
+	ThreadQueueBase();
+	virtual ~ThreadQueueBase();
 	
 	bool pop(Item &item);
 	void push(Item const &item);
@@ -40,8 +41,10 @@ public:
 	bool isStopped() const;
 
 private:
-	ThreadQueue(ThreadQueue const &);
-	ThreadQueue& operator = (ThreadQueue const &);
+	ThreadQueueBase(ThreadQueueBase const &);
+	ThreadQueueBase& operator = (ThreadQueueBase const &);
+
+	using BoundsChecker::boundsReached;
 
 private:
 	bool stopped_;
@@ -50,18 +53,51 @@ private:
 	std::queue<Item> items_;
 };
 
-template <typename Item> NEXTWEB_INLINE
-ThreadQueue<Item>::ThreadQueue() :
+struct NullBoundsChecker {
+	bool boundsReached(std::size_t size) const;
+};
+
+template <std::size_t N>
+struct StaticBoundsChecker {
+	bool boundsReached(std::size_t size) const;
+	typedef StaticBoundsChecker<N> Type;
+};
+
+class DynamicBoundsChecker {
+
+public:
+	DynamicBoundsChecker();
+	void setBounds(std::size_t size);
+	bool boundsReached(std::size_t size) const;
+
+private:
+	std::size_t size_;
+};
+
+template <typename Item>
+struct UnboundedThreadQueue : public ThreadQueueBase<Item, NullBoundsChecker> {
+};
+
+template <typename Item>
+struct DynamicBoundedThreadQueue : public ThreadQueueBase<Item, DynamicBoundsChecker> {
+};
+
+template <typename Item, std::size_t N>
+struct StaticBoundedThreadQueue : public ThreadQueueBase<Item, typename StaticBoundsChecker<N>::Type> {
+};
+
+template <typename Item, typename BoundsChecker> NEXTWEB_INLINE
+ThreadQueueBase<Item, BoundsChecker>::ThreadQueueBase() :
 	stopped_(false)
 {
 }
 
-template <typename Item> NEXTWEB_INLINE 
-ThreadQueue<Item>::~ThreadQueue() {
+template <typename Item, typename BoundsChecker> NEXTWEB_INLINE 
+ThreadQueueBase<Item, BoundsChecker>::~ThreadQueueBase() {
 }
 
-template <typename Item> NEXTWEB_INLINE bool
-ThreadQueue<Item>::pop(Item &item) {
+template <typename Item, typename BoundsChecker> NEXTWEB_INLINE bool
+ThreadQueueBase<Item, BoundsChecker>::pop(Item &item) {
 	Mutex::ScopedLock lock(mutex_);
 	while (!stopped_ && items_.empty()) {
 		condition_.wait(lock);
@@ -75,26 +111,33 @@ ThreadQueue<Item>::pop(Item &item) {
 	return false;
 }
 
-template <typename Item> NEXTWEB_INLINE void
-ThreadQueue<Item>::push(Item const &item) {
+template <typename Item, typename BoundsChecker> NEXTWEB_INLINE void
+ThreadQueueBase<Item, BoundsChecker>::push(Item const &item) {
 	Mutex::ScopedLock lock(mutex_);
+	if (boundsReached(items_.size())) {
+		throw Error("bounds reached in queue");
+	}
 	items_.push(item);
 	condition_.broadcast();
 }
 
-template <typename Item> NEXTWEB_INLINE void
-ThreadQueue<Item>::stop() {
+template <typename Item, typename BoundsChecker> NEXTWEB_INLINE void
+ThreadQueueBase<Item, BoundsChecker>::stop() {
 	Mutex::ScopedLock lock(mutex_);
 	stopped_ = true;
 	condition_.broadcast();
 }
 
-template <typename Item> NEXTWEB_INLINE bool
-ThreadQueue<Item>::isStopped() const {
+template <typename Item, typename BoundsChecker> NEXTWEB_INLINE bool
+ThreadQueueBase<Item, BoundsChecker>::isStopped() const {
 	Mutex::ScopedLock lock(mutex_);
 	return stopped_;
 }
 
 }} // namespaces
+
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/utils/ThreadQueue.hpp"
+#endif
 
 #endif // NEXTWEB_UTILS_THREAD_QUEUE_HPP_INCLUDED

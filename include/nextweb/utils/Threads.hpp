@@ -26,42 +26,8 @@
 
 namespace nextweb { namespace utils {
 
-class LockableShared;
-
-void incRef(LockableShared *object);
-void decRef(LockableShared *object);
-
-class LockableShared {
-
-public:
-	LockableShared();
-	virtual ~LockableShared();
-
-private:
-	LockableShared(LockableShared const &);
-	LockableShared& operator = (LockableShared const &);
-
-	friend void incRef(LockableShared *object);
-	friend void decRef(LockableShared *object);
-
-private:
-	int count_;
-	Mutex mutex_;
-};
-
-class SharedThread : public Thread, public LockableShared {
-
-public:
-	SharedThread();
-	virtual ~SharedThread();
-
-private:
-	SharedThread(SharedThread const &);
-	SharedThread& operator = (SharedThread const &);
-};
-
 template <typename Task>
-class TaskThread : public SharedThread {
+class TaskThread : public Thread {
 
 public:
 	TaskThread(Task const &task);
@@ -84,11 +50,12 @@ public:
 
 	void joinAll();
 	template <typename Task> void start(std::size_t size, Task const &task);
+	template <typename Runnable> void start(std::size_t size);
 
 private:
 	ThreadGroup(ThreadGroup const &);
 	ThreadGroup& operator = (ThreadGroup const &);
-	typedef SharedPtr<SharedThread> ThreadPtr;
+	typedef SharedPtr<Thread> ThreadPtr;
 
 private:
 	std::list<ThreadPtr> threads_;

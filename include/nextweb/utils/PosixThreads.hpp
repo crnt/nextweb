@@ -25,25 +25,6 @@
 
 namespace nextweb { namespace utils {
 
-class Thread {
-
-public:
-	Thread();
-	virtual ~Thread();
-
-	void join();
-	void start();
-	virtual void run() = 0;
-	
-private:
-	Thread(Thread const &);
-	Thread& operator = (Thread const &);
-	static void* threadFunction(void *thread);
-
-private:
-	pthread_t impl_;
-};
-
 struct TimeSpec;
 
 class Condition {
@@ -115,7 +96,7 @@ Condition::wait(Lock &lock) {
 
 template <typename Lock> bool
 Condition::timedWait(Lock &lock, TimeSpec const &ts) {
-	MutexBase &mutex = static_cast<MutexBase&>(lock.lockedObject());
+	MutexBase &mutex = static_cast<MutexBase&>(lock.object());
 	return timedWait(mutex.impl_, ts);
 }
 
@@ -129,6 +110,52 @@ template <int Mode> NEXTWEB_INLINE
 ConcreteMutex<Mode>::~ConcreteMutex() {
 }
 
+class AtomicShared;
+
+void incRef(AtomicShared *object);
+void decRef(AtomicShared *object);
+
+class AtomicShared {
+
+public:
+	AtomicShared();
+	virtual ~AtomicShared();
+
+private:
+	AtomicShared(AtomicShared const &);
+	AtomicShared& operator = (AtomicShared const &);
+
+	friend void incRef(AtomicShared *object);
+	friend void decRef(AtomicShared *object);
+
+private:
+	int count_;
+	Mutex mutex_;
+};
+
+class Thread : public AtomicShared {
+
+public:
+	Thread();
+	virtual ~Thread();
+
+	void join();
+	void start();
+	virtual void run() = 0;
+	
+private:
+	Thread(Thread const &);
+	Thread& operator = (Thread const &);
+	static void* threadFunction(void *thread);
+
+private:
+	pthread_t impl_;
+};
+
 }} // namespaces
+
+#ifndef NEXTWEB_DEBUG
+#include "nextweb/inlines/utils/PosixThreads.hpp"
+#endif
 
 #endif // NEXTWEB_UTILS_POSIX_THREADS_HPP_INCLUDED

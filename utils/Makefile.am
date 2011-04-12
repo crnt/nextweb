@@ -12,6 +12,7 @@ libnextweb_la_SOURCES = \
 	Shared.cpp \
 	StringConverters.cpp \
 	SystemError.cpp \
+	ThreadQueue.cpp \
 	Threads.cpp \
 	TypeTraits.cpp \
 	VarUtils.cpp

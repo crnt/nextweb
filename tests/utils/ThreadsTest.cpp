@@ -28,8 +28,8 @@ ThreadsTest::testQueue() {
 	
 	using namespace utils;
 	
-	ThreadQueue<size_t> queue;
-	SharedPtr<SharedThread> thread(new MockThread(queue, 15));
+	UnboundedThreadQueue<size_t> queue;
+	SharedPtr<Thread> thread(new MockThread(queue, 15));
 	thread->start();
 
 	std::size_t i = 0, item;

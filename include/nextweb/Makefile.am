@@ -1,5 +1,5 @@
 nobase_pkginclude_HEADERS = \
-	Config.hpp \
+ 	Config.hpp \
 	Enumeration.hpp \
 	Error.hpp \
 	Shared.hpp \
@@ -43,9 +43,11 @@ nobase_pkginclude_HEADERS = \
 	inlines/utils/CharTraits.hpp \
 	inlines/utils/Functors.hpp \
 	inlines/utils/MappedFile.hpp \
+	inlines/utils/PosixThreads.hpp \
 	inlines/utils/Range.hpp \
 	inlines/utils/ScopedLock.hpp \
 	inlines/utils/StringConverters.hpp \
+	inlines/utils/ThreadQueue.hpp \
 	inlines/utils/Threads.hpp \
 	templates/impl/TemplateImpl.hpp \
 	templates/ParamSet.hpp \

@@ -1,9 +1,7 @@
 #include "acsetup.hpp"
 #include "nextweb/fastcgi/impl/ServerImpl.hpp"
 
-#include "nextweb/fastcgi/RequestHandler.hpp"
-#include "nextweb/fastcgi/impl/RequestImpl.hpp"
-#include "nextweb/fastcgi/impl/ResponseImpl.hpp"
+#include "nextweb/fastcgi/impl/SocketPolicy.hpp"
 
 namespace nextweb { namespace fastcgi {
 
@@ -12,11 +10,6 @@ ServerImpl::ServerImpl()
 }
 
 ServerImpl::~ServerImpl() {
-}
-
-SharedPtr<ServerImpl>
-ServerImpl::create(Settings const &set) {
-	return SharedPtr<ServerImpl>();
 }
 
 }} // namespaces

@@ -12,40 +12,6 @@ checkResult(int result) {
 	if (0 != result) SystemError::throwError(result);
 }
 
-Thread::Thread()
-{
-}
-
-Thread::~Thread() {
-}
-
-void
-Thread::join() {
-	void *retval = static_cast<void*>(0);
-	checkResult(pthread_join(impl_, &retval));
-}
-
-void
-Thread::start() {
-	pthread_attr_t attr;
-	checkResult(pthread_attr_init(&attr));
-	try {
-		checkResult(pthread_create(&impl_, &attr, &Thread::threadFunction, this));
-		pthread_attr_destroy(&attr);
-	}
-	catch (std::exception const &e) {
-		pthread_attr_destroy(&attr);
-		throw;
-	}
-}
-
-void*
-Thread::threadFunction(void *thread) {
-	Thread *instance = static_cast<Thread*>(thread);
-	instance->run();
-	return static_cast<void*>(0);
-}
-
 Condition::Condition()
 {
 	pthread_condattr_t attr;
@@ -123,4 +89,42 @@ MutexBase::trylock() {
 	return true;
 }
 
+Thread::Thread()
+{
+}
+
+Thread::~Thread() {
+}
+
+void
+Thread::join() {
+	void *retval = static_cast<void*>(0);
+	checkResult(pthread_join(impl_, &retval));
+}
+
+void
+Thread::start() {
+	pthread_attr_t attr;
+	checkResult(pthread_attr_init(&attr));
+	try {
+		checkResult(pthread_create(&impl_, &attr, &Thread::threadFunction, this));
+		pthread_attr_destroy(&attr);
+	}
+	catch (std::exception const &e) {
+		pthread_attr_destroy(&attr);
+		throw;
+	}
+}
+
+void*
+Thread::threadFunction(void *thread) {
+	Thread *instance = static_cast<Thread*>(thread);
+	instance->run();
+	return static_cast<void*>(0);
+}
+
 }} // namespaces
+
+#ifdef NEXTWEB_DEBUG
+#include "nextweb/inlines/utils/PosixThreads.hpp"
+#endif

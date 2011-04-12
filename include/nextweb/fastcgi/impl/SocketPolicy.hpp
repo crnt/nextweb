@@ -32,7 +32,7 @@ class DefaultSocketPolicy {
 public:
 	DefaultSocketPolicy();
 	virtual ~DefaultSocketPolicy();
-	
+
 	void init(Settings const &set);
 	Enumeration<int>::Pointer socketSet() const;
 

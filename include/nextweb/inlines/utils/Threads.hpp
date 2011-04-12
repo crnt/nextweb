@@ -18,44 +18,7 @@
 #ifndef NEXTWEB_INLINES_UTILS_THREADS_HPP_INCLUDED
 #define NEXTWEB_INLINES_UTILS_THREADS_HPP_INCLUDED
 
-#include <cassert>
-
 namespace nextweb { namespace utils {
-
-NEXTWEB_INLINE
-LockableShared::LockableShared() :
-	count_(0)
-{
-}
-
-NEXTWEB_INLINE
-LockableShared::~LockableShared() {
-	assert(0 == count_);
-}
-
-NEXTWEB_INLINE void
-incRef(LockableShared *object) {
-	Mutex::ScopedLock lock(object->mutex_);
-	++object->count_;
-}
-
-NEXTWEB_INLINE void
-decRef(LockableShared *object) {
-	Mutex::ScopedLock lock(object->mutex_);
-	if (0 == --object->count_) {
-		lock.unlock();
-		delete object;
-	}
-}
-
-NEXTWEB_INLINE 
-SharedThread::SharedThread()
-{
-}
-
-NEXTWEB_INLINE 
-SharedThread::~SharedThread() {
-}
 
 NEXTWEB_INLINE 
 ThreadGroup::ThreadGroup()

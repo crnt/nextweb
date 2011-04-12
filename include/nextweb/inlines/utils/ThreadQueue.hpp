@@ -15,33 +15,40 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_HTTP_SERVER_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_HTTP_SERVER_HPP_INCLUDED
+#ifndef NEXTWEB_INLINES_UTILS_THREAD_QUEUE_HPP_INCLUDED
+#define NEXTWEB_INLINES_UTILS_THREAD_QUEUE_HPP_INCLUDED
 
-#include <string>
+namespace nextweb { namespace utils {
 
-#include "nextweb/Config.hpp"
-#include "nextweb/SharedPtr.hpp"
-#include "nextweb/fastcgi/Forward.hpp"
+NEXTWEB_INLINE bool
+NullBoundsChecker::boundsReached(std::size_t size) const {
+	(void) size;
+	return false;
+}
 
-namespace nextweb { namespace fastcgi {
+template <std::size_t N> NEXTWEB_INLINE bool
+StaticBoundsChecker<N>::boundsReached(std::size_t size) const {
+	return N == size;
+}
 
-class Logger;
+DynamicBoundsChecker::DynamicBoundsChecker() :
+	size_(0)
+{
+}
 
-class NEXTWEB_API Server {
+NEXTWEB_INLINE void
+DynamicBoundsChecker::setBounds(std::size_t size) {
+	size_ = size;
+}
 
-public:
-	Server();
-	virtual ~Server();
-
-	void stop();
-	void start(Settings const &set, SharedPtr<Logger> const &log);
-	void addHandler(std::string const &url, SharedPtr<RequestHandler> const &handler);
-
-private:
-	SharedPtr<ServerImpl> impl_;
-};
+NEXTWEB_INLINE bool
+DynamicBoundsChecker::boundsReached(std::size_t size) const {
+	if (0 != size_) {
+		return size_ == size;
+	}
+	throw Error("thread queue was not initialized properly");
+}
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_HTTP_SERVER_HPP_INCLUDED
+#endif // NEXTWEB_INLINES_UTILS_THREAD_QUEUE_HPP_INCLUDED

@@ -15,33 +15,39 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef NEXTWEB_FASTCGI_HTTP_SERVER_HPP_INCLUDED
-#define NEXTWEB_FASTCGI_HTTP_SERVER_HPP_INCLUDED
+#ifndef NEXTWEB_INLINES_UTILS_POSIX_THREADS_HPP_INCLUDED
+#define NEXTWEB_INLINES_UTILS_POSIX_THREADS_HPP_INCLUDED
 
-#include <string>
+#include <cassert>
 
-#include "nextweb/Config.hpp"
-#include "nextweb/SharedPtr.hpp"
-#include "nextweb/fastcgi/Forward.hpp"
+namespace nextweb { namespace utils {
 
-namespace nextweb { namespace fastcgi {
+NEXTWEB_INLINE
+AtomicShared::AtomicShared() :
+	count_(0)
+{
+}
 
-class Logger;
+NEXTWEB_INLINE
+AtomicShared::~AtomicShared() {
+	assert(0 == count_);
+}
 
-class NEXTWEB_API Server {
+NEXTWEB_INLINE void
+incRef(AtomicShared *object) {
+	Mutex::ScopedLock lock(object->mutex_);
+	++object->count_;
+}
 
-public:
-	Server();
-	virtual ~Server();
-
-	void stop();
-	void start(Settings const &set, SharedPtr<Logger> const &log);
-	void addHandler(std::string const &url, SharedPtr<RequestHandler> const &handler);
-
-private:
-	SharedPtr<ServerImpl> impl_;
-};
+NEXTWEB_INLINE void
+decRef(AtomicShared *object) {
+	Mutex::ScopedLock lock(object->mutex_);
+	if (0 == --object->count_) {
+		lock.unlock();
+		delete object;
+	}
+}
 
 }} // namespaces
 
-#endif // NEXTWEB_FASTCGI_HTTP_SERVER_HPP_INCLUDED
+#endif // NEXTWEB_INLINES_UTILS_POSIX_THREADS_HPP_INCLUDED

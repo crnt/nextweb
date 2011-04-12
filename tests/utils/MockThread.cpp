@@ -3,7 +3,7 @@
 
 namespace nextweb { namespace tests {
 
-MockThread::MockThread(utils::ThreadQueue<std::size_t> &queue, std::size_t count) :
+MockThread::MockThread(utils::UnboundedThreadQueue<std::size_t> &queue, std::size_t count) :
 	count_(count), queue_(queue)
 {
 }

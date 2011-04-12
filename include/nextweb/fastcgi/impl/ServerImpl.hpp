@@ -27,6 +27,7 @@
 
 namespace nextweb { namespace fastcgi {
 
+class Logger;
 class Settings;
 class RequestHandler;
 
@@ -37,10 +38,8 @@ public:
 	virtual ~ServerImpl();
 
 	virtual void stop() = 0;
-	virtual void start(Settings const &set) = 0;
+	virtual void start(Settings const &set, SharedPtr<Logger> const &log) = 0;
 	virtual void addHandler(std::string const &pathInfo, SharedPtr<RequestHandler> const &handler) = 0;
-
-	static SharedPtr<ServerImpl> create(Settings const &set);
 
 private:
 	ServerImpl(ServerImpl const &);

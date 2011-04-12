@@ -17,8 +17,8 @@ Server::stop() {
 }
 
 void
-Server::start(Settings const &set) {
-	impl_->start(set);
+Server::start(Settings const &set, SharedPtr<Logger> const &log) {
+	impl_->start(set, log);
 }
 
 void
