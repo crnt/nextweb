@@ -22,6 +22,9 @@ DATE_FORMATS[] = {
 	"%a, %d %b %Y %T GMT", "%A, %d-%b-%y %T GMT", "%a %b %d %T %Y" 
 };
 
+// We use our own day and month names to force them to be in English 
+// because their representation could vary depening of locate setting
+
 static char const*
 SHORT_MONTH_NAMES[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

@@ -47,9 +47,9 @@ urlMatch(Sequence const &seq, Sequence const &pattern) {
 	
 	std::pair<bool, std::size_t> result(true, 0);
 	typename Tokenizer<Reversed, Matcher>::const_iterator si = tseq.begin(), send = tseq.end(), pi = tpat.begin();
-	for (std::size_t count = 0 ; si != send; ++count, ++si, ++pi) {
+	for (std::size_t count = 1; si != send; ++count, ++si, ++pi) {
 		if (MatchConstants::STAR == *pi) {
-			result.second += (count + 1);
+			result.second += count;
 		}
 		else if (*pi != *si) {
 			result.first = false;

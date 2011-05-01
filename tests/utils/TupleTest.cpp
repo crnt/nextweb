@@ -12,32 +12,16 @@ namespace nextweb { namespace tests {
 class TupleTest : public CppUnit::TestFixture {
 
 public:
-	void testSizeof();
 	void testFunctions();
 
 private:
 	CPPUNIT_TEST_SUITE(TupleTest);
-	CPPUNIT_TEST(testSizeof);
 	CPPUNIT_TEST(testFunctions);
 	CPPUNIT_TEST_SUITE_END();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(TupleTest, "TupleTest");
 CPPUNIT_REGISTRY_ADD("TupleTest", "dependent");
-
-void
-TupleTest::testSizeof() {
-
-	using namespace utils;
-	typedef NEXTWEB_MAKE_TUPLE4(int, int, int, double) IntTuple;
-
-	struct TestStruct {
-		int array[3];
-		double doubleValue;
-		NullType null;
-	};
-	CPPUNIT_ASSERT_EQUAL(sizeof(TestStruct), sizeof(IntTuple));
-}
 
 void
 TupleTest::testFunctions() {

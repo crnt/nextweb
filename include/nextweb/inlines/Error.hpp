@@ -25,7 +25,8 @@
 namespace nextweb {
 
 NEXTWEB_INLINE
-Error::Error(char const *format, ...)
+Error::Error(char const *format, ...) :
+	std::exception()
 {
 	va_list args;
 	va_start(args, format);
@@ -38,7 +39,8 @@ Error::~Error() throw () {
 }
 
 NEXTWEB_INLINE
-Error::Error(Error const &other)
+Error::Error(Error const &other) :
+	std::exception(other)
 {
 	memcpy(message_, other.message_, MESSAGE_SIZE);
 }

@@ -11,6 +11,7 @@ nobase_pkginclude_HEADERS = \
 	fastcgi/HttpError.hpp \
 	fastcgi/HttpStatus.hpp \
 	fastcgi/impl/Buffer.hpp \
+	fastcgi/impl/Context.hpp \
 	fastcgi/impl/FileImpl.hpp \
 	fastcgi/impl/GenericRequest.hpp \
 	fastcgi/impl/GenericResponse.hpp \

@@ -30,9 +30,8 @@ AX_CHECK_CPPUNIT([1.10.0], [], [
 
 AC_CONFIG_FILES([fastcgi/Makefile include/Makefile \
 	include/nextweb/Makefile Makefile python/fastcgi/Makefile 
-	python/Makefile python/regions/Makefile python/templates/Makefile \
-	regions/Makefile templates/Makefile tests/fastcgi/Makefile \
-	tests/Makefile tests/regions/Makefile tests/templates/Makefile \
+	python/Makefile python/templates/Makefile templates/Makefile \
+	tests/fastcgi/Makefile tests/Makefile tests/templates/Makefile \
 	tests/utils/Makefile utils/Makefile])
 
 AC_OUTPUT

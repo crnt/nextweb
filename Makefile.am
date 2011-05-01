@@ -1,4 +1,4 @@
-SUBDIRS = include utils fastcgi templates regions python
+SUBDIRS = include utils fastcgi templates python
 
 if HAVE_CPPUNIT
 SUBDIRS += tests

@@ -1,1 +1,1 @@
-SUBDIRS = fastcgi regions templates
+SUBDIRS = fastcgi templates
