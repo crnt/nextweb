@@ -27,8 +27,8 @@
 
 namespace nextweb { namespace utils {
 
-typedef NEXTWEB_MAKE_TYPE_LIST5(signed char, signed short, signed int, signed long, signed long long) SignedIntegerList;
-typedef NEXTWEB_MAKE_TYPE_LIST5(unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long) UnsignedIntegerList;
+typedef NEXTWEB_MAKE_TYPE_LIST5(signed long long, signed long, signed int, signed short, signed char) SignedIntegerList;
+typedef NEXTWEB_MAKE_TYPE_LIST5(unsigned long long, unsigned long, unsigned int, unsigned short, unsigned char) UnsignedIntegerList;
 
 template <typename Arg>
 struct IsInt {

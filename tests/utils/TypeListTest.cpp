@@ -1,6 +1,7 @@
 #include "acsetup.hpp"
 
 #include <complex>
+#include <typeinfo>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -14,12 +15,14 @@ class TypeListTest : public CppUnit::TestFixture {
 public:
 	void testNthItem();
 	void testIndexOf();
+	void testReverse();
 	void testTypeList();
 
 private:
 	CPPUNIT_TEST_SUITE(TypeListTest);
 	CPPUNIT_TEST(testNthItem);
 	CPPUNIT_TEST(testIndexOf);
+	CPPUNIT_TEST(testReverse);
 	CPPUNIT_TEST(testTypeList);
 	CPPUNIT_TEST_SUITE_END();
 };
@@ -62,10 +65,16 @@ TypeListTest::testIndexOf() {
 }
 
 void
-TypeListTest::testTypeList() {
-
+TypeListTest::testReverse() {
 	using namespace utils;
-	
+	typedef NEXTWEB_MAKE_TYPE_LIST9(char, short, int, long, long long, float, double, std::complex<float>, std::complex<double>) TestList;
+	typedef NEXTWEB_MAKE_TYPE_LIST9(std::complex<double>, std::complex<float>, double, float, long long, long, int, short, char) ReversedList;
+	CPPUNIT_ASSERT_EQUAL(true, (IsSame<ReversedList, TypeListReverse<TestList>::Type>::RESULT));
+}
+
+void
+TypeListTest::testTypeList() {
+	using namespace utils;
 	typedef NEXTWEB_MAKE_TYPE_LIST2(int, double) IntDoubleList;
 	typedef TypeList<int, TypeList<double, NullType>::Type> TargetType;
 	CPPUNIT_ASSERT((IsSame<IntDoubleList, TargetType>::RESULT));

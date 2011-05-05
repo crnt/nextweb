@@ -33,6 +33,24 @@ struct TypeList {
 struct NullType {
 };
 
+template <typename List, typename X>
+struct TypeListReverseImpl;
+
+template <typename List>
+struct TypeListReverse {
+	typedef typename TypeListReverseImpl<List, NullType>::Type Type;
+};
+
+template <typename List, typename X>
+struct TypeListReverseImpl {
+	typedef typename TypeListReverseImpl<typename List::Next, typename TypeList<typename List::Value, X>::Type>::Type Type;
+};
+
+template <typename X>
+struct TypeListReverseImpl<NullType, X> {
+	typedef X Type;
+};
+
 template <typename List, std::size_t N>
 struct TypeListNthItem {
 	typedef typename TypeListNthItem<typename List::Next, N - 1>::Type Type;
